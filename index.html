@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="app-version" content="3.2">
+<meta name="app-version" content="3.3">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Canastas Gabi">
@@ -95,7 +95,7 @@
     font-size:1.1rem;padding:4px 8px;cursor:pointer;font-family:inherit}
 
   /* Pista de baloncesto */
-  .cancha{position:relative;height:152px;border-radius:16px;overflow:hidden;margin-bottom:10px;
+  .cancha{position:relative;height:172px;border-radius:16px;overflow:hidden;margin-bottom:10px;
     background:#fbfaf6;border:3px solid #1b2440;}
   .cancha .suelo{position:absolute;left:0;right:0;bottom:0;height:14px;z-index:1;
     background:repeating-linear-gradient(90deg,#e8bf86 0 38px,#dcae72 38px 40px);border-top:2.5px solid #1b2440}
@@ -128,7 +128,8 @@
   .jugador-in[data-pose=lamenta] img{filter:saturate(.5) drop-shadow(0 3px 0 rgba(27,36,64,.18))}
   @keyframes pena{20%{transform:rotate(-7deg) translateY(3px)}45%{transform:rotate(6deg) translateY(3px)}
     70%{transform:rotate(-4deg) translateY(2px)}100%{transform:rotate(0) translateY(2px)}}
-  .silueta{position:absolute;inset:0;width:100%;height:100%;z-index:3;overflow:visible;pointer-events:none}
+  .silueta{position:absolute;inset:0;width:100%;height:100%;z-index:3;overflow:visible;pointer-events:none;
+    filter:drop-shadow(0 0 1.2px rgba(255,255,255,.95)) drop-shadow(0 0 3px rgba(255,255,255,.35))}
   .bocadillo{position:absolute;left:68px;top:22px;z-index:8;background:#fff;border:2.5px solid #1b2440;border-radius:12px;
     padding:0 7px;font-weight:800;font-size:.95rem;color:#1b2440;white-space:nowrap;opacity:0;transform:scale(.5);
     transform-origin:0 100%;transition:opacity .2s, transform .25s cubic-bezier(.3,1.6,.6,1);pointer-events:none}
@@ -261,7 +262,7 @@
   @media (min-width:740px) and (min-height:940px){ .app{zoom:1.32} }
   @media (min-width:1000px) and (min-height:1200px){ .app{zoom:1.6} }
   @media (max-height:720px){
-    .cancha{height:128px}
+    .cancha{height:136px}
     .celda{height:46px;font-size:2.5rem} .resp{height:52px;font-size:2.2rem} .llevo{height:22px}
     .tecla{padding:5px 0}
   }
@@ -270,6 +271,59 @@
     .llevo{width:30px}
     h1{font-size:1.7rem}
   }
+
+  /* ===== Marcador de pabellón ===== */
+  .marcador{background:linear-gradient(#2a2d33,#15171b);border:3px solid #0a0b0d;border-radius:14px;padding:6px 8px;
+    box-shadow:0 0 0 2px #4a4f58 inset,0 5px 0 rgba(0,0,0,.35),0 8px 18px rgba(0,0,0,.25);align-items:stretch;gap:4px}
+  .marcador .eq,.marcador .centro{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0}
+  .marcador .eq{flex:1}
+  .marcador .nom{font-family:'Baloo 2';font-weight:800;font-size:.72rem;letter-spacing:1.5px;color:#f2f2f2;line-height:1.1;text-transform:uppercase}
+  .marcador .nom.mini{font-size:.55rem;margin-top:3px;color:#c9ccd1}
+  .marcador .panel{background:#050505;border-radius:6px;padding:4px 6px;margin-top:2px;box-shadow:inset 0 2px 6px rgba(0,0,0,.9),0 0 0 1px #33373e}
+  .marcador .panel.peq{padding:3px 5px}
+  .marcador .seg{display:block}
+  .marcador .eq.turno .nom{color:#ffb000}
+  .marcador .eq.turno .panel{box-shadow:inset 0 2px 6px rgba(0,0,0,.9),0 0 0 2px #ffb000}
+  .marcador .luces{display:flex;gap:3px;margin-top:2px}
+  .marcador .luces i{width:7px;height:7px;border-radius:50%;background:#2b2b2b;display:block}
+  .marcador .posesion{display:flex;align-items:center;gap:4px;margin-top:3px;color:#3a3a3a;font-size:.8rem}
+  .marcador .posesion span.on{color:#ff3b30;text-shadow:0 0 6px #ff3b30}
+  .marcador .posesion small{font-size:.5rem;color:#c9ccd1;letter-spacing:1px;font-weight:800}
+  .marcador .etq{font-family:'Orbitron',monospace;font-size:.7rem;color:#ffb000;text-align:center;line-height:1.1;margin-top:2px;
+    background:#050505;border-radius:6px;padding:4px 6px;box-shadow:inset 0 2px 6px rgba(0,0,0,.9)}
+  .icono-btn{background:#33373e;color:#fff;align-self:center}
+  /* inicio: marcador del pabellón */
+  .led{background:linear-gradient(#2a2d33,#15171b);border:3px solid #0a0b0d;box-shadow:0 0 0 2px #4a4f58 inset,0 6px 0 rgba(0,0,0,.3)}
+  .led::before,.led::after{background:#4a4f58;width:6px}
+  .led-tit{font-family:'Orbitron',monospace;color:#ffb000;text-shadow:0 0 10px rgba(255,176,0,.8);font-size:1.5rem}
+  .led-caja{background:#050505;border:0;box-shadow:inset 0 2px 6px rgba(0,0,0,.9),0 0 0 1px #33373e;border-radius:8px;padding:4px 10px 6px}
+  .led-etq{color:#f2f2f2;font-weight:800;letter-spacing:1.5px}
+  .led-num{display:flex;justify-content:center;align-items:flex-end;margin-top:2px;gap:4px}
+  .led-de{font-family:'Orbitron',monospace;color:#39d353;font-size:.85rem;opacity:.8}
+  .led .seg{display:block}
+
+  /* ===== Pabellón ===== */
+  .cancha{background:#1c2540;border:3px solid #0a0b0d;box-shadow:0 5px 0 rgba(0,0,0,.3)}
+  .cancha .fondo,.cancha .frente{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .cancha .fondo{z-index:0} .cancha .frente{z-index:7}
+  .cancha .aro-atras{border:3.5px solid #c2410c;box-shadow:none;z-index:3}
+  .cancha .aro-delante{border:3.5px solid transparent;border-bottom-color:#f97316;border-left-color:#f97316;border-right-color:#f97316;z-index:6}
+  .cancha .red{background:repeating-linear-gradient(62deg,transparent 0 5px,rgba(255,255,255,.95) 5px 6.5px),
+    repeating-linear-gradient(-62deg,transparent 0 5px,rgba(255,255,255,.95) 5px 6.5px);height:28px}
+  .cancha .red.mueve{animation:redSwish .6s cubic-bezier(.3,.6,.4,1)}
+  @keyframes redSwish{0%{transform:scaleY(1)}25%{transform:scaleY(1.45) scaleX(.82)}55%{transform:scaleY(.9) scaleX(1.05)}80%{transform:scaleY(1.06)}100%{transform:scaleY(1)}}
+  .cancha .aro-atras.vibra,.cancha .aro-delante.vibra{animation:vibra2 .4s}
+  @keyframes vibra2{20%{transform:translateY(3px) rotate(2deg)}45%{transform:translateY(-2px) rotate(-1deg)}70%{transform:translateY(1px)}}
+  .cancha .balon svg circle{stroke-width:3}
+  #grada{transform-box:fill-box;transform-origin:50% 100%}
+  #grada.ola g{animation:ola .45s ease-out 3}
+  #grada.ola g:nth-child(2n){animation-delay:.08s} #grada.ola g:nth-child(3n){animation-delay:.16s}
+  @keyframes ola{50%{transform:translateY(-4px)}}
+  #flashes circle{opacity:0}
+  #flashes.on circle{animation:flash .25s ease-out}
+  @keyframes flash{0%{opacity:1}100%{opacity:0}}
+  .cancha.vibra-cancha{animation:sacude .3s}
+  @keyframes sacude{25%{transform:translate(1px,-1px)}50%{transform:translate(-1px,1px)}75%{transform:translate(1px,1px)}}
 </style>
 </head>
 <body>
@@ -278,7 +332,6 @@
   <!-- ============ INICIO ============ -->
   <section id="inicio" class="pantalla activa">
     <div class="led">
-      <div class="led-pantalla"><img src="img/capitan-triple.jpg" alt="Gabi tirando a canasta" width="400" height="373"></div>
       <div class="led-tit">¡HOLA, GABI!</div>
       <div class="led-sub">Cada cuenta bien hecha es una canasta 🏀</div>
       <div class="led-fila">
@@ -334,22 +387,8 @@
     <div class="marcador" id="marcador"></div>
 
     <div class="cancha" id="cancha">
-      <svg class="fondo" viewBox="0 0 400 118" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-        <defs><filter id="cera" x="-5%" y="-5%" width="110%" height="110%">
-          <feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" seed="3" result="n"/>
-          <feDisplacementMap in="SourceGraphic" in2="n" scale="3.5"/>
-        </filter></defs>
-        <g filter="url(#cera)" fill="none" stroke="#5b8fe0" stroke-linecap="round" stroke-linejoin="round" opacity=".5">
-          <path d="M70 34 L118 22 L104 44 L170 26" stroke-width="9"/>
-          <path d="M150 92 L196 80 L184 98 L240 84" stroke-width="8"/>
-          <path d="M270 30 L300 24 L292 38 L320 32" stroke-width="5"/>
-          <path d="M24 70 L52 62 L46 76 L74 70" stroke-width="5"/>
-          <path d="M226 46 l7 15 16 2 -12 11 3 16 -14-8 -14 8 3-16 -12-11 16-2z" fill="#5b8fe0" stroke-width="2"/>
-          <path d="M345 82 l3.5 7 8 1 -6 5.5 1.5 8 -7-4 -7 4 1.5-8 -6-5.5 8-1z" fill="#5b8fe0" stroke-width="1.5"/>
-          <path d="M120 66 l2.5 5 5.5.7 -4 3.8 1 5.5 -5-2.7 -5 2.7 1-5.5 -4-3.8 5.5-.7z" fill="#5b8fe0" stroke-width="1.2"/>
-        </g>
-      </svg>
-      <div class="poste"></div><div class="soporte"></div><div class="tablero"></div>
+      <svg class="fondo" id="pabellon" aria-hidden="true"></svg>
+
       <svg class="silueta" id="silueta" aria-hidden="true"></svg>
       <div class="bocadillo" id="bocadillo"></div>
       <div class="aro-atras" id="aro-atras"></div>
@@ -360,7 +399,7 @@
       </div>
       <div class="red" id="red"></div>
       <div class="aro-delante" id="aro-delante"></div>
-      <div class="suelo"></div>
+      <svg class="frente" id="frente" aria-hidden="true"></svg>
     </div>
 
     <div class="tarjeta" id="tarjeta-op">
@@ -594,24 +633,41 @@
   }
 
   // ---------- Marcador ----------
+  // Dígitos de 7 segmentos, como en los marcadores de los pabellones
+  const SEG = {0:'abcdef',1:'bc',2:'abged',3:'abgcd',4:'fgbc',5:'afgcd',6:'afgedc',7:'abc',8:'abcdefg',9:'abcdfg','-':'g',' ':''};
+  const SEGP = { a:'3,1 17,1 14,4 6,4', b:'18,2 18,17 15,15 15,5', c:'18,19 18,34 15,31 15,21', d:'3,35 17,35 14,32 6,32',
+                 e:'2,19 2,34 5,31 5,21', f:'2,2 2,17 5,15 5,5', g:'3,18 6,16 14,16 17,18 14,20 6,20' };
+  function seg7(txt, color='#ff3b30', alto=34, huecos=2){
+    const s = String(txt).padStart(huecos,' '), w = 20, gap = 4, n = s.length;
+    let h = '';
+    [...s].forEach((ch,i) => { const on = SEG[ch] ?? '', x = i*(w+gap);
+      for (const k in SEGP) h += `<polygon points="${SEGP[k]}" transform="translate(${x},0)" fill="${on.includes(k) ? color : 'rgba(255,255,255,.06)'}"/>`; });
+    const W = n*w + (n-1)*gap;
+    return `<svg class="seg" viewBox="0 0 ${W} 36" style="height:${alto}px;width:${alto*W/36}px;filter:drop-shadow(0 0 4px ${color}aa)">${h}</svg>`;
+  }
+
   function pintarMarcador(){
     const m = $('#marcador');
     const snd = `<button class="icono-btn" id="btn-sonido" title="Sonido">${sonido?'🔊':'🔇'}</button>`;
     const salir = `<button class="icono-btn" id="btn-salir" title="Salir">✖</button>`;
+    const equipo = (nombre, num, color, turno='') => `<div class="eq ${turno}"><div class="nom">${nombre}</div><div class="panel">${seg7(num, color, 38)}</div></div>`;
+    const luces = (n, max, color) => `<div class="luces">${Array.from({length:max},(_,i)=>`<i style="${i<n?`background:${color};box-shadow:0 0 6px ${color}`:''}"></i>`).join('')}</div>`;
     if (J.modo==='reto'){
       const [g,r] = J.jug;
-      m.innerHTML = `${salir}
-        <div class="eq ${J.turno===0?'turno':''}"><div class="nom">GABI</div><div class="pts">${g.puntos}</div></div>
-        <div class="centro">RONDA<br><b>${Math.min(Math.floor(J.n/2)+1,5)}/5</b></div>
-        <div class="eq ${J.turno===1?'turno':''}"><div class="nom">${r.nombre.toUpperCase()}</div><div class="pts">${r.puntos}</div></div>${snd}`;
+      m.innerHTML = `${salir}${equipo('GABI', g.puntos, '#ff3b30', J.turno===0?'turno':'')}
+        <div class="centro"><div class="nom">RONDA</div><div class="panel peq">${seg7(Math.min(Math.floor(J.n/2)+1,5),'#ffb000',26,1)}</div>
+          <div class="posesion"><span class="${J.turno===0?'on':''}">◀</span><small>TURNO</small><span class="${J.turno===1?'on':''}">▶</span></div></div>
+        ${equipo(r.nombre.toUpperCase(), r.puntos, '#ff3b30', J.turno===1?'turno':'')}${snd}`;
     } else if (J.modo==='partido'){
-      m.innerHTML = `${salir}<div class="eq"><div class="nom">PUNTOS</div><div class="pts">${J.puntos}</div></div>
-        <div class="centro">TIRO<br><b>${Math.min(J.n+1,10)}/10</b></div>
-        <div class="eq"><div class="nom">RACHA</div><div class="pts">${J.racha?'🔥'.repeat(Math.min(J.racha,3)):'–'}</div></div>${snd}`;
+      const rec = store.get(J.clave) || 0;
+      m.innerHTML = `${salir}${equipo('GABI', J.puntos, '#ff3b30')}
+        <div class="centro"><div class="nom">TIRO</div><div class="panel peq">${seg7(Math.min(J.n+1,10),'#ffb000',26,2)}</div>
+          <div class="nom mini">RACHA</div>${luces(Math.min(J.racha,5),5,'#ffb000')}</div>
+        ${equipo('RÉCORD', rec, '#39d353')}${snd}`;
     } else {
-      m.innerHTML = `${salir}<div class="eq"><div class="nom">ACIERTOS</div><div class="pts">${J.aciertos}</div></div>
-        <div class="centro">ENTRENAMIENTO<br><b class="txt">${J.etiqueta}</b></div>
-        <div class="eq"><div class="nom">CUENTAS</div><div class="pts">${J.n}</div></div>${snd}`;
+      m.innerHTML = `${salir}${equipo('ACIERTOS', J.aciertos, '#ff3b30')}
+        <div class="centro"><div class="nom">ENTRENO</div><div class="etq">${J.etiqueta}</div></div>
+        ${equipo('CUENTAS', J.n, '#ffb000')}${snd}`;
     }
     $('#btn-sonido').onclick = () => { sonido=!sonido; store.set('gabi-sonido',sonido); pintarMarcador(); };
     $('#btn-salir').onclick = () => { sClic(); if (J.modo==='entreno' && J.n>0) terminar(); else { pintarRecord(); pintarInicio(); mostrar('inicio'); } };
@@ -861,17 +917,93 @@
     const c = $('#cancha'), W = c.clientWidth, H = c.clientHeight;
     const piso = H - 14;                       // línea del suelo
     const suelo = piso - R;                    // centro del balón apoyado en el suelo
-    const aroW = 52, aroDcha = W - 25, aroY = Math.round(H*0.5);
+    const aroW = 50, aroDcha = W - 26, aroY = Math.round(H*0.36);
     return { W, H, piso, suelo, aroW, aroDcha, aroIzq: aroDcha-aroW, aroCx: aroDcha-aroW/2, aroY };
   }
   function colocarCanasta(){
     const g = geo();
     for (const id of ['aro-atras','aro-delante']){ const e=$('#'+id); e.style.left=g.aroIzq+'px'; e.style.top=(g.aroY-6)+'px'; }
     const r=$('#red'); r.style.left=(g.aroIzq+2)+'px'; r.style.top=(g.aroY)+'px';
-    const t=document.querySelector('.cancha .tablero'); t.style.top=(g.aroY-48)+'px';
-    document.querySelector('.cancha .soporte').style.top=(g.aroY-6)+'px';
-    document.querySelector('.cancha .poste').style.top=(g.aroY+12)+'px';
     $('#silueta').setAttribute('viewBox', `0 0 ${g.W} ${g.H}`);
+    pintarPabellon();
+  }
+
+  // ===== Pabellón: grada con público, focos, vallas, parqué con líneas y canasta profesional =====
+  function pintarPabellon(){
+    const g = geo(), W = g.W, H = g.H, fondo = $('#pabellon'), frente = $('#frente');
+    if (!W || fondo.dataset.k === W+'x'+H) return; fondo.dataset.k = W+'x'+H;
+    fondo.setAttribute('viewBox',`0 0 ${W} ${H}`); frente.setAttribute('viewBox',`0 0 ${W} ${H}`);
+    const yValla = Math.round(H*0.47), hValla = 13, yParq = yValla + hValla, piso = g.piso;
+    let sd = 11; const az = () => (sd = (sd*9301+49297)%233280)/233280;
+    // grada con público (filas de cabezas y camisetas)
+    let grada = '';
+    const colores = ['#e04848','#2f5fd0','#ffd23f','#f2f2f2','#2a9d5c','#f47b20','#7b5cff','#9aa3b5'];
+    const pieles = ['#f1c9a5','#d9a074','#a86c48','#6e4630','#e8b48c'];
+    for (let fila = 0; fila < 4; fila++){
+      const y = 10 + fila*((yValla-14)/4), esc = .62 + fila*.12, paso = 9*esc + 2;
+      grada += `<rect x="0" y="${y+5*esc}" width="${W}" height="${(yValla-14)/4}" fill="${fila%2?'#26324f':'#2c3a5c'}"/>`;
+      let filaG = '';
+      for (let x = (fila%2)*paso/2 - 4; x < W + 6; x += paso + az()*2){
+        if (az() < .1) continue;
+        const c = colores[Math.floor(az()*colores.length)], p = pieles[Math.floor(az()*pieles.length)];
+        filaG += `<path d="M${x-4*esc} ${y+12*esc} q${4*esc} -${6*esc} ${8*esc} 0 v${4*esc} h-${8*esc}z" fill="${c}" opacity=".9"/><circle cx="${x}" cy="${y+4*esc}" r="${3*esc}" fill="${p}"/>`;
+      }
+      grada += `<g>${filaG}</g>`;
+    }
+    // focos del techo
+    let focos = '';
+    for (let x = 30; x < W; x += 90) focos += `<ellipse cx="${x}" cy="0" rx="34" ry="16" fill="url(#luz)"/>`;
+    // flashes de cámaras (se encienden al encestar)
+    let flashes = '';
+    for (let i = 0; i < 9; i++) flashes += `<circle cx="${10 + az()*(W-20)}" cy="${12 + az()*(yValla-26)}" r="${2+az()*2}" fill="#fff" style="animation-delay:${(az()*.5).toFixed(2)}s"/>`;
+    // vallas luminosas
+    let valla = `<rect x="0" y="${yValla}" width="${W}" height="${hValla}" fill="#0b1226"/><rect x="0" y="${yValla}" width="${W}" height="1.5" fill="#3b4a73"/>`;
+    const textos = ['CANASTAS DE GABI','★ 2º DE PRIMARIA ★','¡A POR EL TRIPLE!'];
+    for (let x = 8, i = 0; x < W; x += 150, i++) valla += `<text x="${x}" y="${yValla+9.5}" font-family="Orbitron, monospace" font-weight="900" font-size="7.5" fill="${i%2?'#ffb000':'#38bdf8'}" letter-spacing="1">${textos[i%textos.length]}</text>`;
+    // parqué en perspectiva con líneas de la cancha
+    const fuga = W*0.55;
+    let tablas = '';
+    for (let i = -14; i <= 14; i++){ const xb = fuga + i*42, xt = fuga + i*42*0.55; tablas += `<line x1="${xt}" y1="${yParq}" x2="${xb}" y2="${H}" stroke="#b9854e" stroke-width="1" opacity=".45"/>`; }
+    for (let k = 1; k < 6; k++){ const y = yParq + (H-yParq)*Math.pow(k/6,1.5); tablas += `<line x1="0" y1="${y}" x2="${W}" y2="${y}" stroke="#c99560" stroke-width=".8" opacity=".35"/>`; }
+    // zona (pintura) bajo la canasta y línea de tiros libres
+    const base = W - 12, libre = W - Math.min(150, W*0.4);
+    const zona = `<path d="M${libre+18} ${yParq+3} L${base-4} ${yParq+3} L${base+10} ${H} L${libre-14} ${H} Z" fill="#c8553d" opacity=".55"/>
+      <path d="M${libre+18} ${yParq+3} L${base-4} ${yParq+3} M${libre+18} ${yParq+3} L${libre-14} ${H}" stroke="#fff" stroke-width="2.2" opacity=".9" fill="none"/>
+      <ellipse cx="${libre+2}" cy="${(yParq+H)/2+2}" rx="22" ry="${(H-yParq)/2-3}" fill="none" stroke="#fff" stroke-width="2" opacity=".85"/>`;
+    // línea de triple (arco) y centro del campo a la izquierda
+    const triple = W - Math.min(250, W*0.68);
+    const arco = `<path d="M${triple+40} ${yParq+3} Q${triple-30} ${(yParq+H)/2} ${triple+10} ${H}" fill="none" stroke="#fff" stroke-width="2.2" opacity=".85"/>
+      <ellipse cx="-30" cy="${(yParq+H)/2+2}" rx="60" ry="${(H-yParq)/2-2}" fill="none" stroke="#fff" stroke-width="2" opacity=".6"/>`;
+    // canasta: base acolchada, brazo, tablero de cristal
+    const tabX = g.aroDcha + 3, tabY = g.aroY - 44, tabW = 7, tabH = 54;
+    const canasta = `
+      <rect x="${W-16}" y="${g.aroY-30}" width="9" height="${piso - g.aroY + 30}" fill="#3b4252" stroke="#0a0b0d" stroke-width="1.5"/>
+      <path d="M${W-12} ${g.aroY-28} L${tabX+tabW} ${g.aroY-20}" stroke="#3b4252" stroke-width="6"/>
+      <rect x="${W-26}" y="${piso-16}" width="26" height="18" rx="3" fill="#2f5fd0" stroke="#0a0b0d" stroke-width="1.5"/>
+      <rect x="${tabX}" y="${tabY}" width="${tabW}" height="${tabH}" rx="1.5" fill="rgba(200,230,255,.55)" stroke="#f2f2f2" stroke-width="2"/>
+      <rect x="${tabX+1}" y="${g.aroY-20}" width="${tabW-2}" height="14" fill="none" stroke="#e04848" stroke-width="1.6"/>
+      <rect x="${g.aroDcha-2}" y="${g.aroY-3}" width="8" height="4" fill="#c2410c"/>`;
+    fondo.innerHTML = `<defs>
+        <linearGradient id="pared" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0f1630"/><stop offset="1" stop-color="#22305a"/></linearGradient>
+        <radialGradient id="luz"><stop offset="0" stop-color="#fff8d6" stop-opacity=".9"/><stop offset="1" stop-color="#fff8d6" stop-opacity="0"/></radialGradient>
+        <linearGradient id="parq" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9a066"/><stop offset="1" stop-color="#ecc58e"/></linearGradient>
+        <linearGradient id="brillo" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".22"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+      </defs>
+      <rect width="${W}" height="${yValla}" fill="url(#pared)"/>
+      <g id="grada">${grada}</g>${focos}<g id="flashes">${flashes}</g>
+      ${valla}
+      <rect y="${yParq}" width="${W}" height="${H-yParq}" fill="url(#parq)"/>${tablas}
+      <rect x="${W*0.15}" y="${yParq}" width="${W*0.5}" height="${H-yParq}" fill="url(#brillo)"/>
+      ${arco}${zona}${canasta}`;
+    frente.innerHTML = '';
+  }
+  function reaccionPublico(ok, retraso){
+    setTimeout(()=>{
+      const gr = document.getElementById('grada'), fl = document.getElementById('flashes'); if (!gr) return;
+      if (ok){ gr.classList.remove('ola'); void gr.getBoundingClientRect(); gr.classList.add('ola');
+        fl.classList.remove('on'); void fl.getBoundingClientRect(); fl.classList.add('on'); setTimeout(()=>fl.classList.remove('on'), 900);
+        setTimeout(()=>gr.classList.remove('ola'), 1500); }
+    }, retraso*1000);
   }
   function ponerBalon(x,y,rot,sx=1,sy=1){
     $('#balon').style.transform = `translate(${x-R}px,${y-R}px) rotate(${rot}deg) scale(${sx},${sy})`;
@@ -886,24 +1018,36 @@
   const TINTA = '#1b2440', AZUL = '#2f5fd0';
   const LM = { torso: 58, cuello: 8, brazo: 31, antebrazo: 29, muslo: 42, pierna: 41, pie: 15, cabeza: 13 };
   const POSE = {
-    boteArriba:{ tronco:12, cabeza:-4, bd:38, ad:78,  bt:-18, at:18,  md:18, pd:-6,  mt:-12, pt:-24, salto:0,  avance:0 },
-    boteAbajo: { tronco:18, cabeza:-2, bd:28, ad:22,  bt:-14, at:24,  md:30, pd:-16, mt:-4,  pt:-36, salto:0,  avance:0 },
-    agacha:    { tronco:22, cabeza:-12,bd:62, ad:128, bt:48,  at:120, md:58, pd:-38, mt:44,  pt:-48, salto:0,  avance:2 },
-    sube:      { tronco:4,  cabeza:-6, bd:162,ad:172, bt:150, at:188, md:6,  pd:-6,  mt:-8,  pt:-30, salto:-46,avance:10 },
-    suelta:    { tronco:2,  cabeza:-10,bd:172,ad:146, bt:150, at:170, md:2,  pd:-10, mt:-12, pt:-38, salto:-52,avance:14 },
-    aterriza:  { tronco:16, cabeza:-6, bd:150,ad:124, bt:40,  at:70,  md:40, pd:-30, mt:30,  pt:-42, salto:0,  avance:16 },
-    mira:      { tronco:8,  cabeza:-14,bd:140,ad:118, bt:20,  at:40,  md:16, pd:-8,  mt:-6,  pt:-20, salto:0,  avance:16 },
-    celebra1:  { tronco:-4, cabeza:-18,bd:160,ad:172, bt:200, at:190, md:40, pd:-70, mt:20,  pt:-80, salto:-38,avance:16 },
+    // bote: dos alturas de mano y balanceo del cuerpo
+    boteArriba:{ tronco:12, cabeza:-6, bd:40, ad:80,  bt:-20, at:16,  md:18, pd:-6,  mt:-12, pt:-24, salto:0,  avance:0 },
+    boteAbajo: { tronco:17, cabeza:-4, bd:26, ad:20,  bt:-14, at:26,  md:30, pd:-16, mt:-4,  pt:-36, salto:0,  avance:1 },
+    boteArriba2:{tronco:10, cabeza:-8, bd:44, ad:86,  bt:-24, at:10,  md:14, pd:-4,  mt:-14, pt:-22, salto:0,  avance:-1 },
+    // tiro en suspensión
+    recoge:    { tronco:16, cabeza:-8, bd:50, ad:110, bt:40,  at:112, md:26, pd:-14, mt:-2,  pt:-34, salto:0,  avance:0 },
+    agacha:    { tronco:24, cabeza:-14,bd:60, ad:130, bt:52,  at:124, md:62, pd:-42, mt:48,  pt:-52, salto:4,  avance:2 },
+    sube:      { tronco:5,  cabeza:-8, bd:150,ad:200, bt:140, at:196, md:8,  pd:-4,  mt:-6,  pt:-26, salto:-42,avance:8 },
+    armado:    { tronco:2,  cabeza:-10,bd:166,ad:206, bt:146, at:184, md:4,  pd:-10, mt:-10, pt:-36, salto:-52,avance:12 },
+    suelta:    { tronco:0,  cabeza:-12,bd:176,ad:150, bt:150, at:168, md:2,  pd:-12, mt:-14, pt:-40, salto:-54,avance:14 },
+    muneca:    { tronco:2,  cabeza:-14,bd:168,ad:118, bt:118, at:120, md:8,  pd:-14, mt:-8,  pt:-34, salto:-34,avance:15 },
+    aterriza:  { tronco:18, cabeza:-8, bd:150,ad:112, bt:40,  at:74,  md:46, pd:-34, mt:34,  pt:-46, salto:3,  avance:16 },
+    mira:      { tronco:8,  cabeza:-16,bd:142,ad:112, bt:22,  at:44,  md:16, pd:-8,  mt:-6,  pt:-20, salto:0,  avance:16 },
+    // celebraciones
+    celebra1:  { tronco:-4, cabeza:-18,bd:160,ad:172, bt:200, at:190, md:40, pd:-70, mt:20,  pt:-80, salto:-36,avance:16 },
     celebra2:  { tronco:6,  cabeza:-6, bd:150,ad:200, bt:210, at:160, md:20, pd:-14, mt:-8,  pt:-26, salto:0,  avance:16 },
-    puno:      { tronco:4,  cabeza:-12,bd:120,ad:190, bt:-20, at:10,  md:20, pd:-14, mt:-8,  pt:-26, salto:0,  avance:16 },
+    puno:      { tronco:4,  cabeza:-12,bd:118,ad:194, bt:-20, at:10,  md:20, pd:-14, mt:-8,  pt:-26, salto:0,  avance:16 },
+    punoAbajo: { tronco:22, cabeza:-4, bd:40,  ad:150,bt:-18, at:20,  md:36, pd:-26, mt:4,   pt:-40, salto:2,  avance:16 },
+    // lamentos
     lamenta:   { tronco:30, cabeza:26, bd:150,ad:262, bt:166, at:250, md:22, pd:-14, mt:-4,  pt:-22, salto:0,  avance:16 },
+    rodillas:  { tronco:58, cabeza:20, bd:30, ad:14,  bt:26,  at:8,   md:40, pd:-20, mt:24,  pt:-34, salto:2,  avance:16 },
     quieto:    { tronco:10, cabeza:-4, bd:30, ad:60,  bt:-16, at:14,  md:14, pd:-4,  mt:-10, pt:-20, salto:0,  avance:16 },
   };
   const SECS = {
-    botar:   { pasos:[['boteArriba',300],['boteAbajo',300]], repite:true },
-    tiro:    { pasos:[['@',240],['agacha',260],['sube',170],['suelta',260],['aterriza',380],['mira',99999]] },
-    celebra: { pasos:[['@',220],['celebra1',240],['celebra2',300],['puno',240],['celebra1',260],['celebra2',500],['quieto',99999]] },
+    botar:   { pasos:[['boteArriba',280],['boteAbajo',260],['boteArriba',280],['boteAbajo',260],['boteArriba2',300],['boteAbajo',260]], repite:true },
+    tiro:    { pasos:[['@',150],['recoge',140],['agacha',230],['sube',120],['armado',110],['suelta',120],['muneca',260],['aterriza',360],['mira',99999]] },
+    celebra: { pasos:[['@',200],['celebra1',240],['celebra2',260],['celebra1',240],['celebra2',420],['quieto',99999]] },
+    celebraB:{ pasos:[['@',220],['puno',200],['punoAbajo',230],['puno',200],['punoAbajo',300],['quieto',99999]] },
     lamenta: { pasos:[['@',350],['lamenta',1100],['lamenta',600],['quieto',99999]] },
+    lamentaB:{ pasos:[['@',380],['rodillas',1000],['rodillas',600],['quieto',99999]] },
   };
   const rad = x => x*Math.PI/180;
   const punta = (x,y,ang,len) => [x + Math.sin(rad(ang))*len, y + Math.cos(rad(ang))*len];
@@ -934,7 +1078,7 @@
   const jugador = (() => {
     let sec = 'botar', i = 0, t0 = performance.now(), desde = null, ultima = POSE.boteArriba, ultimo = null, id = 0;
     let modoBalon = 'bote';   // 'bote' | 'manos' | 'libre'
-    const escala = () => { const g = geo(); return { k: (g.H - 14)*0.68/178, x: 4, piso: g.piso }; };
+    const escala = () => { const g = geo(); return { k: (g.H - 14)*0.6/178, x: 4, piso: g.piso }; };
     const aCancha = ([x,y]) => { const e = escala(); return [e.x + e.k*x, e.piso + e.k*y]; };
     function frame(now){
       id = requestAnimationFrame(frame);
@@ -951,14 +1095,17 @@
       const e = suave(Math.min(1,t)), p = {};
       for (const k in POSE.quieto) p[k] = lerp(A[k], B[k], e);
       ultima = p;
+      p.salto *= .7;
       const d = dibujarSilueta(p), sk = escala();
       $('#silueta').innerHTML = `<g transform="translate(${sk.x},${sk.piso}) scale(${sk.k})">${d.svg}</g>`;
       ultimo = d;
       // el balón acompaña a las manos mientras no ha salido
       if (modoBalon==='bote'){
         const g = geo(), [mx,my] = aCancha(d.mano), arribaY = my + R + 2, sueloY = g.suelo;
-        const y = a==='boteArriba' ? lerp(arribaY, sueloY, t*t) : lerp(sueloY, arribaY, 1-Math.pow(1-t,2));
-        ponerBalon(mx + 3, y, now/4 % 360);
+        const baja = a!=='boteAbajo';
+        const y = baja ? lerp(arribaY, sueloY, t*t) : lerp(sueloY, arribaY, 1-Math.pow(1-t,2));
+        const pegado = sueloY - y < 3;                   // al tocar el suelo se aplasta un poco
+        ponerBalon(mx + 3, y + (pegado ? 1.5 : 0), (baja ? 1 : -1) * t * 120, pegado ? 1.14 : 1, pegado ? .84 : 1);
       } else if (modoBalon==='manos'){
         const [ax,ay] = aCancha(d.mano), [bx,by] = aCancha(d.manoAtras);
         ponerBalon((ax+bx)/2 + 4, Math.min(ay,by) - R*.6, 0);
@@ -969,7 +1116,7 @@
       botar(){ sec = 'botar'; i = 0; t0 = performance.now(); modoBalon = 'bote'; desde = null; },
       tirar(){ sec = 'tiro'; i = 0; t0 = performance.now(); modoBalon = 'manos'; desde = null; },
       soltar(){ modoBalon = 'libre'; return this.posBalon(); },
-      reaccion(ok){ sec = ok ? 'celebra' : 'lamenta'; i = 0; t0 = performance.now(); desde = null; },
+      reaccion(ok){ sec = ok ? (Math.random()<.5 ? 'celebra' : 'celebraB') : (Math.random()<.5 ? 'lamenta' : 'lamentaB'); i = 0; t0 = performance.now(); desde = null; },
       posBalon(){ if (!ultimo) return [60,60]; const [ax,ay] = aCancha(ultimo.mano), [bx,by] = aCancha(ultimo.manoAtras); return [(ax+bx)/2 + 4, Math.min(ay,by) - R*.6]; },
       cabeza(){ return ultimo ? aCancha(ultimo.cabeza) : [40,40]; },
     };
@@ -1013,14 +1160,14 @@
     // 1) se prepara y se agacha  2) salta con el balón sobre la cabeza  3) lo suelta arriba del todo
     jugador.tirar();
     const enManos = (dur) => ({ dur, balon: () => null });          // mientras tanto, el balón lo lleva el jugador
-    const agacha = enManos(240), sube = enManos(260 + 150);
+    const agacha = enManos(150 + 140 + 230), sube = enManos(120 + 110);
     let rel = null; const desde = () => rel || (rel = jugador.soltar());
     const rx = 0, ry = 0;  // (no se usan: el punto de salida se toma de la mano en el momento de soltar)
     const conCaida = tr => tr;
     const arriba = g.aroY - R - 3;
     // altura del arco: lo más alto posible sin salirse por arriba de la cancha
     const arco = (p0,p1) => Math.max(14, (p0[1]+p1[1])/2 - (R+5));                    // centro del balón justo encima del aro
-    const T0 = (240+260+150)/1000;                    // segundos hasta que sale el balón
+    const T0 = (150+140+230+120+110)/1000;            // segundos hasta que sale el balón (arriba del todo)
     let tramos, ev;
     const variante = Math.random();
     if (ok){
@@ -1053,6 +1200,7 @@
         { dur: 400, balon: t => [x0-48 - 22*(1-Math.pow(1-t,2)), g.suelo, 1, 1], giro: .35 });
       delete red.dataset.ok;
       poseTimer = setTimeout(()=>{ jugador.reaccion(true); bocadillo(true); }, ev.entra*1000);
+      reaccionPublico(true, ev.entra);
     } else {
       balon.style.zIndex = 7;                         // por delante del aro: rebota fuera
       if (variante < .5){
@@ -1195,8 +1343,8 @@
     }
   }
   function pintarInicio(){
-    $('#led-canastas').textContent = L.canastas;
-    $('#led-trofeos').textContent = Object.keys(L.t).length + '/' + TROFEOS.length;
+    $('#led-canastas').innerHTML = seg7(L.canastas, '#ff3b30', 34, 3);
+    $('#led-trofeos').innerHTML = seg7(Object.keys(L.t).length, '#39d353', 34, 2) + `<span class="led-de">/${TROFEOS.length}</span>`;
   }
   function pintarVitrina(){
     const n = Object.keys(L.t).length;
@@ -1212,6 +1360,7 @@
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['3.3', ['🏟️ ¡Pabellón nuevo! Con grada, público, focos y parqué con las líneas de la cancha', '⛹️ Tiros en suspensión más reales y nuevas celebraciones', '🔢 Marcador como el de un partido de verdad']],
     ['3.2', ['⛹️ ¡Jugador nuevo! Bota el balón mientras piensas, salta, tira en suspensión… y celebra o se lleva las manos a la cabeza']],
     ['2.3', ['⛹️ El Capitán Triple se agacha, salta y tira en suspensión', '🏀 Tiros más reales: a veces la pelota toca el aro… y entra o se sale', '🟠 El botón de jugar siempre a la vista']],
     ['2.2', ['⛹️ ¡El Capitán Triple baja a la cancha! Ahora tira él, salta cuando encestas y dice lo que piensa']],
