@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="app-version" content="3.10">
+<meta name="app-version" content="3.11">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Canastas Gabi">
@@ -411,6 +411,19 @@
   .ajuste{margin:12px 0}
   .ajuste > b{display:block;margin-bottom:6px;color:var(--azul)}
   .ajuste .chips{margin-top:0}
+  /* Iconos ordenados: herramientas en las esquinas, modos en filas iguales */
+  .btn-esquina.izq{right:auto;left:8px}
+  .led .led-tit{padding:0 48px}
+  .led .led-sub{margin-top:10px}
+  #modos{grid-template-columns:1fr !important}
+  .opt.modo{display:flex;align-items:center;gap:12px;text-align:left;padding:10px 14px;min-height:68px}
+  .modo-ico{width:46px;height:46px;border-radius:50%;background:rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .modo-ico .signo{width:28px;height:28px;margin:0;filter:none}
+  .modo-txt{display:flex;flex-direction:column;line-height:1.15}
+  .modo-txt b{font-size:1.15rem}
+  .modo-txt small{margin-top:2px}
+  /* 5: lo elegido, siempre con el aro amarillo */
+  #inicio .chip.sel{background:#fff;color:var(--azul);border-color:#fff;box-shadow:0 3px 0 #c9cfdb,0 0 0 4px var(--amarillo);transform:translateY(-2px)}
 </style>
 </head>
 <body>
@@ -419,14 +432,13 @@
   <!-- ============ INICIO ============ -->
   <section id="inicio" class="pantalla activa">
     <div class="led">
-      <button class="btn-ajustes" id="btn-ajustes" aria-label="Ajustes" title="Ajustes">⚙︎</button>
+      <button class="btn-ajustes btn-esquina izq" id="btn-vitrina" aria-label="Mis trofeos" title="Mis trofeos"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0z M8 6H5a3 3 0 0 0 3 4 M16 6h3a3 3 0 0 1-3 4 M12 13v4 M8 20h8 M10 17h4" fill="none" stroke="#ffd23f" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="btn-ajustes" id="btn-ajustes" aria-label="Ajustes" title="Ajustes"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><g fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="6.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></g></svg></button>
       <div class="led-tit">¡HOLA, GABI!</div>
       <div class="led-sub">Cada cuenta bien hecha es una canasta 🏀</div>
       <div class="led-fila">
         <div class="led-caja"><div class="led-etq">CANASTAS</div><div class="led-num" id="led-canastas">0</div></div>
         <div class="led-caja"><div class="led-etq">TROFEOS</div><div class="led-num verde" id="led-trofeos">0</div></div>
       </div>
-      <button class="btn-vitrina" id="btn-vitrina">🏆 Mis trofeos</button>
     </div>
 
     <div class="tarjeta">
@@ -456,9 +468,9 @@
     <div class="tarjeta">
       <h2>2. ¿Cómo jugamos?</h2>
       <div class="opciones" id="modos">
-        <button class="opt sel" data-modo="partido"><span class="emoji">🏀</span>Partido<small>10 tiros con reloj</small></button>
-        <button class="opt" data-modo="entreno"><span class="emoji">🎯</span>Entrenamiento<small>sin prisa y con ayuda</small></button>
-        <button class="opt" data-modo="reto" style="grid-column:1/-1"><span class="emoji">🆚</span>Reto contra papá o mamá<small>por turnos; ellos, cuentas más difíciles</small></button>
+        <button class="opt sel modo" data-modo="partido"><span class="modo-ico"><svg class="signo" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="#fff" stroke-width="2"/><path d="M3 12h18M12 3v18M5.6 5.6c3 2.6 3 10.2 0 12.8M18.4 5.6c-3 2.6-3 10.2 0 12.8" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="modo-txt"><b>Partido</b><small>10 tiros con reloj y público</small></span></button>
+        <button class="opt modo" data-modo="entreno"><span class="modo-ico"><svg class="signo" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.2 3.5h3.6l4.7 14.5h-13z" fill="#fff"/><path d="M8.9 8.2h6.2l1 3.2H7.9z" fill="#1f7f7f"/><rect x="3" y="18" width="18" height="3" rx="1.2" fill="#fff"/></svg></span><span class="modo-txt"><b>Entrenamiento</b><small>Sin prisa; el entrenador te ayuda</small></span></button>
+        <button class="opt modo" data-modo="reto"><span class="modo-ico"><svg class="signo" viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="8" r="3" fill="none" stroke="#fff" stroke-width="2.1"/><circle cx="17" cy="9" r="2.5" fill="none" stroke="#fff" stroke-width="2.1"/><path d="M3 19c0-3 2.2-5 5-5s5 2 5 5M14.6 19c.3-2.5 1.6-4 3.4-4s3 1.5 3 4" fill="none" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="modo-txt"><b>Reto contra papá o mamá</b><small>Por turnos; ellos, cuentas más difíciles</small></span></button>
       </div>
       <div id="eleccion-rival" style="display:none;margin-top:10px">
         <div class="opciones" id="rivales">
@@ -1707,6 +1719,7 @@
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['3.11', ['🏆 Trofeos y ajustes, en las esquinas del marcador', '⛹️ Modos de juego en filas, con iconos nuevos']],
     ['3.10', ['✂️ Textos de los modos de juego más cortos y claros']],
     ['3.9', ['⛹️ Salida al pabellón: se encienden los focos al empezar', '➕ Signos nuevos, más claros, en Sumas, Restas, Tablas y Mezcla']],
     ['3.8', ['🗣️ ¡El jugador habla! Dice sus frases en voz alta y en un bocadillo', '⏱️ Partido con reloj de posesión y pabellón lleno; entrenamiento tranquilo, sin reloj y con ayuda del entrenador', '🔢 El marcador cuenta tus aciertos y tus fallos', '⚙️ Ajustes: tamaño de letra, movimiento y sonidos', '👆 Botones más grandes y fáciles de pulsar', '📱 En el iPad, también en horizontal']],
