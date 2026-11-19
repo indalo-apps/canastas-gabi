@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="app-version" content="3.0">
+<meta name="app-version" content="3.1">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Canastas Gabi">
@@ -13,7 +13,7 @@
 <title>Canastas de Gabi: sumas y restas con llevadas</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Orbitron:wght@700;900&family=Bangers&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
 <style>
   :root{
     --naranja:#f47b20; --naranja-osc:#c95d0c; --azul:#1d3557; --azul2:#274b7a;
@@ -269,118 +269,6 @@
     .llevo{width:30px}
     h1{font-size:1.7rem}
   }
-
-  /* ================= ESTILO CÓMIC DE CERA (v3) ================= */
-  :root{ --tinta:#1b2440; --azulc:#2f5fd0; --papel:#fbf9f3; }
-  body{
-    background:
-      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='420' height='420' viewBox='0 0 420 420'><filter id='c'><feTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='2' seed='5'/><feDisplacementMap in='SourceGraphic' scale='4'/></filter><g filter='url(%23c)' fill='none' stroke='%235b8fe0' stroke-linecap='round' stroke-linejoin='round' opacity='.22'><path d='M30 60 L80 46 L66 70 L130 52' stroke-width='9'/><path d='M260 300 L310 286 L298 310 L360 292' stroke-width='9'/><path d='M300 90 l9 19 21 3 -15 14 4 21 -19-10 -19 10 4-21 -15-14 21-3z' fill='%235b8fe0' stroke-width='2'/><path d='M70 300 l6 12 13 2 -10 9 3 13 -12-6 -12 6 3-13 -10-9 13-2z' fill='%235b8fe0' stroke-width='2'/><path d='M180 180 L210 172 L202 186 L236 178' stroke-width='6'/></g></svg>"),
-      radial-gradient(circle at 30% 20%, #fffdf8, #f3efe4 70%);
-    background-size:420px 420px, cover; background-attachment:fixed;
-  }
-  body::before{display:none}
-  .tarjeta{background:var(--papel);border:3px solid var(--tinta);border-radius:20px;
-    box-shadow:5px 6px 0 var(--tinta);}
-  h2{font-family:'Bangers','Baloo 2',sans-serif;font-weight:400;letter-spacing:1px}
-  .banda{display:inline-block;background:var(--azulc);color:#fff;font-size:1.55rem;line-height:1.15;padding:3px 16px 1px;
-    margin:-4px 0 12px -4px;border:3px solid var(--tinta);border-radius:6px;transform:rotate(-1.5deg) skewX(-8deg);
-    box-shadow:3px 4px 0 var(--tinta);text-shadow:2px 2px 0 var(--tinta)}
-  .ico{display:block;width:38px;height:38px;margin:0 auto 2px}
-  .ico svg{width:100%;height:100%;display:block;overflow:visible}
-  .opt{font-family:'Bangers','Baloo 2',sans-serif;font-weight:400;letter-spacing:.8px;font-size:1.25rem}
-  .opt small{font-family:'Baloo 2',sans-serif;letter-spacing:0}
-  .opt[data-nivel],.opt[data-modo]{border:3px solid var(--tinta);box-shadow:0 5px 0 var(--tinta);text-shadow:2px 2px 0 rgba(27,36,64,.55)}
-  .opt[data-nivel].sel,.opt[data-modo].sel{border-color:var(--tinta);transform:translateY(-3px) rotate(-2deg);
-    box-shadow:0 8px 0 var(--tinta),0 0 0 4px var(--amarillo),0 0 0 7px var(--tinta)}
-  .opt[data-nivel]:not(.sel),.opt[data-modo]:not(.sel){filter:saturate(.7) brightness(.98)}
-  .opciones.cuatro .opt{font-size:1.15rem}
-  .opt[data-rival]{border:3px solid var(--tinta);box-shadow:0 4px 0 var(--tinta);font-family:'Bangers';font-size:1.3rem;font-weight:400}
-  .opt[data-rival].sel{background:var(--amarillo);border-color:var(--tinta)}
-  .chip{border:2.5px solid var(--tinta);box-shadow:0 3px 0 var(--tinta)}
-  .chip.sel{background:var(--azulc);border-color:var(--tinta);color:#fff;box-shadow:0 3px 0 var(--tinta)}
-  .btn{border:3px solid var(--tinta);box-shadow:0 5px 0 var(--tinta);font-family:'Bangers','Baloo 2',sans-serif;font-weight:400;letter-spacing:1px;
-    text-shadow:2px 2px 0 rgba(27,36,64,.6)}
-  .btn:active{box-shadow:0 2px 0 var(--tinta)}
-  .btn.azul{background:var(--azulc);box-shadow:0 5px 0 var(--tinta)}
-  .btn.verde{box-shadow:0 5px 0 var(--tinta)}
-  #btn-jugar{font-size:2rem;border:4px solid var(--tinta);box-shadow:0 6px 0 var(--tinta),0 10px 24px rgba(27,36,64,.35)}
-  /* marcador del inicio: pizarra azul dibujada */
-  .led{background:var(--azulc);border:3px solid var(--tinta);border-radius:22px;box-shadow:5px 6px 0 var(--tinta);
-    background-image:radial-gradient(circle at 20% 10%,rgba(255,255,255,.18),transparent 55%)}
-  .led::before,.led::after{display:none}
-  .led-pantalla{background:#fff;border:3px solid var(--tinta);box-shadow:3px 4px 0 var(--tinta);transform:rotate(-2deg);border-radius:14px}
-  .led-tit{font-family:'Bangers',sans-serif;font-weight:400;font-size:2.2rem;letter-spacing:2px;color:#fff;
-    text-shadow:3px 3px 0 var(--tinta),-1px -1px 0 var(--tinta),1px -1px 0 var(--tinta),-1px 1px 0 var(--tinta)}
-  .led-sub{color:#fff;font-weight:700}
-  .led-caja{background:#fff;border:3px solid var(--tinta);border-radius:12px;box-shadow:2px 3px 0 var(--tinta)}
-  .led-etq{color:var(--tinta);font-weight:800;font-size:.7rem}
-  .led-num,.led-num.verde{font-family:'Bangers',sans-serif;font-weight:400;font-size:2rem;color:var(--naranja);text-shadow:2px 2px 0 var(--tinta);letter-spacing:1px}
-  .led-num.verde{color:var(--verde)}
-  .btn-vitrina{background:var(--amarillo);color:var(--tinta);border:3px solid var(--tinta);box-shadow:0 4px 0 var(--tinta);
-    font-family:'Bangers',sans-serif;font-weight:400;font-size:1.3rem;letter-spacing:1px}
-  /* marcador del partido */
-  .marcador{background:var(--azulc);border:3px solid var(--tinta);box-shadow:4px 5px 0 var(--tinta);
-    background-image:radial-gradient(circle at 15% 0,rgba(255,255,255,.2),transparent 60%)}
-  .marcador .nom{color:#dfe8ff;font-weight:800}
-  .marcador .pts{font-family:'Bangers',sans-serif;font-weight:400;font-size:2.1rem;color:var(--amarillo);letter-spacing:1px;
-    text-shadow:2px 2px 0 var(--tinta),-1px -1px 0 var(--tinta),1px -1px 0 var(--tinta),-1px 1px 0 var(--tinta)}
-  .marcador .centro{color:#dfe8ff;font-weight:800}
-  .marcador .centro b{font-family:'Bangers',sans-serif;font-weight:400;font-size:1.4rem;color:#fff;text-shadow:2px 2px 0 var(--tinta)}
-  .marcador .centro b.txt{font-family:'Baloo 2';font-size:1rem}
-  .icono-btn{background:#fff;color:var(--tinta);border:2.5px solid var(--tinta);box-shadow:0 3px 0 var(--tinta)}
-  .pts.bump{animation:bump .5s cubic-bezier(.3,1.8,.5,1)}
-  @keyframes bump{40%{transform:scale(1.6) rotate(-6deg)}}
-  /* cuenta */
-  .celda{color:var(--tinta)}
-  .raya{height:6px;border-radius:4px;background:var(--tinta)}
-  .resp{border:3px solid var(--tinta);box-shadow:0 3px 0 rgba(27,36,64,.25)}
-  .resp.act{border-color:var(--naranja);box-shadow:0 0 0 4px rgba(244,123,32,.35)}
-  .resp.ok{background:#e3f7ea;border-color:var(--verde);color:var(--verde);animation:okcol .35s}
-  @keyframes okcol{50%{transform:scale(1.15)}}
-  .llevo{background:#fff7cc;border:2.5px dashed #d9a400;color:var(--tinta);border-radius:9px}
-  .llevo.on{background:var(--amarillo);border:2.5px solid var(--tinta);color:var(--tinta);box-shadow:0 2px 0 var(--tinta)}
-  .etq-llevo{font-size:.62rem;line-height:1;color:#b08300;font-weight:800;text-align:right;align-self:center}
-  .tecla{border:2.5px solid var(--tinta);box-shadow:0 4px 0 var(--tinta);color:var(--tinta)}
-  .tecla:active{box-shadow:0 1px 0 var(--tinta)}
-  .tecla.acc{background:#e6ecf8}
-  .tecla.pista{background:#fff3c4;box-shadow:0 4px 0 var(--tinta)}
-  .pista-txt{border:2.5px solid var(--tinta);background:#fff7cc}
-  .mensaje{font-family:'Bangers','Baloo 2',sans-serif;font-weight:400;letter-spacing:.8px;font-size:1.35rem}
-  /* cancha */
-  .cancha{box-shadow:4px 5px 0 var(--tinta)}
-  .publico{position:absolute;left:0;right:0;bottom:12px;height:50px;z-index:1;pointer-events:none}
-  .publico svg{width:100%;height:100%;display:block}
-  .publico .fan{transform-box:fill-box;transform-origin:50% 100%}
-  .publico.ola .fan{animation:ola .55s ease-out 2;animation-delay:calc(var(--i) * 25ms)}
-  @keyframes ola{45%{transform:translateY(-9px)}}
-  .publico.pena .fan{animation:aww .9s ease-in-out;animation-delay:calc(var(--i) * 10ms)}
-  @keyframes aww{40%,70%{transform:translateY(3px) scaleY(.94)}}
-  /* puntos que vuelan al marcador */
-  .vuela{position:fixed;z-index:45;pointer-events:none;font-family:'Bangers',sans-serif;font-size:2.4rem;color:var(--amarillo);
-    text-shadow:3px 3px 0 var(--tinta),-1px -1px 0 var(--tinta),1px -1px 0 var(--tinta),-1px 1px 0 var(--tinta)}
-  /* diálogos, avisos y final */
-  .dlg{background:rgba(27,36,64,.7)}
-  .dlg .tarjeta{box-shadow:6px 7px 0 var(--tinta)}
-  .toast{background:var(--amarillo);color:var(--tinta);border:3px solid var(--tinta);box-shadow:4px 5px 0 var(--tinta);
-    font-family:'Bangers',sans-serif;font-weight:400;font-size:1.4rem;letter-spacing:1px}
-  .nuevos-trofeos{background:var(--amarillo);color:var(--tinta);border:3px solid var(--tinta)}
-  .grande{font-family:'Bangers',sans-serif;font-weight:400;font-size:4rem;text-shadow:3px 3px 0 var(--tinta)}
-  .final-img{box-shadow:3px 4px 0 var(--tinta);transform:rotate(-2deg)}
-  .podio{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:6px}
-  .podio .trofeo{width:118px;opacity:0;border:3px solid var(--tinta);box-shadow:3px 4px 0 var(--tinta);
-    animation:aparece .8s cubic-bezier(.3,1.5,.5,1) forwards;animation-delay:calc(var(--i) * .7s + .2s)}
-  @keyframes aparece{0%{opacity:0;transform:scale(.2) rotateY(360deg)}100%{opacity:1;transform:scale(1) rotateY(0)}}
-  .trofeo{border:2.5px solid var(--tinta);box-shadow:2px 3px 0 var(--tinta)}
-  .trofeo.bloq{border-style:dashed;box-shadow:none}
-  .aviso-turno{background:var(--azulc)}
-  .aviso-turno .quien{font-family:'Bangers',sans-serif;font-weight:400;font-size:3.2rem;color:var(--amarillo);text-shadow:3px 3px 0 var(--tinta)}
-  /* transición entre pantallas */
-  .pantalla.activa{animation:desliza .4s cubic-bezier(.2,.9,.3,1.1)}
-  @keyframes desliza{from{opacity:0;transform:translateX(40px) rotate(1deg)}to{opacity:1;transform:none}}
-  /* avance automático: el botón se va llenando */
-  #btn-siguiente.auto{background-image:linear-gradient(90deg,rgba(255,255,255,.35) 50%,transparent 50%);
-    background-size:200% 100%;background-position:100% 0;animation:llena var(--dur,2.8s) linear forwards}
-  @keyframes llena{to{background-position:0 0}}
 </style>
 </head>
 <body>
@@ -400,12 +288,12 @@
     </div>
 
     <div class="tarjeta">
-      <h2 class="banda">1 · ¿Qué practicamos?</h2>
+      <h2>1. ¿Qué practicamos?</h2>
       <div class="opciones cuatro" id="niveles">
-        <button class="opt sel" data-nivel="suma"><span class="ico"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M16 5h8v11h11v8H24v11h-8V24H5v-8h11z" fill="#fff" stroke="#1b2440" stroke-width="3" stroke-linejoin="round"/></svg></span>Sumas</button>
-        <button class="opt" data-nivel="resta"><span class="ico"><svg viewBox="0 0 40 40" aria-hidden="true"><rect x="5" y="15.5" width="30" height="9" rx="2" fill="#fff" stroke="#1b2440" stroke-width="3"/></svg></span>Restas</button>
-        <button class="opt" data-nivel="tablas"><span class="ico"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M16 5h8v11h11v8H24v11h-8V24H5v-8h11z" fill="#fff" stroke="#1b2440" stroke-width="3" stroke-linejoin="round" transform="rotate(45 20 20)"/></svg></span>Tablas</button>
-        <button class="opt" data-nivel="mezcla"><span class="ico"><svg viewBox="0 0 40 40" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11h7c7 0 9 18 16 18h5M5 29h7c3 0 5-4 7-8M23 15c1.5-2 3-4 5-4h5" stroke="#1b2440" stroke-width="9"/><path d="M5 11h7c7 0 9 18 16 18h5M5 29h7c3 0 5-4 7-8M23 15c1.5-2 3-4 5-4h5" stroke="#fff" stroke-width="4.5"/></g><path d="M31 5l6 6-6 6zM31 23l6 6-6 6z" fill="#fff" stroke="#1b2440" stroke-width="2.5" stroke-linejoin="round"/></svg></span>Mezcla</button>
+        <button class="opt sel" data-nivel="suma"><span class="emoji">➕</span>Sumas</button>
+        <button class="opt" data-nivel="resta"><span class="emoji">➖</span>Restas</button>
+        <button class="opt" data-nivel="tablas"><span class="emoji">✖️</span>Tablas</button>
+        <button class="opt" data-nivel="mezcla"><span class="emoji">🔀</span>Mezcla</button>
       </div>
       <div id="eleccion-cifras" class="sub">
         <span class="sub-tit">¿Cuántas cifras?</span>
@@ -421,11 +309,11 @@
     </div>
 
     <div class="tarjeta">
-      <h2 class="banda">2 · ¿Cómo jugamos?</h2>
+      <h2>2. ¿Cómo jugamos?</h2>
       <div class="opciones" id="modos">
-        <button class="opt sel" data-modo="partido"><span class="ico"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="15" fill="#f47b20" stroke="#1b2440" stroke-width="3"/><path d="M5 20h30M20 5v30M9 9c6 6 6 16 0 22M31 9c-6 6-6 16 0 22" fill="none" stroke="#1b2440" stroke-width="2.2"/></svg></span>Partido<small>10 tiros, ¡a por el récord!</small></button>
-        <button class="opt" data-modo="entreno"><span class="ico"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="15" fill="#fff" stroke="#1b2440" stroke-width="3"/><circle cx="20" cy="20" r="10" fill="#e04848" stroke="#1b2440" stroke-width="2"/><circle cx="20" cy="20" r="5" fill="#fff" stroke="#1b2440" stroke-width="2"/><circle cx="20" cy="20" r="2" fill="#1b2440"/></svg></span>Entrenamiento<small>sin prisa, todas las que quieras</small></button>
-        <button class="opt" data-modo="reto" style="grid-column:1/-1"><span class="ico"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 2l4 7 8-3-1 8 8 3-6 6 5 7-8 1 0 8-7-4-6 6-3-8-8 1 3-8-7-5 7-4-3-8 8 2z" fill="#ffd23f" stroke="#1b2440" stroke-width="2.5" stroke-linejoin="round"/><text x="20" y="25.5" text-anchor="middle" font-family="Bangers, Impact, sans-serif" font-size="15" fill="#e04848" stroke="#1b2440" stroke-width=".8">VS</text></svg></span>Reto contra papá o mamá<small>por turnos: ellos tienen cuentas más difíciles</small></button>
+        <button class="opt sel" data-modo="partido"><span class="emoji">🏀</span>Partido<small>10 tiros, ¡a por el récord!</small></button>
+        <button class="opt" data-modo="entreno"><span class="emoji">🎯</span>Entrenamiento<small>sin prisa, todas las que quieras</small></button>
+        <button class="opt" data-modo="reto" style="grid-column:1/-1"><span class="emoji">🆚</span>Reto contra papá o mamá<small>por turnos: ellos tienen cuentas más difíciles</small></button>
       </div>
       <div id="eleccion-rival" style="display:none;margin-top:10px">
         <div class="opciones" id="rivales">
@@ -461,7 +349,6 @@
         </g>
       </svg>
       <div class="poste"></div><div class="soporte"></div><div class="tablero"></div>
-      <div class="publico" id="publico" aria-hidden="true"></div>
       <div class="jugador" id="jugador" aria-hidden="true">
         <div class="jugador-in" id="jugador-in" data-pose="listo"><img src="img/jugador.png" alt="" width="178" height="215"></div>
         <div class="bocadillo" id="bocadillo"></div>
@@ -469,10 +356,8 @@
       <div class="aro-atras" id="aro-atras"></div>
       <div class="sombra" id="sombra"></div>
       <div class="balon" id="balon">
-        <svg viewBox="0 0 64 64"><defs><radialGradient id="gbalon" cx="38%" cy="32%" r="70%"><stop offset="0" stop-color="#ffb070"/><stop offset=".55" stop-color="#f07a22"/><stop offset="1" stop-color="#c65410"/></radialGradient></defs>
-          <circle cx="32" cy="32" r="29" fill="url(#gbalon)" stroke="#1b2440" stroke-width="4"/>
-          <path d="M3 32h58M32 3v58M11 11c11 11 11 31 0 42M53 11c-11 11-11 31 0 42" fill="none" stroke="#5a2a0c" stroke-width="3" stroke-linecap="round"/>
-          <ellipse cx="22" cy="18" rx="7" ry="4" fill="#fff" opacity=".35" transform="rotate(-30 22 18)"/></svg>
+        <svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#f47b20" stroke="#7a3a08" stroke-width="4"/>
+        <path d="M2 32h60M32 2v60M10 10c12 10 12 34 0 44M54 10c-12 10-12 34 0 44" fill="none" stroke="#7a3a08" stroke-width="4"/></svg>
       </div>
       <div class="red" id="red"></div>
       <div class="aro-delante" id="aro-delante"></div>
@@ -529,13 +414,6 @@
   </div>
 </div>
 <div class="toast" id="toast" role="status"></div>
-<div class="dlg ceremonia" id="ceremonia" hidden>
-  <div class="tarjeta centrado">
-    <h2 class="banda">¡Trofeos nuevos!</h2>
-    <div class="podio" id="podio"></div>
-    <button class="btn" id="ceremonia-ok" style="margin-top:14px">¡Genial! 🏆</button>
-  </div>
-</div>
 <div class="barra-act" id="barra-act" hidden role="status">✨ ¡Versión nueva! Actualizando…</div>
 
 <script>
@@ -652,7 +530,7 @@
   const S = { nivel:'suma', modo:'partido', rival:'Papá', cifras: store.get('gabi-cifras') || '2', tabla: store.get('gabi-tabla') || 2 };
   let recientes = [];
   let J = null; // estado de partida
-  let op = null, ans = [], llevo = [], activo = 0, intentos = 0, usoPista = false, resuelta = false, ultimoAcierto = false;
+  let op = null, ans = [], llevo = [], activo = 0, intentos = 0, usoPista = false, resuelta = false;
 
   // ---------- Menú ----------
   function marcarSel(cont, attr){
@@ -730,7 +608,7 @@
     } else if (J.modo==='partido'){
       m.innerHTML = `${salir}<div class="eq"><div class="nom">PUNTOS</div><div class="pts">${J.puntos}</div></div>
         <div class="centro">TIRO<br><b>${Math.min(J.n+1,10)}/10</b></div>
-        <div class="eq"><div class="nom">RACHA</div><div class="pts" style="font-size:${1.7+Math.min(J.racha,6)*.14}rem">${J.racha?'🔥'+J.racha:'–'}</div></div>${snd}`;
+        <div class="eq"><div class="nom">RACHA</div><div class="pts">${J.racha?'🔥'.repeat(Math.min(J.racha,3)):'–'}</div></div>${snd}`;
     } else {
       m.innerHTML = `${salir}<div class="eq"><div class="nom">ACIERTOS</div><div class="pts">${J.aciertos}</div></div>
         <div class="centro">ENTRENAMIENTO<br><b class="txt">${J.etiqueta}</b></div>
@@ -774,7 +652,7 @@
     const a = String(op.a).padStart(W,' '), b = String(op.b).padStart(W,' ');
     let h = '';
     // fila de llevadas
-    h += `<div class="etq-llevo">me<br>llevo</div>`;
+    h += `<div></div>`;
     for (let i=0;i<W;i++){
       const oculto = i===W-1 ? 'oculto' : '';
       h += `<button class="llevo ${llevo[i]?'on':''} ${oculto}" data-l="${i}" aria-label="llevada">${llevo[i]?'1':''}</button>`;
@@ -786,12 +664,10 @@
     for (let i=0;i<W;i++) h += `<div class="celda${cls(i)}">${b[i].trim()}</div>`;
     h += `<div class="raya"></div>`;
     h += `<div></div>`;
-    const esperado = String(op.r).padStart(W,' ');
     for (let i=0;i<W;i++){
       let c = 'resp';
       if (i===activo && !resuelta) c+=' act';
       if (marcas && marcas[i]) c+=' '+marcas[i];
-      else if (!resuelta && ans[i]!=='' && esperado[i]!==' ' && ans[i]===esperado[i]) c+=' ok';
       h += `<button class="${c}" data-r="${i}">${ans[i]}</button>`;
     }
     g.innerHTML = h;
@@ -913,7 +789,6 @@
     const marcas = op.horiz ? ans.map(()=> 'mal') : ans.map((x,i)=> (esperado[i].trim()===x || (esperado[i]===' ' && (x===''||x==='0'))) ? 'bien':'mal');
     const jugador = quienJuega(); const esRival = J.modo==='reto' && J.turno===1;
     intentos++;
-    ultimoAcierto = valor===op.r;
     if (valor===op.r){
       resuelta = true;
       let pts = 0, triple=false;
@@ -930,15 +805,12 @@
       mensaje(m,'ok');
       triple ? sTriple(ev.entra, ev.toques) : sBien(ev.entra, ev.toques);
       setTimeout(()=>confeti(triple ? 90 : 45), ev.entra*1000);
-      publico('ola', ev.entra);
-      volarPuntos(J.modo==='entreno' ? '+1' : '+'+pts, ev.entra);
-      J.espera = (ev.entra + .75)*1000;
       finCuenta();
     } else {
       pintarRejilla(marcas);
       $('#tarjeta-op').classList.remove('tiembla'); void $('#tarjeta-op').offsetWidth; $('#tarjeta-op').classList.add('tiembla');
       jugador.racha = 0; if (J.modo!=='reto') J.racha = 0;
-      const ev = lanzar(false); sMal(ev.aro, ev.toques); publico('pena', ev.aro + .1);
+      const ev = lanzar(false); sMal(ev.aro, ev.toques);
       if (intentos < 2){
         mensaje(esRival ? `¡Uy, ${jugador.nombre}! Otro intento…` : elige(msgMal),'ko');
         // limpiar solo las casillas mal
@@ -964,72 +836,14 @@
   }
   function mensaje(t,c){ const m=$('#mensaje'); m.innerHTML=t; m.className='mensaje '+c; m.classList.remove('pop'); void m.offsetWidth; m.classList.add('pop'); }
 
-  let autoTimer = 0, marcadorTimer = 0;
   function finCuenta(){
     J.n++;
-    clearTimeout(marcadorTimer);
-    if (J.espera){ const espera = J.espera; J.espera = 0;
-      marcadorTimer = setTimeout(()=>{ pintarMarcador(); const p = objetivoPuntos(); if (p){ p.classList.remove('bump'); void p.offsetWidth; p.classList.add('bump'); } }, espera); }
-    else pintarMarcador();
+    pintarMarcador();
     $('#acciones').style.display='none'; $('#acciones-sig').style.display='block';
-    const ultima = J.n>=J.total, bs = $('#btn-siguiente');
-    bs.textContent = ultima ? 'Ver resultado 🏆' : 'Siguiente ➜';
-    bs.classList.remove('auto'); clearTimeout(autoTimer);
-    // Tras una canasta (y si no hay que pasar la tablet), se pasa sola a la siguiente
-    if (resuelta && intentos && !ultima && J.modo!=='reto' && $('#pista-txt').className.indexOf('vis')<0 && ultimoAcierto){
-      const dur = 4200; bs.style.setProperty('--dur', dur+'ms'); void bs.offsetWidth; bs.classList.add('auto');
-      autoTimer = setTimeout(()=>{ if ($('#juego').classList.contains('activa') && $('#acciones-sig').style.display==='block') bs.click(); }, dur);
-    }
-  }
-  // Elemento del marcador al que vuelan los puntos
-  function objetivoPuntos(){
-    const m = $('#marcador');
-    if (J.modo==='reto') return m.querySelector('.eq.turno .pts') || m.querySelector('.pts');
-    return m.querySelector('.eq .pts');
-  }
-  function volarPuntos(txt, retraso){
-    setTimeout(()=>{
-      const g = geo(), c = $('#cancha').getBoundingClientRect(), z = parseFloat(getComputedStyle(document.querySelector('.app')).zoom) || 1;
-      const x0 = c.left*1 + (g.aroCx)*z, y0 = c.top + (g.aroY - 10)*z;
-      const t = objetivoPuntos(); if (!t) return; const r = t.getBoundingClientRect();
-      const el = document.createElement('div'); el.className = 'vuela'; el.textContent = txt; document.body.appendChild(el);
-      const w = el.offsetWidth, h = el.offsetHeight;
-      const dx = r.left + r.width/2 - x0, dy = r.top + r.height/2 - y0;
-      el.style.left = (x0 - w/2)+'px'; el.style.top = (y0 - h/2)+'px';
-      const an = el.animate([
-        { transform:'translate(0,0) scale(.4)', opacity:0 },
-        { transform:'translate(0,-34px) scale(1.4) rotate(-8deg)', opacity:1, offset:.25 },
-        { transform:`translate(${dx}px,${dy}px) scale(.7)`, opacity:1 }
-      ], { duration: 750, easing:'cubic-bezier(.5,0,.6,1)' });
-      an.onfinish = () => el.remove();
-    }, retraso*1000);
-  }
-  // Público que celebra o se lamenta
-  function pintarPublico(){
-    const pub = $('#publico'), W = $('#cancha').clientWidth;
-    if (!W || pub.dataset.w == W) return; pub.dataset.w = W;
-    const pieles = ['#f6c79a','#e0a77a','#c98b62','#8d5a3b','#f2d2b6'], pelos = ['#3b2416','#8a4f24','#1b1b1b','#d9a441','#6b3b1f'],
-          ropa = ['#e04848','#2f5fd0','#ffd23f','#2a9d5c','#7b5cff','#f47b20','#14a3a3'];
-    let h = '', i = 0, semilla = 7; const az = () => (semilla = (semilla*9301+49297)%233280)/233280;
-    for (let x = 30; x < W - 70; x += 17 + az()*6, i++){
-      const y = 6 + az()*8, sk = pieles[Math.floor(az()*pieles.length)], pe = pelos[Math.floor(az()*pelos.length)], ro = ropa[Math.floor(az()*ropa.length)];
-      h += `<g class="fan" style="--i:${i}"><path d="M${x-9} 42 q0-${18-y/3} 9-${18-y/3} q9 0 9 ${18-y/3}z" fill="${ro}" stroke="#1b2440" stroke-width="2"/>
-        <circle cx="${x}" cy="${y+12}" r="7" fill="${sk}" stroke="#1b2440" stroke-width="2"/>
-        <path d="M${x-7} ${y+11} q1-8 7-8 q6 0 7 8 q-3-3-7-3 q-4 0-7 3z" fill="${pe}" stroke="#1b2440" stroke-width="1.5"/></g>`;
-    }
-    // valla publicitaria delante del público
-    let valla = `<rect x="-4" y="38" width="${W+8}" height="12" fill="#2f5fd0" stroke="#1b2440" stroke-width="2.5"/>`;
-    for (let x = 40; x < W - 90; x += 170) valla += `<text x="${x}" y="47.5" font-family="Bangers, Impact, sans-serif" font-size="10" fill="#ffd23f" letter-spacing="1">CANASTAS DE GABI ★</text>`;
-    pub.innerHTML = `<svg viewBox="0 0 ${W} 50" preserveAspectRatio="none">${h}${valla}</svg>`;
-  }
-  let publicoTimer = 0;
-  function publico(tipo, retraso){
-    clearTimeout(publicoTimer);
-    publicoTimer = setTimeout(()=>{ const p = $('#publico'); p.classList.remove('ola','pena'); void p.offsetWidth; p.classList.add(tipo);
-      setTimeout(()=>p.classList.remove(tipo), 1600); }, retraso*1000);
+    $('#btn-siguiente').textContent = (J.n>=J.total) ? 'Ver resultado 🏆' : 'Siguiente ➜';
   }
   $('#btn-siguiente').onclick = () => {
-    sClic(); clearTimeout(autoTimer); $('#btn-siguiente').classList.remove('auto');
+    sClic();
     if (J.n>=J.total){ terminar(); return; }
     if (J.modo==='reto'){
       J.turno = J.n%2;
@@ -1062,7 +876,6 @@
     const t=document.querySelector('.cancha .tablero'); t.style.top=(g.aroY-48)+'px';
     document.querySelector('.cancha .soporte').style.top=(g.aroY-6)+'px';
     document.querySelector('.cancha .poste').style.top=(g.aroY+12)+'px';
-    pintarPublico();
     const j=$('#jugador'); j.style.width=g.jw+'px'; j.style.height=g.jh+'px'; j.style.left=g.jx+'px';
   }
   function ponerBalon(x,y,rot,sx=1,sy=1){
@@ -1228,18 +1041,11 @@
     }
     if (nuevos.length) h += `<div class="nuevos-trofeos">🏆 Trofeos nuevos: ${nuevos.map(id=>trofeo(id)[2]).join(', ')}</div>`;
     $('#final-contenido').innerHTML = h;
-    if (nuevos.length){
-      const lista = nuevos.slice();
-      $('#podio').innerHTML = lista.map((id,i)=>{ const t = trofeo(id); return `<div class="trofeo" style="--i:${i}"><div class="ic">${t[1]}</div><b>${t[2]}</b><small>${t[3]}</small></div>`; }).join('');
-      setTimeout(()=>{ $('#ceremonia').hidden = false;
-        lista.forEach((id,i)=>{ tono(784,.12,i*.7+.35,'triangle',.1); tono(1175,.22,i*.7+.47,'triangle',.1); });
-        setTimeout(()=>confeti(70), lista.length*700); }, 900);
-    }
     mostrar('final');
   }
 
   function confeti(n){
-    const cols = ['#f47b20','#ffd23f','#2a9d5c','#2f5fd0','#e04848','#5b8fe0','#fff'];
+    const cols = ['#f47b20','#ffd23f','#2a9d5c','#1d3557','#e04848','#8ec5ff'];
     for (let i=0;i<n;i++){
       const d = document.createElement('div'); d.className='confeti';
       d.style.left = Math.random()*100+'vw'; d.style.background = elige(cols);
@@ -1322,7 +1128,6 @@
     $('#lista-trofeos').innerHTML = TROFEOS.map(([id,ic,nom,desc]) => `<div class="trofeo ${L.t[id]?'':'bloq'}">
         <div class="ic">${ic}</div><b>${nom}</b><small>${L.t[id] ? '¡Conseguido!' : desc}</small></div>`).join('');
   }
-  $('#ceremonia-ok').onclick = () => { sClic(); $('#ceremonia').hidden = true; };
   $('#btn-vitrina').onclick = () => { sClic(); pintarVitrina(); mostrar('vitrina'); };
   $('#btn-vitrina-volver').onclick = () => { sClic(); pintarInicio(); mostrar('inicio'); };
   pintarInicio();
@@ -1331,11 +1136,6 @@
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
-    ['3.0', ['🎨 Todo el juego con el estilo de cómic del Capitán Triple',
-             '📣 ¡Hay público en la cancha! Celebra tus canastas… y hace «ooh» si fallas',
-             '✨ Los puntos vuelan al marcador y la racha 🔥 crece',
-             '🏆 Ceremonia de trofeos al final del partido',
-             '✅ Cada cifra bien puesta se pone verde; la casilla amarilla es para «me llevo»']],
     ['2.3', ['⛹️ El Capitán Triple se agacha, salta y tira en suspensión', '🏀 Tiros más reales: a veces la pelota toca el aro… y entra o se sale', '🟠 El botón de jugar siempre a la vista']],
     ['2.2', ['⛹️ ¡El Capitán Triple baja a la cancha! Ahora tira él, salta cuando encestas y dice lo que piensa']],
     ['2.1', ['🎨 Gráficos nuevos al estilo del Capitán Triple: el jugador, la cancha con rayos y estrellas y la pantalla gigante']],
