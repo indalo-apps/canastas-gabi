@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="app-version" content="3.9">
+<meta name="app-version" content="3.10">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Canastas Gabi">
@@ -456,9 +456,9 @@
     <div class="tarjeta">
       <h2>2. ¿Cómo jugamos?</h2>
       <div class="opciones" id="modos">
-        <button class="opt sel" data-modo="partido"><span class="emoji">🏀</span>Partido<small>10 tiros, reloj de posesión, público y récord</small></button>
-        <button class="opt" data-modo="entreno"><span class="emoji">🎯</span>Entrenamiento<small>pabellón tranquilo, sin reloj ni puntos; el entrenador te ayuda</small></button>
-        <button class="opt" data-modo="reto" style="grid-column:1/-1"><span class="emoji">🆚</span>Reto contra papá o mamá<small>por turnos: ellos tienen cuentas más difíciles</small></button>
+        <button class="opt sel" data-modo="partido"><span class="emoji">🏀</span>Partido<small>10 tiros con reloj</small></button>
+        <button class="opt" data-modo="entreno"><span class="emoji">🎯</span>Entrenamiento<small>sin prisa y con ayuda</small></button>
+        <button class="opt" data-modo="reto" style="grid-column:1/-1"><span class="emoji">🆚</span>Reto contra papá o mamá<small>por turnos; ellos, cuentas más difíciles</small></button>
       </div>
       <div id="eleccion-rival" style="display:none;margin-top:10px">
         <div class="opciones" id="rivales">
@@ -1707,6 +1707,7 @@
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['3.10', ['✂️ Textos de los modos de juego más cortos y claros']],
     ['3.9', ['⛹️ Salida al pabellón: se encienden los focos al empezar', '➕ Signos nuevos, más claros, en Sumas, Restas, Tablas y Mezcla']],
     ['3.8', ['🗣️ ¡El jugador habla! Dice sus frases en voz alta y en un bocadillo', '⏱️ Partido con reloj de posesión y pabellón lleno; entrenamiento tranquilo, sin reloj y con ayuda del entrenador', '🔢 El marcador cuenta tus aciertos y tus fallos', '⚙️ Ajustes: tamaño de letra, movimiento y sonidos', '👆 Botones más grandes y fáciles de pulsar', '📱 En el iPad, también en horizontal']],
     ['3.6', ['🏃 El jugador se mueve por la pista mientras piensas', '🏀 Bota de muchas formas: alto, bajo y rápido, cambiando de mano… y a veces se para a mirar la canasta', '👌 El balón bota como uno de verdad']],
