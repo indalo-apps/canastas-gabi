@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="app-version" content="3.11">
+<meta name="app-version" content="3.12">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Canastas Gabi">
@@ -411,6 +411,10 @@
   .ajuste{margin:12px 0}
   .ajuste > b{display:block;margin-bottom:6px;color:var(--azul)}
   .ajuste .chips{margin-top:0}
+  .resp.falta{animation:falta .45s ease-in-out 3;border-color:var(--naranja) !important}
+  @keyframes falta{0%,100%{transform:scale(1);background:#fff}50%{transform:scale(1.12);background:#ffe1c4}}
+  .resp.act{box-shadow:0 0 0 4px rgba(244,123,32,.35)}
+  .btn-salir-si{margin-top:12px;background:none;border:0;font:inherit;font-size:1.05rem;font-weight:700;color:#c0392b;text-decoration:underline;min-height:44px;padding:0 16px;cursor:pointer}
   /* Iconos ordenados: herramientas en las esquinas, modos en filas iguales */
   .btn-esquina.izq{right:auto;left:8px}
   .led .led-tit{padding:0 48px}
@@ -550,6 +554,14 @@
     <h2 id="nov-titulo">¡Novedades en el juego!</h2>
     <div id="nov-lista"></div>
     <button class="btn" id="nov-cerrar" style="margin-top:14px">¡Genial! 🏀</button>
+  </div>
+</div>
+<div class="dlg" id="dlg-salir" hidden role="dialog" aria-labelledby="salir-tit">
+  <div class="tarjeta centrado">
+    <h2 id="salir-tit">¿Dejar el partido?</h2>
+    <p id="salir-txt" style="font-size:1.15rem;margin:6px 0 16px"></p>
+    <button class="btn" id="salir-seguir">¡Seguir jugando! 🏀</button>
+    <button class="btn-salir-si" id="salir-si">Sí, salir</button>
   </div>
 </div>
 <div class="toast" id="toast" role="status"></div>
@@ -754,7 +766,7 @@
     '¡Esta es fácil para ti!','¡Concentración de campeón! 🧠','¡Que no te tiemble el pulso!','¡Cuenta y a tirar!'];
 
   // ---------- Estado ----------
-  const S = { nivel:'suma', modo:'partido', rival:'Papá', cifras: store.get('gabi-cifras') || '2', tabla: store.get('gabi-tabla') || 2 };
+  const S = { nivel: store.get('gabi-nivel') || 'suma', modo: store.get('gabi-modo') || 'partido', rival: store.get('gabi-rival') || 'Papá', cifras: store.get('gabi-cifras') || '2', tabla: store.get('gabi-tabla') || 2 };
   let recientes = [];
   let J = null; // estado de partida
   let op = null, ans = [], llevo = [], activo = 0, intentos = 0, usoPista = false, resuelta = false, tInicio = 0, fraseJugador = '';
@@ -766,7 +778,7 @@
       sClic();
       cont.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));
       b.classList.add('sel');
-      S[attr] = b.dataset[attr];
+      S[attr] = b.dataset[attr]; store.set('gabi-'+attr, S[attr]);
       $('#eleccion-rival').style.display = S.modo==='reto' ? 'block':'none';
       $('#eleccion-tablas').style.display = S.nivel==='tablas' ? 'block':'none';
       $('#eleccion-cifras').style.display = S.nivel==='tablas' ? 'none':'block';
@@ -774,6 +786,12 @@
     });
   }
   marcarSel($('#niveles'),'nivel'); marcarSel($('#modos'),'modo'); marcarSel($('#rivales'),'rival');
+  // Al abrir la app, queda elegido lo último con lo que jugó
+  [['#niveles','nivel'],['#modos','modo'],['#rivales','rival']].forEach(([c,a]) =>
+    document.querySelectorAll(c+' .opt').forEach(x => x.classList.toggle('sel', x.dataset[a]===S[a])));
+  $('#eleccion-rival').style.display = S.modo==='reto' ? 'block':'none';
+  $('#eleccion-tablas').style.display = S.nivel==='tablas' ? 'block':'none';
+  $('#eleccion-cifras').style.display = S.nivel==='tablas' ? 'none':'block';
 
   // Nivel real según lo elegido: suma, suma3, resta, resta3, mezcla, mezcla3, tablas
   const nivelReal = () => S.nivel==='tablas' ? 'tablas' : S.nivel + (S.cifras==='3' ? '3' : '');
@@ -877,18 +895,36 @@
         <div class="centro"><div class="nom">ENTRENO</div><div class="etq">${J.etiqueta}</div></div>${snd}`;
     }
     $('#btn-sonido').onclick = () => { sonido=!sonido; store.set('gabi-sonido',sonido); pintarMarcador(); };
-    $('#btn-salir').onclick = () => { sClic(); if (J.modo==='entreno' && J.n>0) terminar(); else { pintarRecord(); pintarInicio(); mostrar('inicio'); } };
+    $('#btn-salir').onclick = () => { sClic();
+      if (J.modo==='entreno'){ if (J.n>0) terminar(); else salirAlMenu(); return; }
+      const empezado = J.n>0 || ans.some(x=>x!=='') || (J.modo==='reto' && J.jug.some(j=>j.puntos>0));
+      if (!empezado){ salirAlMenu(); return; }
+      pausarReloj();
+      $('#salir-tit').textContent = J.modo==='reto' ? '¿Dejar el reto?' : '¿Dejar el partido?';
+      $('#salir-txt').innerHTML = J.modo==='reto'
+        ? `Vais <b>Gabi ${J.jug[0].puntos}</b> – <b>${J.jug[1].puntos} ${J.jug[1].nombre}</b>. Si sales, se pierde el reto.`
+        : `Llevas <b>${J.puntos} puntos</b> en ${J.n} ${J.n===1?'tiro':'tiros'}. Si sales, se pierde el partido.`;
+      $('#dlg-salir').hidden = false;
+    };
   }
 
   // ---------- Reloj de posesión (solo en el partido) ----------
   let relojFin = 0, relojDur = 0, relojInt = null, posesionAgotada = false;
   const relojSeg = () => relojFin ? Math.max(0, Math.ceil((relojFin - performance.now())/1000)) : relojDur;
   function pararReloj(){ clearInterval(relojInt); relojInt = null; }
+  let relojResto = 0;
+  // Si la app pasa a segundo plano (o sale el aviso de salir), el reloj se para y luego sigue donde estaba
+  function pausarReloj(){ if (relojInt && !resuelta){ relojResto = Math.max(0, relojFin - performance.now()); pararReloj(); } }
+  function reanudarReloj(){ if (relojResto && !resuelta && !posesionAgotada && J && J.modo==='partido'){ relojFin = performance.now() + relojResto; relojResto = 0; tictac(); } }
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState==='hidden') pausarReloj(); else if ($('#dlg-salir').hidden) reanudarReloj(); });
   function arrancarReloj(){
-    pararReloj(); posesionAgotada = false; relojFin = 0;
+    pararReloj(); posesionAgotada = false; relojFin = 0; relojResto = 0;
     if (J.modo!=='partido' || AJ.reloj==='no') return;
     relojDur = op.horiz ? 24 : (op.W>=4 ? 60 : 40);
     relojFin = performance.now() + relojDur*1000;
+    tictac();
+  }
+  function tictac(){
     let ultimo = -1;
     relojInt = setInterval(() => {
       if (resuelta || !$('#juego').classList.contains('activa')){ pararReloj(); return; }
@@ -900,6 +936,10 @@
         mensaje('⏱️ ¡Bocina! Se acabó la posesión: ahora la canasta vale 1 punto. ¡Sin prisa, termínala!','ko'); }
     }, 200);
   }
+
+  function salirAlMenu(){ pararReloj(); relojResto = 0; pintarRecord(); pintarInicio(); mostrar('inicio'); }
+  $('#salir-seguir').onclick = () => { sClic(); $('#dlg-salir').hidden = true; reanudarReloj(); };
+  $('#salir-si').onclick = () => { sClic(); $('#dlg-salir').hidden = true; salirAlMenu(); };
 
   // ---------- Cuenta ----------
   function quienJuega(){ return J.modo==='reto' ? J.jug[J.turno] : J.jug[0]; }
@@ -1062,13 +1102,27 @@
 
   // ---------- Comprobar ----------
   $('#btn-comprobar').onclick = () => { sClic(); comprobar(); };
+  // Las casillas vacías parpadean para que se vea cuál falta
+  function avisarVacias(){
+    const n = ans.length;
+    const ini = ans.findIndex(x=>x!==''), fin = n - 1 - [...ans].reverse().findIndex(x=>x!=='');
+    // vertical: se rellena de derecha a izquierda; horizontal (tablas): de izquierda a derecha
+    const falta = i => ans[i]==='' && (ini<0 ? i===(op.horiz ? 0 : n-1) : (op.horiz ? i<fin : i>ini));
+    const huecos = ans.map((_,i)=>i).filter(falta);
+    if (huecos.length) activo = op.horiz ? huecos[0] : huecos[huecos.length-1];
+    pintarRejilla();
+    const rs = document.querySelectorAll('#rejilla .resp');
+    huecos.forEach(i => rs[i] && rs[i].classList.add('falta'));
+    if (sonido) tono(330,.12,0,'triangle',.06);
+  }
   function comprobar(){
     if (resuelta) return;
     const escrito = ans.join('');
-    if (escrito===''){ mensaje('Escribe el resultado en las casillas de abajo 👇',''); return; }
+    if (escrito===''){ mensaje('Escribe el resultado en las casillas de abajo 👇',''); avisarVacias(); return; }
     // huecos en medio: no vale
     const txt = ans.map(x=>x===''?' ':x).join('').trim();
-    const valido = !txt.includes(' ');
+    const valido = !txt.includes(' ') && (op.horiz ? ans[0]!=='' : ans[ans.length-1]!=='');
+    if (!valido){ mensaje('Te falta una casilla por rellenar 👇',''); avisarVacias(); return; }
     const valor = valido ? parseInt(txt,10) : NaN;
     const esperado = String(op.r).padStart(op.W,' ');
     const marcas = op.horiz ? ans.map(()=> 'mal') : ans.map((x,i)=> (esperado[i].trim()===x || (esperado[i]===' ' && (x===''||x==='0'))) ? 'bien':'mal');
@@ -1719,6 +1773,7 @@
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['3.12', ['⏸️ El reloj se para si sales un momento de la app', '❓ Antes de dejar un partido, te pregunta', '💾 Recuerda qué estabas practicando', '👆 Si falta una casilla, parpadea']],
     ['3.11', ['🏆 Trofeos y ajustes, en las esquinas del marcador', '⛹️ Modos de juego en filas, con iconos nuevos']],
     ['3.10', ['✂️ Textos de los modos de juego más cortos y claros']],
     ['3.9', ['⛹️ Salida al pabellón: se encienden los focos al empezar', '➕ Signos nuevos, más claros, en Sumas, Restas, Tablas y Mezcla']],
