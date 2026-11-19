@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="app-version" content="3.6">
+<meta name="app-version" content="3.7">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Canastas Gabi">
@@ -293,7 +293,10 @@
   .marcador .posesion small{font-size:.5rem;color:#c9ccd1;letter-spacing:1px;font-weight:800}
   .marcador .etq{font-family:'Orbitron',monospace;font-size:.7rem;color:#ffb000;text-align:center;line-height:1.1;margin-top:2px;
     background:#050505;border-radius:6px;padding:4px 6px;box-shadow:inset 0 2px 6px rgba(0,0,0,.9)}
-  .icono-btn{background:#33373e;color:#fff;align-self:center}
+  .icono-btn{background:#f2f2f2;color:#1b2440;align-self:center;width:38px;height:38px;border-radius:50%;padding:0;
+    display:flex;align-items:center;justify-content:center;font-size:1.15rem;border:2px solid #fff;box-shadow:0 3px 0 rgba(0,0,0,.45)}
+  .icono-btn.salir{background:#e04848;border-color:#fff}
+  .icono-btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.45)}
   /* inicio: marcador del pabellón */
   .led{background:linear-gradient(#2a2d33,#15171b);border:3px solid #0a0b0d;box-shadow:0 0 0 2px #4a4f58 inset,0 6px 0 rgba(0,0,0,.3)}
   .led::before,.led::after{background:#4a4f58;width:6px}
@@ -691,7 +694,7 @@
   function pintarMarcador(){
     const m = $('#marcador');
     const snd = `<button class="icono-btn" id="btn-sonido" title="Sonido">${sonido?'🔊':'🔇'}</button>`;
-    const salir = `<button class="icono-btn" id="btn-salir" title="Salir">✖</button>`;
+    const salir = `<button class="icono-btn salir" id="btn-salir" title="Salir" aria-label="Salir"><svg viewBox="0 0 20 20" width="16" height="16"><path d="M4 4L16 16M16 4L4 16" stroke="#fff" stroke-width="3.4" stroke-linecap="round"/></svg></button>`;
     const equipo = (nombre, num, color, turno='') => `<div class="eq ${turno}"><div class="nom">${nombre}</div><div class="panel">${seg7(num, color, 38)}</div></div>`;
     const luces = (n, max, color) => `<div class="luces">${Array.from({length:max},(_,i)=>`<i style="${i<n?`background:${color};box-shadow:0 0 6px ${color}`:''}"></i>`).join('')}</div>`;
     if (J.modo==='reto'){
