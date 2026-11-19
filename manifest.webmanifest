@@ -3,7 +3,7 @@
   "short_name": "Canastas Gabi",
   "start_url": "./",
   "display": "standalone",
-  "orientation": "portrait",
+  "orientation": "any",
   "background_color": "#e9c48f",
   "theme_color": "#1d3557",
   "lang": "es",

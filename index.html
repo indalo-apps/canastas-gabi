@@ -2,8 +2,8 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="app-version" content="3.7">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="app-version" content="3.8">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Canastas Gabi">
@@ -130,9 +130,16 @@
     70%{transform:rotate(-4deg) translateY(2px)}100%{transform:rotate(0) translateY(2px)}}
   .silueta{position:absolute;inset:0;width:100%;height:100%;z-index:3;overflow:visible;pointer-events:none;
     filter:drop-shadow(0 0 1.2px rgba(255,255,255,.95)) drop-shadow(0 0 3px rgba(255,255,255,.35))}
-  .bocadillo{position:absolute;left:68px;top:22px;z-index:8;background:#fff;border:2.5px solid #1b2440;border-radius:12px;
-    padding:0 7px;font-weight:800;font-size:.95rem;color:#1b2440;white-space:nowrap;opacity:0;transform:scale(.5);
-    transform-origin:0 100%;transition:opacity .2s, transform .25s cubic-bezier(.3,1.6,.6,1);pointer-events:none}
+  .bocadillo{position:absolute;left:68px;top:22px;z-index:8;background:#fff;border:3px solid #1b2440;border-radius:16px;
+    padding:6px 12px;font-weight:800;font-size:1.05rem;line-height:1.2;color:#1b2440;width:max-content;max-width:min(260px, 70%);
+    opacity:0;transform:scale(.4);transform-origin:var(--cola,20px) 100%;transition:opacity .2s, transform .35s cubic-bezier(.3,1.6,.5,1);
+    pointer-events:none;box-shadow:0 4px 0 rgba(27,36,64,.35)}
+  .bocadillo::after{content:"";position:absolute;left:calc(var(--cola,20px) - 9px);bottom:-14px;border:9px solid transparent;
+    border-top:14px solid #1b2440;border-bottom:0}
+  .bocadillo::before{content:"";position:absolute;left:calc(var(--cola,20px) - 6px);bottom:-9px;border:6px solid transparent;
+    border-top:10px solid #fff;border-bottom:0;z-index:1}
+  .bocadillo.mal{background:#fff3f3}
+  .bocadillo.mal::before{border-top-color:#fff3f3}
   .bocadillo.vis{opacity:1;transform:scale(1)}
   .cancha .fondo{position:absolute;inset:0;width:100%;height:100%;z-index:0}
   .jugador svg{width:100%;height:100%;display:block;overflow:visible}
@@ -154,11 +161,12 @@
     font-size:2.9rem;font-weight:800;line-height:1;border-radius:10px;transition:background .15s}
   .col-act{background:#ffe6cc}
   .signo{color:var(--naranja);}
-  .llevo{width:56px;height:30px;border:2px dashed #b9c0cc;border-radius:8px;font-size:1.25rem;font-weight:800;
+  .llevo{width:56px;height:44px;border:0;font-size:1.25rem;font-weight:800;position:relative;
     background:transparent;color:var(--rojo);cursor:pointer;font-family:inherit;padding:0;
     display:flex;align-items:center;justify-content:center;line-height:1;justify-self:center}
-  .llevo span{display:block}
-  .llevo.on{border-style:solid;border-color:var(--rojo);background:#ffe7e7}
+  .llevo::before{content:"";position:absolute;left:0;right:0;top:7px;bottom:7px;border:2px dashed #b9c0cc;border-radius:8px}
+  .llevo span{display:block;position:relative}
+  .llevo.on::before{border-style:solid;border-color:var(--rojo);background:#ffe7e7}
   .llevo.oculto{visibility:hidden}
   .raya{grid-column:1/-1;height:5px;width:100%;background:var(--tinta);border-radius:3px}
   .resp{width:56px;height:60px;border:3px solid #c3cad6;border-radius:12px;background:#fff;
@@ -265,7 +273,7 @@
   @media (min-width:1000px) and (min-height:1200px){ .app{zoom:1.6} }
   @media (max-height:720px){
     .cancha{height:136px}
-    .celda{height:46px;font-size:2.5rem} .resp{height:52px;font-size:2.2rem} .llevo{height:22px}
+    .celda{height:46px;font-size:2.5rem} .resp{height:50px;font-size:2.2rem}
     .tecla{padding:5px 0}
   }
   @media (max-width:400px){
@@ -286,7 +294,14 @@
   .marcador .seg{display:block}
   .marcador .eq.turno .nom{color:#ffb000}
   .marcador .eq.turno .panel{box-shadow:inset 0 2px 6px rgba(0,0,0,.9),0 0 0 2px #ffb000}
-  .marcador .luces{display:flex;gap:3px;margin-top:2px}
+  .marcador .luces{display:flex;gap:3px;margin-top:4px}
+  .marcador .msub{font-size:.7rem;font-weight:800;color:#c9ccd1;margin-top:2px;line-height:1;white-space:nowrap}
+  /* rejilla del marcador: cada dato con su hueco */
+  .marcador{display:grid;align-items:center;gap:4px}
+  .marcador.m-partido{grid-template-columns:44px 1fr 1fr 1fr .8fr 44px}
+  .marcador.m-entreno{grid-template-columns:44px 1fr 1fr 1.3fr 44px}
+  .marcador.m-reto{grid-template-columns:44px 1fr .9fr 1fr 44px}
+  .marcador .nom{letter-spacing:.3px;white-space:nowrap}
   .marcador .luces i{width:7px;height:7px;border-radius:50%;background:#2b2b2b;display:block}
   .marcador .posesion{display:flex;align-items:center;gap:4px;margin-top:3px;color:#3a3a3a;font-size:.8rem}
   .marcador .posesion span.on{color:#ff3b30;text-shadow:0 0 6px #ff3b30}
@@ -329,6 +344,64 @@
   @keyframes flash{0%{opacity:1}100%{opacity:0}}
   .cancha.vibra-cancha{animation:sacude .3s}
   @keyframes sacude{25%{transform:translate(1px,-1px)}50%{transform:translate(-1px,1px)}75%{transform:translate(1px,1px)}}
+
+  /* ===== Normas de Apple: tamaños mínimos (44 pt táctil, 11 pt de texto) ===== */
+  .icono-btn{width:44px;height:44px}
+  .tecla{min-height:44px}
+  .chip{min-height:44px}
+  .btn-vitrina{min-height:44px}
+  .version button{min-height:44px;padding:0 10px}
+  .marcador .nom.mini{font-size:.72rem}
+  .marcador .posesion small{font-size:.7rem}
+  .led-etq{font-size:.75rem}
+  /* zonas seguras (muesca, isla dinámica, esquinas redondeadas) */
+  .app{padding-top:max(12px, env(safe-area-inset-top));padding-bottom:max(24px, env(safe-area-inset-bottom));
+       padding-left:max(12px, env(safe-area-inset-left));padding-right:max(12px, env(safe-area-inset-right))}
+  .toast{top:max(12px, env(safe-area-inset-top))}
+  /* la ampliación de tablet, solo en vertical */
+  @media (orientation:landscape){ .app{zoom:1 !important} }
+  /* iPad o pantalla grande en horizontal: dos columnas */
+  @media (orientation:landscape) and (min-width:900px){
+    .app{max-width:1180px}
+    #inicio.activa{display:grid;grid-template-columns:1fr 1fr;gap:0 18px;align-items:start}
+    #inicio > *{grid-column:1}
+    #inicio > .tarjeta:nth-of-type(2){grid-column:2;grid-row:1 / span 4}
+    #inicio > .version{grid-column:2}
+    #juego.activa{display:grid;grid-template-columns:1.25fr 1fr;gap:0 18px;align-items:start}
+    #juego > #marcador,#juego > #cancha{grid-column:1}
+    #juego > #tarjeta-op{grid-column:2;grid-row:1 / span 2}
+    #juego .cancha{height:calc(100vh - 190px);max-height:300px;min-height:200px}
+    #final.activa,#vitrina.activa{max-width:640px;margin:0 auto}
+  }
+  /* pantallas bajitas (iPhone SE): que quepa todo sin desplazar */
+  @media (max-height:700px) and (orientation:portrait){
+    .app{padding-top:max(8px, env(safe-area-inset-top))}
+    .marcador{padding:4px 8px;margin-bottom:6px}
+    .marcador .seg{height:30px !important;width:auto !important}
+    .cancha{height:112px !important;margin-bottom:6px}
+    #tarjeta-op{padding:8px 12px 10px}
+    .celda{height:42px;font-size:2.3rem}
+    .resp{height:46px;font-size:2rem}
+    .llevo{height:44px;margin:-6px 0}
+    .mensaje{min-height:1.3em;font-size:1rem;margin:2px 0}
+    .teclado{gap:6px;margin-top:4px}
+    .tecla{padding:4px 0;font-size:1.5rem}
+    .acciones{margin-top:8px}
+    #btn-comprobar{padding:10px}
+  }
+  /* ===== Ajustes: tamaño de letra ===== */
+  html.letra-grande{font-size:18px}
+  html.letra-muy-grande{font-size:20px}
+  /* ===== Movimiento reducido (del sistema o de los ajustes) ===== */
+  html.sin-mov *, html.sin-mov *::before, html.sin-mov *::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+  html.sin-mov .confeti{display:none}
+  /* botón de ajustes y diálogo */
+  .btn-ajustes{position:absolute;top:8px;right:8px;width:44px;height:44px;border-radius:50%;border:2px solid #fff;background:#33373e;
+    color:#fff;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 0 rgba(0,0,0,.45)}
+  .led{position:relative}
+  .ajuste{margin:12px 0}
+  .ajuste > b{display:block;margin-bottom:6px;color:var(--azul)}
+  .ajuste .chips{margin-top:0}
 </style>
 </head>
 <body>
@@ -337,6 +410,7 @@
   <!-- ============ INICIO ============ -->
   <section id="inicio" class="pantalla activa">
     <div class="led">
+      <button class="btn-ajustes" id="btn-ajustes" aria-label="Ajustes" title="Ajustes">⚙︎</button>
       <div class="led-tit">¡HOLA, GABI!</div>
       <div class="led-sub">Cada cuenta bien hecha es una canasta 🏀</div>
       <div class="led-fila">
@@ -373,8 +447,8 @@
     <div class="tarjeta">
       <h2>2. ¿Cómo jugamos?</h2>
       <div class="opciones" id="modos">
-        <button class="opt sel" data-modo="partido"><span class="emoji">🏀</span>Partido<small>10 tiros, ¡a por el récord!</small></button>
-        <button class="opt" data-modo="entreno"><span class="emoji">🎯</span>Entrenamiento<small>sin prisa, todas las que quieras</small></button>
+        <button class="opt sel" data-modo="partido"><span class="emoji">🏀</span>Partido<small>10 tiros, reloj de posesión, público y récord</small></button>
+        <button class="opt" data-modo="entreno"><span class="emoji">🎯</span>Entrenamiento<small>pabellón tranquilo, sin reloj ni puntos; el entrenador te ayuda</small></button>
         <button class="opt" data-modo="reto" style="grid-column:1/-1"><span class="emoji">🆚</span>Reto contra papá o mamá<small>por turnos: ellos tienen cuentas más difíciles</small></button>
       </div>
       <div id="eleccion-rival" style="display:none;margin-top:10px">
@@ -458,6 +532,27 @@
   </div>
 </div>
 <div class="toast" id="toast" role="status"></div>
+<div class="dlg" id="dlg-ajustes" hidden role="dialog" aria-labelledby="aj-tit">
+  <div class="tarjeta">
+    <h2 id="aj-tit">⚙︎ Ajustes</h2>
+    <div class="ajuste"><b>Tamaño de la letra</b>
+      <div class="chips" data-aj="letra"><button class="chip ancho" data-v="normal">Normal</button><button class="chip ancho" data-v="grande">Grande</button><button class="chip ancho" data-v="muy-grande">Muy grande</button></div></div>
+    <div class="ajuste"><b>Movimiento</b>
+      <div class="chips" data-aj="mov"><button class="chip ancho" data-v="normal">Normal</button><button class="chip ancho" data-v="reducido">Reducido</button></div>
+      <small id="aj-mov-nota" style="display:none;color:#6b7280">Tu dispositivo tiene activado «Reducir movimiento».</small></div>
+    <div class="ajuste"><b>Sonidos del juego</b>
+      <div class="chips" data-aj="sonido"><button class="chip ancho" data-v="si">Sí</button><button class="chip ancho" data-v="no">No</button></div></div>
+    <div class="ajuste"><b>Reloj de posesión en el partido</b>
+      <div class="chips" data-aj="reloj"><button class="chip ancho" data-v="si">Sí</button><button class="chip ancho" data-v="no">No</button></div></div>
+    <div class="ajuste"><b>Voz del jugador</b>
+      <div class="chips" data-aj="voz"><button class="chip ancho" data-v="si">Sí</button><button class="chip ancho" data-v="no">No</button></div></div>
+    <div class="ajuste"><b>Público (aplausos y «oooh»)</b>
+      <div class="chips" data-aj="publico"><button class="chip ancho" data-v="si">Sí</button><button class="chip ancho" data-v="no">No</button></div></div>
+    <div class="ajuste"><b>Sonido del bote</b>
+      <div class="chips" data-aj="bote"><button class="chip ancho" data-v="si">Sí</button><button class="chip ancho" data-v="no">No</button></div></div>
+    <button class="btn" id="aj-cerrar" style="margin-top:8px">Listo ✓</button>
+  </div>
+</div>
 <div class="barra-act" id="barra-act" hidden role="status">✨ ¡Versión nueva! Actualizando…</div>
 
 <script>
@@ -507,8 +602,8 @@
     src.buffer = b; g.gain.value = vol; src.connect(g); g.connect(ac.destination);
     src.start(Math.max(t, ac.currentTime));
   }
-  const aplauso = (retraso=0, fuerza=1) => reproducir('aplauso', retraso, Math.min(1, .75*fuerza));
-  const oooh = (retraso=0) => reproducir('ooh', retraso, .9);
+  const aplauso = (retraso=0, fuerza=1) => { if (AJ.publico!=='no' && !(J && J.modo==='entreno')) reproducir('aplauso', retraso, Math.min(1, .75*fuerza)); };
+  const oooh = (retraso=0) => { if (AJ.publico!=='no' && !(J && J.modo==='entreno')) reproducir('ooh', retraso, .9); };
   // Al primer toque se preparan los sonidos para que suenen a tiempo
   document.addEventListener('pointerdown', () => { if (audio()) { buffer('aplauso'); buffer('ooh'); } }, {once:true});
   // t = segundos hasta que el balón entra o toca el aro (lo calcula la animación del tiro)
@@ -516,6 +611,34 @@
   const sBien = (t, toques=[]) => { toques.forEach(sAro); tono(784,.18,t,'triangle',.12); tono(1047,.25,t+.1,'triangle',.12); aplauso(t, 1); };
   const sTriple = (t, toques=[]) => { toques.forEach(sAro); [523,659,784,1047].forEach((f,i)=>tono(f,.2,t+i*.1,'triangle')); aplauso(t, 1.4); };
   const sMal = (t, toques=[]) => { toques.forEach(sAro); oooh(t+.1); };
+
+
+  // ---------- Ajustes (tamaño de letra, movimiento y sonidos) ----------
+  const AJ = Object.assign({ letra:'normal', mov:'normal', publico:'si', bote:'si', voz:'si', reloj:'si' }, store.get('gabi-ajustes') || {});
+  const sistemaSinMov = () => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch(e){ return false; } };
+  const menosMov = () => AJ.mov==='reducido' || sistemaSinMov();
+  function aplicarAjustes(){
+    const h = document.documentElement;
+    h.classList.toggle('letra-grande', AJ.letra==='grande');
+    h.classList.toggle('letra-muy-grande', AJ.letra==='muy-grande');
+    h.classList.toggle('sin-mov', menosMov());
+    document.querySelectorAll('#dlg-ajustes .chips').forEach(c => {
+      const k = c.dataset.aj, v = k==='sonido' ? (sonido ? 'si' : 'no') : AJ[k];
+      c.querySelectorAll('.chip').forEach(b => b.classList.toggle('sel', b.dataset.v===v));
+    });
+    $('#aj-mov-nota').style.display = sistemaSinMov() ? 'block' : 'none';
+  }
+  document.querySelectorAll('#dlg-ajustes .chips').forEach(c => c.addEventListener('click', e => {
+    const b = e.target.closest('.chip'); if (!b) return;
+    const k = c.dataset.aj;
+    if (k==='sonido'){ sonido = b.dataset.v==='si'; store.set('gabi-sonido', sonido); }
+    else { AJ[k] = b.dataset.v; store.set('gabi-ajustes', AJ); }
+    sClic(); aplicarAjustes();
+  }));
+  $('#btn-ajustes').onclick = () => { sClic(); aplicarAjustes(); $('#dlg-ajustes').hidden = false; };
+  $('#aj-cerrar').onclick = () => { sClic(); $('#dlg-ajustes').hidden = true; };
+  try { matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', aplicarAjustes); } catch(e){}
+  aplicarAjustes();
 
   // ---------- Generadores de cuentas ----------
   function llevadasSuma(a,b){ let c=0,n=0; while(a||b){ const s=a%10+b%10+c; c = s>=10?1:0; n+=c; a=Math.floor(a/10); b=Math.floor(b/10);} return n; }
@@ -613,7 +736,7 @@
   const S = { nivel:'suma', modo:'partido', rival:'Papá', cifras: store.get('gabi-cifras') || '2', tabla: store.get('gabi-tabla') || 2 };
   let recientes = [];
   let J = null; // estado de partida
-  let op = null, ans = [], llevo = [], activo = 0, intentos = 0, usoPista = false, resuelta = false, tInicio = 0;
+  let op = null, ans = [], llevo = [], activo = 0, intentos = 0, usoPista = false, resuelta = false, tInicio = 0, fraseJugador = '';
 
   // ---------- Menú ----------
   function marcarSel(cont, attr){
@@ -670,7 +793,7 @@
 
   function empezar(){
     J = { modo:S.modo, nivel:nivelReal(), etiqueta:nombreNivel(), clave:claveRecord(), n:0, total: S.modo==='partido'?10 : S.modo==='reto'?10 : Infinity,
-          puntos:0, aciertos:0, racha:0, primeras:0, tabla:S.tabla,
+          puntos:0, aciertos:0, fallos:0, racha:0, primeras:0, tabla:S.tabla,
           jug:[{nombre:'Gabi',puntos:0,racha:0},{nombre:S.rival,puntos:0,racha:0}], turno:0 };
     nuevos = [];
     mostrar('juego');
@@ -692,10 +815,10 @@
   }
 
   function pintarMarcador(){
-    const m = $('#marcador');
+    const m = $('#marcador'); m.className = 'marcador m-' + J.modo;
     const snd = `<button class="icono-btn" id="btn-sonido" title="Sonido">${sonido?'🔊':'🔇'}</button>`;
     const salir = `<button class="icono-btn salir" id="btn-salir" title="Salir" aria-label="Salir"><svg viewBox="0 0 20 20" width="16" height="16"><path d="M4 4L16 16M16 4L4 16" stroke="#fff" stroke-width="3.4" stroke-linecap="round"/></svg></button>`;
-    const equipo = (nombre, num, color, turno='') => `<div class="eq ${turno}"><div class="nom">${nombre}</div><div class="panel">${seg7(num, color, 38)}</div></div>`;
+    const equipo = (nombre, num, color, turno='', sub='', alto=38) => `<div class="eq ${turno}"><div class="nom">${nombre}</div><div class="panel">${seg7(num, color, alto)}</div>${sub ? `<div class="msub">${sub}</div>` : ''}</div>`;
     const luces = (n, max, color) => `<div class="luces">${Array.from({length:max},(_,i)=>`<i style="${i<n?`background:${color};box-shadow:0 0 6px ${color}`:''}"></i>`).join('')}</div>`;
     if (J.modo==='reto'){
       const [g,r] = J.jug;
@@ -705,17 +828,39 @@
         ${equipo(r.nombre.toUpperCase(), r.puntos, '#ff3b30', J.turno===1?'turno':'')}${snd}`;
     } else if (J.modo==='partido'){
       const rec = store.get(J.clave) || 0;
-      m.innerHTML = `${salir}${equipo('GABI', J.puntos, '#ff3b30')}
-        <div class="centro"><div class="nom">TIRO</div><div class="panel peq">${seg7(Math.min(J.n+1,10),'#ffb000',26,2)}</div>
-          <div class="nom mini">RACHA</div>${luces(Math.min(J.racha,5),5,'#ffb000')}</div>
-        ${equipo('RÉCORD', rec, '#39d353')}${snd}`;
+      m.innerHTML = `${salir}${equipo('PUNTOS', J.puntos, '#ffb000', '', `RÉCORD ${rec}`, 32)}
+        ${equipo('ACIERTOS', J.aciertos, '#39d353', '', '', 32)}
+        ${equipo('FALLOS', J.fallos, '#ff3b30', '', '', 32)}
+        <div class="centro"><div class="nom">TIRO ${Math.min(J.n+1,10)}/10</div>${AJ.reloj!=='no' ? `<div class="panel peq" id="reloj">${seg7(relojSeg(),'#ffb000',24,2)}</div>` : ''}
+          ${luces(Math.min(J.racha,5),5,'#ffb000')}</div>${snd}`;
     } else {
-      m.innerHTML = `${salir}${equipo('ACIERTOS', J.aciertos, '#ff3b30')}
-        <div class="centro"><div class="nom">ENTRENO</div><div class="etq">${J.etiqueta}</div></div>
-        ${equipo('CUENTAS', J.n, '#ffb000')}${snd}`;
+      m.innerHTML = `${salir}${equipo('ACIERTOS', J.aciertos, '#39d353', '', '', 34)}
+        ${equipo('FALLOS', J.fallos, '#ff3b30', '', '', 34)}
+        <div class="centro"><div class="nom">ENTRENO</div><div class="etq">${J.etiqueta}</div></div>${snd}`;
     }
     $('#btn-sonido').onclick = () => { sonido=!sonido; store.set('gabi-sonido',sonido); pintarMarcador(); };
     $('#btn-salir').onclick = () => { sClic(); if (J.modo==='entreno' && J.n>0) terminar(); else { pintarRecord(); pintarInicio(); mostrar('inicio'); } };
+  }
+
+  // ---------- Reloj de posesión (solo en el partido) ----------
+  let relojFin = 0, relojDur = 0, relojInt = null, posesionAgotada = false;
+  const relojSeg = () => relojFin ? Math.max(0, Math.ceil((relojFin - performance.now())/1000)) : relojDur;
+  function pararReloj(){ clearInterval(relojInt); relojInt = null; }
+  function arrancarReloj(){
+    pararReloj(); posesionAgotada = false; relojFin = 0;
+    if (J.modo!=='partido' || AJ.reloj==='no') return;
+    relojDur = op.horiz ? 24 : (op.W>=4 ? 60 : 40);
+    relojFin = performance.now() + relojDur*1000;
+    let ultimo = -1;
+    relojInt = setInterval(() => {
+      if (resuelta || !$('#juego').classList.contains('activa')){ pararReloj(); return; }
+      const sg = relojSeg(), el = $('#reloj');
+      if (sg !== ultimo && el){ ultimo = sg; el.innerHTML = seg7(sg, sg<=5 ? '#ff3b30' : '#ffb000', 24, 2);
+        if (sg<=5 && sg>0 && sonido) tono(1200, .05, 0, 'square', .03); }
+      if (sg===0){ pararReloj(); posesionAgotada = true;
+        if (sonido){ tono(220,.9,0,'sawtooth',.08); tono(223,.9,0,'square',.05); }
+        mensaje('⏱️ ¡Bocina! Se acabó la posesión: ahora la canasta vale 1 punto. ¡Sin prisa, termínala!','ko'); }
+    }, 200);
   }
 
   // ---------- Cuenta ----------
@@ -735,7 +880,7 @@
     $('#pista-txt').className = 'pista-txt';
     $('#acciones').style.display = 'grid'; $('#acciones-sig').style.display = 'none';
     balonInicio();
-    pintarMarcador(); pintarRejilla();
+    pintarMarcador(); pintarRejilla(); arrancarReloj();
   }
 
   function pintarRejilla(marcas, colPista){
@@ -894,7 +1039,8 @@
     if (valor===op.r){
       resuelta = true;
       let pts = 0, triple=false;
-      if (intentos===1 && !usoPista){ jugador.racha++; triple = jugador.racha%3===0; pts = triple?3:2; }
+      pararReloj();
+      if (intentos===1 && !usoPista && !posesionAgotada){ jugador.racha++; triple = jugador.racha%3===0; pts = triple?3:2; }
       else { jugador.racha = 0; pts = 1; }
       if (J.modo!=='reto'){ J.racha = jugador.racha; J.puntos += pts; }
       else jugador.puntos += pts;
@@ -910,8 +1056,9 @@
         : intentos>1 ? frase(msgTiroLibre)
         : rapido && Math.random()<.6 ? frase(msgRapido)
         : frase(msgBien);
-      if (J.modo!=='entreno') m += pts===1 ? '  (+1, tiro libre)' : `  (+${pts})`;
-      mensaje(m,'ok');
+      fraseJugador = m;
+      const corto = triple ? '¡TRIPLE!' : (esRival ? `¡Canasta de ${jugador.nombre}!` : '¡Canasta!');
+      mensaje(J.modo==='entreno' ? corto + ' 🏀' : `${corto} +${pts}${pts===1 ? ' (tiro libre)' : ''}`,'ok');
       triple ? sTriple(ev.entra, ev.toques) : sBien(ev.entra, ev.toques);
       setTimeout(()=>confeti(triple ? 90 : 45), ev.entra*1000);
       finCuenta();
@@ -919,9 +1066,12 @@
       pintarRejilla(marcas);
       $('#tarjeta-op').classList.remove('tiembla'); void $('#tarjeta-op').offsetWidth; $('#tarjeta-op').classList.add('tiembla');
       jugador.racha = 0; if (J.modo!=='reto') J.racha = 0;
+      if (!esRival) J.fallos++;
       const ev = lanzar(false); sMal(ev.aro, ev.toques);
       if (intentos < 2){
-        mensaje(esRival ? frase(msgRivalMal(jugador.nombre)) : frase(msgMal),'ko');
+        fraseJugador = esRival ? frase(msgRivalMal(jugador.nombre)) : frase(msgMal);
+        mensaje(op.horiz ? 'Casi… ¡prueba otra vez! 🔍' : 'Revisa las casillas en rojo y vuelve a tirar 🔍','ko');
+        if (J.modo==='entreno') setTimeout(() => { if (!resuelta){ $('#btn-pista').onclick(); $('#pista-txt').innerHTML = $('#pista-txt').innerHTML.replace('💡','📋 El entrenador te ayuda:'); } }, 1400);
         // limpiar solo las casillas mal
         setTimeout(()=>{ if(resuelta) return; ans = ans.map((x,i)=> marcas[i]==='mal' ? '' : x);
           const pm = ans.map((x,i)=>marcas[i]==='mal'); activo = op.horiz ? 0 : pm.lastIndexOf(true); if (activo<0) activo=op.W-1;
@@ -931,7 +1081,8 @@
         resuelta = true;
         ans = (op.horiz ? String(op.r).padEnd(op.W,' ') : String(op.r).padStart(op.W,' ')).split('').map(x=>x.trim());
         pintarRejilla(ans.map(()=>'bien'));
-        mensaje(esRival ? frase(msgRivalFallo(jugador.nombre, op.r)) : frase(msgFallo2(op.r)),'ko');
+        fraseJugador = esRival ? frase(msgRivalFallo(jugador.nombre, op.r)).replace(/ Era \d+\.?/,'') : frase(['¡Jo! Esta se ha resistido','¡Uf! La próxima es mía','¡Hasta Michael Jordan fallaba!','¡Mecachis! A por la siguiente']);
+        mensaje(esRival ? `Era ${op.r}.` : `El resultado era <b>${op.r}</b>. Mira cómo se hace 👇`,'ko');
         if (!esRival && op.horiz){
           $('#pista-txt').innerHTML = `💡 ${op.a} × ${op.b} = <b>${op.r}</b>` + filaTabla();
           $('#pista-txt').className = 'pista-txt vis';
@@ -985,9 +1136,10 @@
   // ===== Pabellón: grada con público, focos, vallas, parqué con líneas y canasta profesional =====
   function pintarPabellon(){
     const g = geo(), W = g.W, H = g.H, fondo = $('#pabellon'), frente = $('#frente');
-    if (!W || fondo.dataset.k === W+'x'+H) return; fondo.dataset.k = W+'x'+H;
+    const vacio = J && J.modo==='entreno';
+    if (!W || fondo.dataset.k === W+'x'+H+vacio) return; fondo.dataset.k = W+'x'+H+vacio;
     fondo.setAttribute('viewBox',`0 0 ${W} ${H}`); frente.setAttribute('viewBox',`0 0 ${W} ${H}`);
-    const yValla = Math.round(H*0.47), hValla = 13, yParq = yValla + hValla, piso = g.piso;
+    const yValla = Math.round(H*0.47), hValla = 16, yParq = yValla + hValla, piso = g.piso;
     let sd = 11; const az = () => (sd = (sd*9301+49297)%233280)/233280;
     // grada con público (filas de cabezas y camisetas)
     let grada = '';
@@ -998,6 +1150,8 @@
       grada += `<rect x="0" y="${y+5*esc}" width="${W}" height="${(yValla-14)/4}" fill="${fila%2?'#26324f':'#2c3a5c'}"/>`;
       let filaG = '';
       for (let x = (fila%2)*paso/2 - 4; x < W + 6; x += paso + az()*2){
+        if (vacio){ // grada vacía: solo asientos
+          filaG += `<rect x="${x-3.5*esc}" y="${y+5*esc}" width="${7*esc}" height="${7*esc}" rx="${1.5*esc}" fill="${fila%2?'#3a4a75':'#41528a'}"/>`; continue; }
         if (az() < .1) continue;
         const c = colores[Math.floor(az()*colores.length)], p = pieles[Math.floor(az()*pieles.length)];
         filaG += `<path d="M${x-4*esc} ${y+12*esc} q${4*esc} -${6*esc} ${8*esc} 0 v${4*esc} h-${8*esc}z" fill="${c}" opacity=".9"/><circle cx="${x}" cy="${y+4*esc}" r="${3*esc}" fill="${p}"/>`;
@@ -1006,14 +1160,14 @@
     }
     // focos del techo
     let focos = '';
-    for (let x = 30; x < W; x += 90) focos += `<ellipse cx="${x}" cy="0" rx="34" ry="16" fill="url(#luz)"/>`;
+    for (let x = 30; x < W; x += vacio ? 270 : 90) focos += `<ellipse cx="${x}" cy="0" rx="34" ry="16" fill="url(#luz)"/>`;
     // flashes de cámaras (se encienden al encestar)
     let flashes = '';
     for (let i = 0; i < 9; i++) flashes += `<circle cx="${10 + az()*(W-20)}" cy="${12 + az()*(yValla-26)}" r="${2+az()*2}" fill="#fff" style="animation-delay:${(az()*.5).toFixed(2)}s"/>`;
     // vallas luminosas
     let valla = `<rect x="0" y="${yValla}" width="${W}" height="${hValla}" fill="#0b1226"/><rect x="0" y="${yValla}" width="${W}" height="1.5" fill="#3b4a73"/>`;
-    const textos = ['CANASTAS DE GABI','★ 2º DE PRIMARIA ★','¡A POR EL TRIPLE!'];
-    for (let x = 8, i = 0; x < W; x += 150, i++) valla += `<text x="${x}" y="${yValla+9.5}" font-family="Orbitron, monospace" font-weight="900" font-size="7.5" fill="${i%2?'#ffb000':'#38bdf8'}" letter-spacing="1">${textos[i%textos.length]}</text>`;
+    const textos = vacio ? ['ENTRENAMIENTO','SIN PRISA','PRÁCTICA LIBRE'] : ['CANASTAS DE GABI','★ 2º DE PRIMARIA ★','¡A POR EL TRIPLE!'];
+    for (let x = 8, i = 0; x < W; x += 200, i++) valla += `<text x="${x}" y="${yValla+12}" font-family="Orbitron, monospace" font-weight="900" font-size="11" fill="${i%2?'#ffb000':'#38bdf8'}" letter-spacing="1">${textos[i%textos.length]}</text>`;
     // parqué en perspectiva con líneas de la cancha
     const fuga = W*0.55;
     let tablas = '';
@@ -1043,7 +1197,7 @@
         <linearGradient id="parq" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9a066"/><stop offset="1" stop-color="#ecc58e"/></linearGradient>
         <linearGradient id="brillo" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".22"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
       </defs>
-      <rect width="${W}" height="${yValla}" fill="url(#pared)"/>
+      <rect width="${W}" height="${yValla}" fill="url(#pared)"/>${vacio ? `<rect width="${W}" height="${yValla}" fill="#000" opacity=".25"/>` : ''}
       <g id="grada">${grada}</g>${focos}<g id="flashes">${flashes}</g>
       ${valla}
       <rect y="${yParq}" width="${W}" height="${H-yParq}" fill="url(#parq)"/>${tablas}
@@ -1136,7 +1290,7 @@
     let posX = 0, destino = 0, pasoFase = 0, last = performance.now();
     // estado del bote: fase del bote (0..1), mano que bota ('d' delante, 't' detrás), altura, cruce y pausas
     const B = { fase: 0, dur: 560, mano: 'd', cruce: false, bajo: 0, objBajo: 0, ciclosBajo: 0, pausa: 0, tocado: false, cuenta: 0 };
-    const escala = () => { const g = geo(); return { k: (g.H - 14)*0.6/178, x: 4 + posX, piso: g.piso }; };
+    const escala = () => { const g = geo(); return { k: Math.min(.56, (g.H - 14)*0.6/178), x: 4 + posX, piso: g.piso }; };
     const aCancha = ([x,y]) => { const e = escala(); return [e.x + e.k*x, e.piso + e.k*y]; };
     const limiteX = () => Math.max(0, geo().W*0.36);
 
@@ -1146,7 +1300,7 @@
       if (B.ciclosBajo > 0 && --B.ciclosBajo === 0) B.objBajo = 0;
       const moviendo = Math.abs(destino - posX) > 2, r = Math.random();
       if (!moviendo && B.cuenta > 2){
-        if (r < .24){ destino = Math.random()*limiteX(); if (Math.abs(destino-posX) < 18) destino = posX < limiteX()/2 ? posX+30 : posX-30; }
+        if (r < .24 && !menosMov()){ destino = Math.random()*limiteX(); if (Math.abs(destino-posX) < 18) destino = posX < limiteX()/2 ? posX+30 : posX-30; }
         else if (r < .40){ B.cruce = true; }
         else if (r < .54){ B.objBajo = 1; B.ciclosBajo = 3 + Math.floor(Math.random()*3); }
         else if (r < .62){ B.pausa = 900; }
@@ -1239,7 +1393,7 @@
       else if (f < T_BAJA + T_SUELO){
         const q = (f - T_BAJA)/T_SUELO, apl = Math.sin(q*Math.PI);           // aplastado contra el suelo
         y = yS + 2*apl; sx = 1 + .22*apl; sy = 1 - .26*apl; x = B.cruce ? (manoA[0]+manoFin[0])/2+3 : manoA[0]+3;
-        if (!B.tocado){ B.tocado = true; if (sonido) tono(95, .07, 0, 'sine', .05); }
+        if (!B.tocado){ B.tocado = true; if (sonido && AJ.bote!=='no') tono(95, .07, 0, 'sine', .05); }
       } else {
         const q = (f - T_BAJA - T_SUELO)/(1 - T_BAJA - T_SUELO);
         y = lerp(yS, yFin, 1 - Math.pow(1-q, 2)); x = lerp(B.cruce ? (manoA[0]+manoFin[0])/2+3 : manoA[0]+3, manoFin[0]+3, q);
@@ -1261,11 +1415,34 @@
   jugador.iniciar();
 
   function bocadillo(ok){
-    const b = $('#bocadillo'), [hx,hy] = jugador.cabeza();
-    b.textContent = ok ? frase(['¡Toma!','¡Sí!','¡Dentro!','¡Chof!','¡Canasta!','¡Bum!','¡Olé!','¡Facilísimo!','¡Para casa!','¡Ñam!','¡Zas!','¡Yuju!'])
-                       : frase(['¡Ooh!','¡Casi!','¡Uy!','¡Jo!','¡Nooo!','¡Ay, ay!','¡Por poco!','¡Mecachis!','¡Recórcholis!','¡Otra!']);
-    b.style.left = (hx + 14)+'px'; b.style.top = Math.max(2, hy - 34)+'px'; b.classList.add('vis');
+    const b = $('#bocadillo'), g = geo(), [hx,hy] = jugador.cabeza();
+    const txt = fraseJugador || (ok ? frase(['¡Toma!','¡Sí!','¡Dentro!','¡Chof!']) : frase(['¡Ooh!','¡Casi!','¡Uy!','¡Jo!']));
+    fraseJugador = '';
+    b.innerHTML = txt; b.classList.toggle('mal', !ok);
+    b.style.left = '0px'; b.style.top = '0px';
+    const w = b.offsetWidth, h = b.offsetHeight;
+    const x = Math.max(6, Math.min(g.W - w - 6, hx - 18)), y = Math.max(4, hy - h - 18);
+    b.style.left = x + 'px'; b.style.top = y + 'px';
+    b.style.setProperty('--cola', Math.max(14, Math.min(w - 20, hx - x)) + 'px');
+    b.classList.remove('vis'); void b.offsetWidth; b.classList.add('vis');
+    decir(txt);
   }
+  // ---------- Voz del jugador (síntesis de voz del propio dispositivo) ----------
+  let vozES = null;
+  function elegirVoz(){
+    try { const vs = speechSynthesis.getVoices();
+      vozES = vs.find(v => /es[-_]ES/i.test(v.lang) && /(Mónica|Monica|Jorge|Paulina|Google español)/i.test(v.name)) || vs.find(v => /es[-_]ES/i.test(v.lang)) || vs.find(v => /^es/i.test(v.lang)) || null; } catch(e){}
+  }
+  try { elegirVoz(); speechSynthesis.addEventListener('voiceschanged', elegirVoz); } catch(e){}
+  function decir(txt){
+    if (!sonido || AJ.voz==='no' || !('speechSynthesis' in window)) return;
+    const limpio = txt.replace(/<[^>]+>/g,'').replace(/[\p{Extended_Pictographic}\uFE0F\u200D]/gu,'').replace(/\s+/g,' ').trim();
+    if (!limpio) return;
+    try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(limpio);
+      u.lang = 'es-ES'; if (vozES) u.voice = vozES; u.rate = 1.05; u.pitch = 1.25; u.volume = 1; speechSynthesis.speak(u); } catch(e){}
+  }
+  // En el iPad/iPhone la voz se tiene que «desbloquear» con un primer toque
+  document.addEventListener('pointerdown', () => { try { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } catch(e){} }, { once:true });
   function balonInicio(){
     cancelAnimationFrame(animId); animId = 0; clearTimeout(poseTimer); colocarCanasta();
     $('#bocadillo').classList.remove('vis'); $('#balon').style.zIndex = 4; jugador.botar();
@@ -1338,7 +1515,7 @@
         { dur: 400, balon: t => [x0-48 - 22*(1-Math.pow(1-t,2)), g.suelo, 1, 1], giro: .35 });
       delete red.dataset.ok;
       poseTimer = setTimeout(()=>{ jugador.reaccion(true); bocadillo(true); }, ev.entra*1000);
-      reaccionPublico(true, ev.entra);
+      if (!menosMov()) reaccionPublico(true, ev.entra);
     } else {
       balon.style.zIndex = 7;                         // por delante del aro: rebota fuera
       if (variante < .5){
@@ -1412,6 +1589,7 @@
   }
 
   function confeti(n){
+    if (menosMov()) return;
     const cols = ['#f47b20','#ffd23f','#2a9d5c','#1d3557','#e04848','#8ec5ff'];
     for (let i=0;i<n;i++){
       const d = document.createElement('div'); d.className='confeti';
@@ -1503,6 +1681,7 @@
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['3.8', ['🗣️ ¡El jugador habla! Dice sus frases en voz alta y en un bocadillo', '⏱️ Partido con reloj de posesión y pabellón lleno; entrenamiento tranquilo, sin reloj y con ayuda del entrenador', '🔢 El marcador cuenta tus aciertos y tus fallos', '⚙️ Ajustes: tamaño de letra, movimiento y sonidos', '👆 Botones más grandes y fáciles de pulsar', '📱 En el iPad, también en horizontal']],
     ['3.6', ['🏃 El jugador se mueve por la pista mientras piensas', '🏀 Bota de muchas formas: alto, bajo y rápido, cambiando de mano… y a veces se para a mirar la canasta', '👌 El balón bota como uno de verdad']],
     ['3.4', ['😂 ¡Muchas frases nuevas y graciosas! Para las canastas, los fallos, las rachas y para chinchar a papá y mamá', '➕ De vez en cuando sale alguna cuenta sin llevadas']],
     ['3.3', ['🏟️ ¡Pabellón nuevo! Con grada, público, focos y parqué con las líneas de la cancha', '⛹️ Tiros en suspensión más reales y nuevas celebraciones', '🔢 Marcador como el de un partido de verdad']],
