@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="app-version" content="3.15">
+<meta name="app-version" content="3.16">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Canastas Gabi">
@@ -809,7 +809,7 @@
   const S = { nivel: store.get('gabi-nivel') || 'suma', modo: store.get('gabi-modo') || 'partido', rival: store.get('gabi-rival') || 'Papá', cifras: store.get('gabi-cifras') || '2', tabla: store.get('gabi-tabla') || 2 };
   let recientes = [];
   let J = null; // estado de partida
-  let op = null, ans = [], llevo = [], activo = 0, intentos = 0, usoPista = false, resuelta = false, tInicio = 0, fraseJugador = '';
+  let op = null, ans = [], llevo = [], activo = 0, intentos = 0, usoPista = false, resuelta = false, tInicio = 0, fraseJugador = '', enVuelo = false;
 
   // ---------- Menú ----------
   function marcarSel(cont, attr){
@@ -1002,7 +1002,7 @@
     const esRival = J.modo==='reto' && J.turno===1;
     op = generar(esRival ? (J.nivel==='tablas' ? 'tablasDificil' : 'dificil') : J.nivel);
     ans = Array(op.W).fill(''); llevo = Array(op.W).fill(false);
-    activo = op.horiz ? 0 : op.W-1; intentos = 0; usoPista = false; resuelta = false;
+    activo = op.horiz ? 0 : op.W-1; intentos = 0; usoPista = false; resuelta = false; enVuelo = false;
     const rivalN = J.modo==='reto' ? J.jug[1].nombre : '';
     $('#mensaje').textContent = esRival ? frase([`Turno de ${rivalN}: ¡cuenta de mayores! 😎`,`${rivalN}, a ver si te acuerdas del cole… 🤓`,`¡${rivalN} al ataque! Gabi vigila 👀`])
       : op.horiz ? `${frase(inicioCuenta)} ¿Cuánto es? 🤔`
@@ -1053,7 +1053,7 @@
   }
 
   $('#rejilla').addEventListener('click', e => {
-    if (resuelta) return;
+    if (resuelta || enVuelo) return;
     const l = e.target.closest('[data-l]'), r = e.target.closest('[data-r]');
     if (l){ const i=+l.dataset.l; llevo[i]=!llevo[i]; sClic(); pintarRejilla(); }
     if (r){ activo=+r.dataset.r; sClic(); pintarRejilla(); }
@@ -1066,7 +1066,7 @@
   [6,7,8,9,0].forEach(d => tec.insertAdjacentHTML('beforeend', `<button class="tecla" data-d="${d}">${d}</button>`));
   tec.insertAdjacentHTML('beforeend', `<button class="tecla pista" id="btn-pista" aria-label="Pista">💡</button>`);
   tec.addEventListener('click', e => {
-    const b = e.target.closest('.tecla'); if(!b || resuelta || b.id==='btn-pista') return;
+    const b = e.target.closest('.tecla'); if(!b || resuelta || enVuelo || b.id==='btn-pista') return;
     sClic();
     if (b.dataset.d!==undefined) escribir(b.dataset.d);
     else if (b.dataset.k==='borrar') borrar();
@@ -1083,6 +1083,7 @@
     if (!$('#juego').classList.contains('activa')) return;
     if (['Enter','Backspace','ArrowLeft','ArrowRight'].includes(e.key)) e.preventDefault();
     if ($('#aviso-turno').classList.contains('vis')){ if(e.key==='Enter') $('#btn-listo').click(); return; }
+    if (enVuelo) return;
     if (resuelta){ if (e.key==='Enter') $('#btn-siguiente').click(); return; }
     if (/^[0-9]$/.test(e.key)) escribir(e.key);
     else if (e.key==='Backspace') borrar();
@@ -1141,7 +1142,7 @@
     return `<br>Tabla del ${t}: ` + [1,2,3,4,5,6,7,8,9,10].map(i=> i===op.veces ? `<b>${t}×${i}=${t*i}</b>` : `${t*i}`).join(', ');
   }
   $('#btn-pista').onclick = () => {
-    if (resuelta) return; sClic(); jugador.piensa(); if (J && J.modo==='entreno' && intentos===0) entrenador('explica');
+    if (resuelta || enVuelo) return; sClic(); jugador.piensa(); if (J && J.modo==='entreno' && intentos===0) entrenador('explica');
     usoPista = true;
     if (op.horiz){
       $('#pista-txt').innerHTML = '💡 ' + pistaTabla();
@@ -1170,7 +1171,7 @@
     if (sonido) tono(330,.12,0,'triangle',.06);
   }
   function comprobar(){
-    if (resuelta) return;
+    if (resuelta || enVuelo) return;
     const escrito = ans.join('');
     if (escrito===''){ mensaje('Escribe el resultado en las casillas de abajo 👇',''); avisarVacias(); return; }
     // huecos en medio: no vale
@@ -1192,7 +1193,6 @@
       else jugador.puntos += pts;
       J.aciertos++;
       if (!esRival){ if (intentos===1 && !usoPista) J.primeras++; logroCanasta(jugador.racha, triple); }
-      pintarRejilla(ans.map(()=> 'bien'));
       celebraEspecial = triple || jugador.racha===5 || jugador.racha===10; fuego = jugador.racha >= 5;
       const ev = lanzar(true);
       const rapido = intentos===1 && !usoPista && (performance.now() - tInicio) < (op.horiz ? 4000 : 7000);
@@ -1205,41 +1205,53 @@
         : frase(msgBien);
       fraseJugador = m;
       const corto = triple ? '¡TRIPLE!' : (esRival ? `¡Canasta de ${jugador.nombre}!` : '¡Canasta!');
-      mensaje(J.modo==='entreno' ? corto + ' 🏀' : `${corto} +${pts}${pts===1 ? ' (tiro libre)' : ''}`,'ok');
       triple ? sTriple(ev.entra, ev.toques) : sBien(ev.entra, ev.toques);
       setTimeout(()=>confeti(triple ? 90 : 45), ev.entra*1000);
-      finCuenta();
+      // la cuenta espera al tiro: se pone en verde justo cuando entra el balón
+      enVuelo = true; mensaje(elige(['¿Entrará? 🤞','¡Allá va! 🏀','¡Tira…! 🤞']), '');
+      const opTiro = op;
+      setTimeout(() => { if (op !== opTiro) return; enVuelo = false;
+        pintarRejilla(ans.map(()=> 'bien'));
+        mensaje(J.modo==='entreno' ? corto + ' 🏀' : `${corto} +${pts}${pts===1 ? ' (tiro libre)' : ''}`,'ok');
+        finCuenta(); }, ev.entra*1000);
     } else {
-      pintarRejilla(marcas);
-      $('#tarjeta-op').classList.remove('tiembla'); void $('#tarjeta-op').offsetWidth; $('#tarjeta-op').classList.add('tiembla');
       jugador.racha = 0; if (J.modo!=='reto') J.racha = 0;
       if (!esRival) J.fallos++;
       celebraEspecial = false; fuego = false;
       const ev = lanzar(false); sMal(ev.aro, ev.toques);
-      if (intentos < 2){
-        fraseJugador = esRival ? frase(msgRivalMal(jugador.nombre)) : frase(msgMal);
-        mensaje(op.horiz ? 'Casi… ¡prueba otra vez! 🔍' : 'Revisa las casillas en rojo y vuelve a tirar 🔍','ko');
-        if (J.modo==='entreno') setTimeout(() => { if (!resuelta){ $('#btn-pista').onclick(); $('#pista-txt').innerHTML = $('#pista-txt').innerHTML.replace('💡','📋 El entrenador te ayuda:'); } }, 1400);
-        // limpiar solo las casillas mal
-        setTimeout(()=>{ if(resuelta) return; ans = ans.map((x,i)=> marcas[i]==='mal' ? '' : x);
-          const pm = ans.map((x,i)=>marcas[i]==='mal'); activo = op.horiz ? 0 : pm.lastIndexOf(true); if (activo<0) activo=op.W-1;
-          pintarRejilla(); }, 1300);
-        pintarMarcador();
-      } else {
-        resuelta = true;
-        ans = (op.horiz ? String(op.r).padEnd(op.W,' ') : String(op.r).padStart(op.W,' ')).split('').map(x=>x.trim());
-        pintarRejilla(ans.map(()=>'bien'));
-        fraseJugador = esRival ? frase(msgRivalFallo(jugador.nombre, op.r)).replace(/ Era \d+\.?/,'') : frase(['¡Jo! Esta se ha resistido','¡Uf! La próxima es mía','¡Hasta Michael Jordan fallaba!','¡Mecachis! A por la siguiente']);
-        mensaje(esRival ? `Era ${op.r}.` : `El resultado era <b>${op.r}</b>. Mira cómo se hace 👇`,'ko');
-        if (!esRival && op.horiz){
-          $('#pista-txt').innerHTML = `💡 ${op.a} × ${op.b} = <b>${op.r}</b>` + filaTabla();
-          $('#pista-txt').className = 'pista-txt vis';
-        } else if (!esRival){
-          $('#pista-txt').innerHTML = '💡 ' + pasos().map((p,k)=>`<b>${nombreCol[k][0].toUpperCase()+nombreCol[k].slice(1)}:</b> ${p}`).join('<br>');
-          $('#pista-txt').className = 'pista-txt vis';
+      enVuelo = true; mensaje(elige(['¿Entrará? 🤞','¡Allá va! 🏀','¡Tira…! 🤞']), '');
+      const opTiro = op, ultimo = intentos >= 2;
+      if (ultimo) resuelta = true;
+      // la cuenta espera al tiro: se descubre el fallo justo cuando el balón sale del aro
+      setTimeout(() => {
+        if (op !== opTiro) return; enVuelo = false;
+        $('#tarjeta-op').classList.remove('tiembla'); void $('#tarjeta-op').offsetWidth; $('#tarjeta-op').classList.add('tiembla');
+        if (!ultimo){
+          pintarRejilla(marcas);
+          mensaje(op.horiz ? 'Casi… ¡prueba otra vez! 🔍' : 'Revisa las casillas en rojo y vuelve a tirar 🔍','ko');
+          if (J.modo==='entreno') setTimeout(() => { if (!resuelta && op === opTiro){ $('#btn-pista').onclick(); $('#pista-txt').innerHTML = $('#pista-txt').innerHTML.replace('💡','📋 El entrenador te ayuda:'); } }, 700);
+          // limpiar solo las casillas mal
+          setTimeout(()=>{ if (resuelta || op !== opTiro) return; ans = ans.map((x,i)=> marcas[i]==='mal' ? '' : x);
+            const pm = ans.map((x,i)=>marcas[i]==='mal'); activo = op.horiz ? 0 : pm.lastIndexOf(true); if (activo<0) activo=op.W-1;
+            pintarRejilla(); }, 1300);
+          pintarMarcador();
+        } else {
+          ans = (op.horiz ? String(op.r).padEnd(op.W,' ') : String(op.r).padStart(op.W,' ')).split('').map(x=>x.trim());
+          pintarRejilla(ans.map(()=>'bien'));
+          mensaje(esRival ? `Era ${op.r}.` : `El resultado era <b>${op.r}</b>. Mira cómo se hace 👇`,'ko');
+          if (!esRival && op.horiz){
+            $('#pista-txt').innerHTML = `💡 ${op.a} × ${op.b} = <b>${op.r}</b>` + filaTabla();
+            $('#pista-txt').className = 'pista-txt vis';
+          } else if (!esRival){
+            $('#pista-txt').innerHTML = '💡 ' + pasos().map((p,k)=>`<b>${nombreCol[k][0].toUpperCase()+nombreCol[k].slice(1)}:</b> ${p}`).join('<br>');
+            $('#pista-txt').className = 'pista-txt vis';
+          }
+          finCuenta();
         }
-        finCuenta();
-      }
+      }, (ev.aro + .15)*1000);
+      // la frase del jugador (bocadillo) sale a la vez que se descubre el fallo
+      fraseJugador = !ultimo ? (esRival ? frase(msgRivalMal(jugador.nombre)) : frase(msgMal))
+        : (esRival ? frase(msgRivalFallo(jugador.nombre, op.r)).replace(/ Era \d+\.?/,'') : frase(['¡Jo! Esta se ha resistido','¡Uf! La próxima es mía','¡Hasta Michael Jordan fallaba!','¡Mecachis! A por la siguiente']));
     }
   }
   function mensaje(t,c){ const m=$('#mensaje'); m.innerHTML=t; m.className='mensaje '+c; m.classList.remove('pop'); void m.offsetWidth; m.classList.add('pop'); }
@@ -1935,6 +1947,7 @@
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['3.16', ['🤞 La cuenta espera al tiro: se pone en verde o en rojo cuando el balón entra o se sale del aro']],
     ['3.15', ['📺 La valla de publicidad se mueve como una de verdad: anuncios que pasan, parpadeos y «¡CANASTA!» en grande', '🔊 Ahora se oye el bote del balón', '📜 La ventana de novedades ya cabe en pantallas pequeñas']],
     ['3.14', ['📐 Líneas de la pista bien dibujadas: zona, tiros libres y triple, centradas en la canasta']],
     ['3.13', ['⛹️ ¡Gabi en dibujos! Bota, corre, cambia de mano, hace trucos con el balón en el dedo y celebra a lo grande', '🔥 En las rachas, ¡el balón vuela en llamas!', '🏀 Canasta, red y balón nuevos, con chispas, estrellas y polvo', '📋 En el entrenamiento te ayuda el entrenador', '🏆 Al acabar, Gabi levanta la copa si bate el récord']],
