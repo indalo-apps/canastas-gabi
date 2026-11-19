@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="app-version" content="3.12">
+<meta name="app-version" content="3.13">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Canastas Gabi">
@@ -428,6 +428,16 @@
   .modo-txt small{margin-top:2px}
   /* 5: lo elegido, siempre con el aro amarillo */
   #inicio .chip.sel{background:#fff;color:var(--azul);border-color:#fff;box-shadow:0 3px 0 #c9cfdb,0 0 0 4px var(--amarillo);transform:translateY(-2px)}
+  .cancha.sprite-balon #balon, .cancha.sprite-balon #sombra{visibility:hidden}
+  #aro-atras,#aro-delante,#red{display:none !important}
+  .aro-spr{position:absolute;pointer-events:none} #aro-fondo{z-index:1} #aro-frente{z-index:6}
+  .ent-spr{position:absolute;z-index:2;pointer-events:none;filter:brightness(.92)}
+  #fuego{position:absolute;z-index:5;pointer-events:none}
+  .fx-spr{position:absolute;z-index:7;pointer-events:none;opacity:.92}
+  .vibra-spr{animation:vibraSpr .35s}
+  @keyframes vibraSpr{0%{transform:translateY(0)}25%{transform:translateY(2px)}50%{transform:translateY(-1.5px)}75%{transform:translateY(1px)}100%{transform:translateY(0)}}
+  .cancha .balon{width:22px !important;height:22px !important;margin:-1px}
+  .final-spr{width:170px;display:block;margin:0 auto 2px}
 </style>
 </head>
 <body>
@@ -496,14 +506,13 @@
 
       <svg class="silueta" id="silueta" aria-hidden="true"></svg>
       <div class="bocadillo" id="bocadillo"></div>
-      <div class="aro-atras" id="aro-atras"></div>
+      <img class="aro-spr" id="aro-fondo" src="sprites/aro-fondo.webp" alt=""><img class="ent-spr" id="entrenador" alt="" style="display:none"><div class="aro-atras" id="aro-atras"></div>
       <div class="sombra" id="sombra"></div>
       <div class="balon" id="balon">
-        <svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#f47b20" stroke="#7a3a08" stroke-width="4"/>
-        <path d="M2 32h60M32 2v60M10 10c12 10 12 34 0 44M54 10c-12 10-12 34 0 44" fill="none" stroke="#7a3a08" stroke-width="4"/></svg>
+        <img src="sprites/bal0.webp" alt="" style="width:100%;height:100%;display:block">
       </div>
       <div class="red" id="red"></div>
-      <div class="aro-delante" id="aro-delante"></div>
+      <div class="aro-delante" id="aro-delante"></div><img class="aro-spr" id="aro-frente" src="sprites/red0.webp" alt=""><img id="fuego" alt="" style="display:none">
       <svg class="frente" id="frente" aria-hidden="true"></svg>
     </div>
 
@@ -933,7 +942,7 @@
         if (sg<=5 && sg>0 && sonido) tono(1200, .05, 0, 'square', .03); }
       if (sg===0){ pararReloj(); posesionAgotada = true;
         if (sonido){ tono(220,.9,0,'sawtooth',.08); tono(223,.9,0,'square',.05); }
-        mensaje('⏱️ ¡Bocina! Se acabó la posesión: ahora la canasta vale 1 punto. ¡Sin prisa, termínala!','ko'); }
+        jugador.susto(); mensaje('⏱️ ¡Bocina! Se acabó la posesión: ahora la canasta vale 1 punto. ¡Sin prisa, termínala!','ko'); }
     }, 200);
   }
 
@@ -958,7 +967,7 @@
     $('#pista-txt').className = 'pista-txt';
     $('#acciones').style.display = 'grid'; $('#acciones-sig').style.display = 'none';
     balonInicio();
-    pintarMarcador(); pintarRejilla(); arrancarReloj();
+    pintarMarcador(); pintarRejilla(); arrancarReloj(); entrenador(J.n===0 ? 'silbato' : 'quieto');
   }
 
   function pintarRejilla(marcas, colPista){
@@ -1087,7 +1096,7 @@
     return `<br>Tabla del ${t}: ` + [1,2,3,4,5,6,7,8,9,10].map(i=> i===op.veces ? `<b>${t}×${i}=${t*i}</b>` : `${t*i}`).join(', ');
   }
   $('#btn-pista').onclick = () => {
-    if (resuelta) return; sClic();
+    if (resuelta) return; sClic(); jugador.piensa(); if (J && J.modo==='entreno' && intentos===0) entrenador('explica');
     usoPista = true;
     if (op.horiz){
       $('#pista-txt').innerHTML = '💡 ' + pistaTabla();
@@ -1139,6 +1148,7 @@
       J.aciertos++;
       if (!esRival){ if (intentos===1 && !usoPista) J.primeras++; logroCanasta(jugador.racha, triple); }
       pintarRejilla(ans.map(()=> 'bien'));
+      celebraEspecial = triple || jugador.racha===5 || jugador.racha===10; fuego = jugador.racha >= 5;
       const ev = lanzar(true);
       const rapido = intentos===1 && !usoPista && (performance.now() - tInicio) < (op.horiz ? 4000 : 7000);
       let m = esRival ? frase(msgRival(jugador.nombre))
@@ -1159,6 +1169,7 @@
       $('#tarjeta-op').classList.remove('tiembla'); void $('#tarjeta-op').offsetWidth; $('#tarjeta-op').classList.add('tiembla');
       jugador.racha = 0; if (J.modo!=='reto') J.racha = 0;
       if (!esRival) J.fallos++;
+      celebraEspecial = false; fuego = false;
       const ev = lanzar(false); sMal(ev.aro, ev.toques);
       if (intentos < 2){
         fraseJugador = esRival ? frase(msgRivalMal(jugador.nombre)) : frase(msgMal);
@@ -1214,7 +1225,8 @@
     const c = $('#cancha'), W = c.clientWidth, H = c.clientHeight;
     const piso = H - 14;                       // línea del suelo
     const suelo = piso - R;                    // centro del balón apoyado en el suelo
-    const aroW = 50, aroDcha = W - 26, aroY = Math.round(H*0.36);
+    // la canasta dibujada: el tablero (125 px de alto por cada 106 de aro) tiene que caber por arriba
+    const aroW = Math.round(Math.max(34, Math.min(50, H*0.29))), aroDcha = W - 46, aroY = Math.max(Math.round(H*0.36), Math.round((aroW + 6)*125/106) + 6);
     return { W, H, piso, suelo, aroW, aroDcha, aroIzq: aroDcha-aroW, aroCx: aroDcha-aroW/2, aroY };
   }
   function colocarCanasta(){
@@ -1222,7 +1234,7 @@
     for (const id of ['aro-atras','aro-delante']){ const e=$('#'+id); e.style.left=g.aroIzq+'px'; e.style.top=(g.aroY-6)+'px'; }
     const r=$('#red'); r.style.left=(g.aroIzq+2)+'px'; r.style.top=(g.aroY)+'px';
     $('#silueta').setAttribute('viewBox', `0 0 ${g.W} ${g.H}`);
-    pintarPabellon();
+    pintarPabellon(); colocarAroSpr();
   }
 
   // ===== Pabellón: grada con público, focos, vallas, parqué con líneas y canasta profesional =====
@@ -1294,7 +1306,7 @@
       ${valla}
       <rect y="${yParq}" width="${W}" height="${H-yParq}" fill="url(#parq)"/>${tablas}
       <rect x="${W*0.15}" y="${yParq}" width="${W*0.5}" height="${H-yParq}" fill="url(#brillo)"/>
-      ${arco}${zona}${canasta}`;
+      ${arco}${zona}`;
     frente.innerHTML = '';
   }
   function reaccionPublico(ok, retraso){
@@ -1306,6 +1318,7 @@
     }, retraso*1000);
   }
   function ponerBalon(x,y,rot,sx=1,sy=1){
+    ultBalon = [x,y]; pintarFuego(x,y);
     $('#balon').style.transform = `translate(${x-R}px,${y-R}px) rotate(${rot}deg) scale(${sx},${sy})`;
     const g = geo(), alt = Math.max(0, g.suelo - y), k = Math.max(.3, 1 - alt/150);
     const sm = $('#sombra'); sm.style.transform = `translateX(${x-9}px) scale(${k})`; sm.style.opacity = k;
@@ -1375,135 +1388,213 @@
     const sombra = `<ellipse cx="${px+6}" cy="-3" rx="${30 - Math.min(18,-p.salto/3)}" ry="5" fill="rgba(27,36,64,.15)"/>`;
     return { svg: sombra + bt.s + pierna(p.mt,p.pt,atras) + pantalon + camiseta + pierna(p.md,p.pd,TINTA) + cabeza + bd.s, mano: bd.mano, manoAtras: bt.mano, cabeza:[hx,hy] };
   }
+  // ===== Jugador con sprites (dibujos fotograma a fotograma) =====
+  // Prefijos: f = hoja 1 · g = lamentos/carrera/recoger · a = triple/esperar/pensar/fin · b = bote y tiro de 8
+  //           c = cambio de mano y entre piernas · d = balón en el dedo · t = giro y carrera a la izquierda
+  const SPR = { celda: 313, suelo: 298, ejeX: 160, cabeza: [195, 75], bola: [254.5, 33.5], recoge: [245, 265], dedo: {"d03": [232, 73], "d10": [230, 74], "d11": [226, 69], "d12": [234, 63], "d13": [234, 65]} };
+  const FOT = n => 'sprites/' + n + '.webp';
+  const TODOS = ["f00", "f01", "f02", "f03", "f30", "f31", "f32", "f33", "g00", "g01", "g02", "g03", "g10", "g11", "g12", "g13", "g20", "g21", "g22", "g23", "g30", "g31", "g32", "g33", "a00", "a01", "a02", "a03", "a12", "a13", "a20", "a21", "a22", "a23", "a30", "a31", "a32", "b00", "b01", "b02", "b03", "b10", "b11", "b12", "b13", "b20", "b21", "b22", "b23", "b30", "b31", "b32", "b33", "c00", "c01", "c02", "c03", "c10", "c11", "c12", "c13", "d00", "d01", "d02", "d03", "d10", "d11", "d12", "d13", "d20", "d21", "d22", "d23", "t00", "t01", "t02", "t03", "t10", "t11", "t12", "t13", "t20", "t21", "t22", "t23"];
+  ['bal0','bal1','bal2','bal3','red1','red2','red3','red4','x00','x01','x02','x03','x10','x11','x12','x13','x20','x21','x22','x23','x30','x31','x32','x33','e00','e01','e02','e03','e10','e11','e12','e13']
+    .forEach(n => { const im = new Image(); im.src = FOT(n); });
+  const SALTOS = new Set(['f31','f32','a01','a02','b30','b31','b32','f22']);
+  let ultBalon = [0,0], celebraEspecial = false, fuego = false;
+  const LAMENTOS = [
+    [['g00',650],['g01',650],['g03',99999]],
+    [['g02',900],['g03',99999]],
+    [['g30',800],['g33',99999]],
+    [['g31',450],['g32',800],['g33',99999]],
+    [['g01',700],['g02',700],['g03',99999]],
+  ];
+  const CELEBRA = [['f30',180],['f31',170],['f32',220],['f31',170],['f30',200],['f31',170],['f32',220],['f31',170],['f33',99999]];
+  const CELEBRA_TRIPLE = [['a00',380],['a01',300],['a02',300],['a01',220],['a00',250],['a03',99999]];
+  const TIRO = [['b20',150],['b21',140],['b22',230],['b23',120],['b30',110],['b31',150],['b32',150],['b33',99999]];
+  const BOTE = ['b00','b01','b02','b03','b10','b11','b12','b13'];
+  const GIRO_IZQ = ['t02','t01','t00','t13','t12'], GIRO_DER = ['t12','t13','t00','t01','t02'];
   const jugador = (() => {
-    let sec = 'botar', i = 0, t0 = performance.now(), desde = null, ultima = POSE.boteArriba, ultimo = null, id = 0;
-    let modoBalon = 'bote';   // 'bote' | 'manos' | 'libre'
-    // posición del jugador en la pista (px desde la izquierda) y movimiento
-    let posX = 0, destino = 0, pasoFase = 0, last = performance.now();
-    // estado del bote: fase del bote (0..1), mano que bota ('d' delante, 't' detrás), altura, cruce y pausas
-    const B = { fase: 0, dur: 560, mano: 'd', cruce: false, bajo: 0, objBajo: 0, ciclosBajo: 0, pausa: 0, tocado: false, cuenta: 0 };
-    const escala = () => { const g = geo(); return { k: Math.min(.56, (g.H - 14)*0.6/178), x: 4 + posX, piso: g.piso }; };
-    const aCancha = ([x,y]) => { const e = escala(); return [e.x + e.k*x, e.piso + e.k*y]; };
-    const limiteX = () => Math.max(0, geo().W*0.36);
-
-    // Decide qué hace en el siguiente bote: moverse, cambiar de mano, botar bajo o pararse a mirar la canasta
-    function siguienteBote(){
-      B.cuenta++; B.cruce = false;
-      if (B.ciclosBajo > 0 && --B.ciclosBajo === 0) B.objBajo = 0;
-      const moviendo = Math.abs(destino - posX) > 2, r = Math.random();
-      if (!moviendo && B.cuenta > 2){
-        if (r < .24 && !menosMov()){ destino = Math.random()*limiteX(); if (Math.abs(destino-posX) < 18) destino = posX < limiteX()/2 ? posX+30 : posX-30; }
-        else if (r < .40){ B.cruce = true; }
-        else if (r < .54){ B.objBajo = 1; B.ciclosBajo = 3 + Math.floor(Math.random()*3); }
-        else if (r < .62){ B.pausa = 900; }
-      } else if (moviendo && r < .2){ B.cruce = true; }
-      B.dur = B.objBajo ? 380 : (moviendo ? 460 : 560);
+    let modo = 'botar', t0 = performance.now(), last = performance.now(), id = 0, fot = 'b00', dy = 0, prev = 'b00';
+    let posX = 0, destino = 0, ciclos = -1, sec = null, tReac = 0, rb = null, accion = null, tAcc = 0, mirando = 'der';
+    let ultimaActividad = performance.now(), bolaDedo = null, ultDecision = -1;
+    const hueco = () => (J && J.modo === 'entreno') ? 62 : 0;      // sitio para el entrenador en la banda
+    const escala = () => { const g = geo(); return { k: Math.min(.38, (g.H - 14)*0.62/SPR.suelo), x: 4 + hueco() + posX, piso: g.piso }; };
+    const aCancha = ([x,y]) => { const e = escala(); return [e.x + e.k*(x - SPR.ejeX + 130), e.piso + e.k*(y - SPR.suelo + dy)]; };
+    const limiteX = () => { const g = geo(), k = Math.min(.38, (g.H - 14)*0.62/SPR.suelo); return Math.max(0, Math.min(g.W*0.36, g.aroIzq - 70 - 130*k) - hueco()); };
+    const conBalonEnDibujo = on => $('#cancha').classList.toggle('sprite-balon', on);
+    const hacer = (pasos, fin) => { accion = { pasos, fin }; tAcc = performance.now(); };
+    let montado = false, visible = null;
+    function pintar(now){
+      const sv = $('#silueta');
+      if (!montado || !sv.querySelector('#spr')){
+        sv.innerHTML = '<ellipse id="spr-sombra" fill="rgba(27,36,64,.18)"/><g id="spr">' + TODOS.map(n => `<image id="fr${n}" href="${FOT(n)}" width="${SPR.celda}" height="${SPR.celda}" style="display:none"/>`).join('')
+          + ['0','1','2','3'].map(i => `<image id="bd${i}" href="${FOT('bal'+i)}" width="62" height="62" style="display:none"/>`).join('') + '</g>';
+        montado = true; visible = null;
+      }
+      const e = escala();
+      const x = e.x + e.k*(130 - SPR.ejeX), y = e.piso + e.k*(dy - SPR.suelo);
+      sv.querySelector('#spr').setAttribute('transform', `translate(${x},${y}) scale(${e.k})`);
+      const sm = sv.querySelector('#spr-sombra');
+      sm.setAttribute('cx', e.x + 130*e.k); sm.setAttribute('cy', e.piso - 2); sm.setAttribute('ry', 5);
+      sm.setAttribute('rx', 80*e.k*(1 - Math.min(.5, -dy/160)));
+      if (visible !== fot){ const nv = sv.querySelector('#fr'+fot); if (!nv) return;
+        const vj = visible && sv.querySelector('#fr'+visible); if (vj) vj.style.display = 'none'; nv.style.display = ''; visible = fot; }
+      // balón girando en la punta del dedo
+      for (let i = 0; i < 4; i++) sv.querySelector('#bd'+i).style.display = 'none';
+      if (bolaDedo && SPR.dedo[fot]){
+        const i = Math.floor(now/55) % 4, [fx,fy] = SPR.dedo[fot], w = Math.sin(now/170)*3;
+        const im = sv.querySelector('#bd'+i); im.style.display = '';
+        im.setAttribute('x', fx - 31 + w); im.setAttribute('y', fy - 60 + dy);
+      }
+      // polvo al aterrizar
+      if (prev !== fot){ if (SALTOS.has(prev) && !SALTOS.has(fot)) polvo(); prev = fot; }
     }
-    // Postura procedimental mientras bota (y camina si se está moviendo)
-    function poseBote(dt){
-      B.bajo += (B.objBajo - B.bajo)*Math.min(1, dt/180);
-      const moviendo = Math.abs(destino - posX) > 2;
-      if (moviendo){ const v = .055*dt*(B.objBajo ? .8 : 1); posX += Math.sign(destino-posX)*Math.min(v, Math.abs(destino-posX)); pasoFase += dt/(B.objBajo ? 300 : 360); }
-      const b = B.bajo, f = B.fase;
-      // empuje del balón: la mano baja al principio del bote y sube a recogerlo al final
-      const emp = f < .3 ? Math.sin(f/.3*Math.PI/2) : Math.cos((f-.3)/.7*Math.PI/2);
-      const brazoArr = { b: lerp(42, 30, b), a: lerp(86, 52, b) }, brazoAb = { b: lerp(26, 20, b), a: lerp(18, 6, b) };
-      const bd = lerp(brazoArr.b, brazoAb.b, emp), ad = lerp(brazoArr.a, brazoAb.a, emp);
-      const protege = moviendo ? { b: 34, a: 76 } : { b: -14, a: 18 };          // el otro brazo protege el balón
-      const s = Math.sin(pasoFase*Math.PI*2), c = Math.cos(pasoFase*Math.PI*2);
-      const paso = moviendo ? 1 : 0;
-      const p = {
-        tronco: lerp(12, 26, b) + 2*emp + (moviendo ? 4 : 0), cabeza: lerp(-6, -10, b),
-        md: lerp(16, 36, b) + paso*18*s, pd: lerp(-6, -26, b) + paso*(-10 - 14*Math.max(0, c)),
-        mt: lerp(-12, 6, b) - paso*18*s, pt: lerp(-24, -42, b) + paso*(-10 - 14*Math.max(0, -c)),
-        salto: moviendo ? -2*Math.abs(s) : 0, avance: 0,
-      };
-      if (B.mano === 'd'){ p.bd = bd; p.ad = ad; p.bt = protege.b; p.at = protege.a; }
-      else { p.bt = bd - 4; p.at = ad; p.bd = protege.b + 10; p.ad = protege.a; }
-      return p;
+    function polvo(){ const e = escala(); efecto(0, e.x + 130*e.k, e.piso - 2, 300*e.k, 300, true); }
+    const porPasos = (pasos, t) => { let acc = 0; for (const [f,d] of pasos){ if (t < acc + d) return f; acc += d; } return pasos[pasos.length-1][0]; };
+    const durPasos = pasos => pasos.reduce((a,[,d]) => a + (d >= 99999 ? 0 : d), 0);
+    function empezarRebote(){
+      if (animId) return false;                          // el balón aún está volando: esperamos
+      const ini = ultBalon.slice(), dist = Math.abs(ini[0] - aCancha(SPR.recoge)[0]);
+      rb = { ini, dur: Math.max(500, Math.min(1300, dist*2.4)), fase: 'rueda' };
+      destino = Math.min(limiteX(), posX + 26); fuego = false;
+      modo = 'rebote'; t0 = performance.now(); conBalonEnDibujo(false);
+      setTimeout(() => $('#bocadillo').classList.remove('vis'), 400);
+      return true;
+    }
+    // Qué hace al final de cada bote cuando está quieto
+    function decidir(now){
+      let r = Math.random();
+      if (now - ultimaActividad > 20000){ ultimaActividad = now; hacer([['a12',1500],['a13',1300]]); return; }   // se aburre
+      if (r < .16 && !menosMov()){
+        destino = Math.random()*limiteX(); if (Math.abs(destino-posX) < 40) destino = posX < limiteX()/2 ? posX+60 : Math.max(0,posX-60);
+        if (destino < posX) hacer(GIRO_IZQ.map(f=>[f,60]), () => { mirando = 'izq'; });
+      }
+      else if (r < .26) hacer([['c00',90],['c01',90],['c02',90],['c03',90],['c03',140]]);           // cambio de mano
+      else if (r < .32) hacer([['c10',100],['c11',100],['c12',100],['c13',110],['c00',90]]);           // entre las piernas
+      else if (r < .38) hacer([['f00',240],['f01',240],['f02',240],['f03',240]]);                    // «triple amenaza»
+      else if (r < .42) truco();
+    }
+    function truco(){
+      hacer([['d00',220],['d01',220],['d02',200],['d10',300],['d11',300],['d12',300],['d10',300],['d11',300],['d12',300],['d13',520],['d20',200],['d21',220],['d22',240],['d23',200]]);
+      bolaDedo = true; accion.fin = () => { bolaDedo = null; };
     }
     function frame(now){
       id = requestAnimationFrame(frame);
       const dt = Math.min(50, now - last); last = now;
       if (!$('#juego').classList.contains('activa')) return;
-      let p, d;
-      if (sec === 'botar' && B.pausa > 0){
-        // pausa: sujeta el balón con las dos manos y mira la canasta («triple amenaza»)
-        B.pausa -= dt;
-        const k = Math.min(1, (900 - B.pausa)/200, B.pausa/200);
-        p = {}; for (const key in POSE.quieto) p[key] = lerp(poseBote(0)[key], POSE.recoge[key], k);
-        p.cabeza = -14; p.avance = 0;
-        d = dibujarSilueta(p); pintar(d);
-        const [ax,ay] = aCancha(d.mano), [bx,by] = aCancha(d.manoAtras), g = geo();
-        const yb = lerp(ay + R + 2, Math.min(ay,by) - R*.6, k);
-        ponerBalon(lerp(ax+3, (ax+bx)/2+4, k), yb, 0);
-        if (B.pausa <= 0){ B.fase = 0; siguienteBote(); }
-        ultima = p; return;
+      const t = Math.max(0, now - t0); dy = 0;
+      if (accion){                                       // una jugada corta en curso (giro, cambio de mano, truco…)
+        const ta = now - tAcc; fot = porPasos(accion.pasos, ta);
+        if (fot === 'a22') dy = -12;
+        if (ta >= durPasos(accion.pasos)){ const f = accion.fin; accion = null; t0 = now; f && f(); }
+        pintar(now); return;
       }
-      if (sec === 'botar'){
-        const antes = B.fase;
-        B.fase += dt / B.dur;
-        if (B.fase >= 1){ B.fase -= 1; if (B.cruce) B.mano = B.mano==='d' ? 't' : 'd'; siguienteBote(); B.tocado = false; }
-        p = poseBote(dt); d = dibujarSilueta(p); pintar(d); ultima = p;
-        if (modoBalon === 'bote') balonBote(d);
-        return;
+      const moviendo = Math.abs(destino - posX) > 2;
+      if (modo === 'botar'){
+        if (moviendo){
+          const fase = Math.floor(t/120);
+          fot = (destino < posX ? 't2' : 'g1') + (fase % 4);
+          if (fot.endsWith('2') && fase !== ciclos && sonido && AJ.bote!=='no'){ ciclos = fase; tono(95, .07, 0, 'sine', .05); }
+          posX += Math.sign(destino - posX)*Math.min(.065*dt, Math.abs(destino - posX));
+          if (Math.abs(destino - posX) <= 2 && mirando === 'izq'){ hacer(GIRO_DER.map(f=>[f,60]), () => { mirando = 'der'; }); }
+        } else {
+          const fase = Math.floor(t/70), i = fase % 8;
+          fot = BOTE[i];
+          if (i === 4 && fase !== ciclos){ ciclos = fase; if (sonido && AJ.bote!=='no') tono(95, .07, 0, 'sine', .05); }
+          if (i === 7 && fase !== ultDecision){ ultDecision = fase; decidir(now); }
+        }
+      } else if (modo === 'tiro'){
+        fot = porPasos(TIRO, t);
+        if (fot === 'b30') dy = -10*((t-640)/110);
+        else if (fot === 'b31' || fot === 'b32') dy = -10 + 10*Math.min(1,(t-750)/300);
+      } else if (modo === 'reaccion'){
+        fot = porPasos(sec, t);
+        if (t > tReac) empezarRebote();
+      } else if (modo === 'rebote'){
+        if (rb.fase === 'rueda'){
+          // el balón vuelve rodando y botando hacia él; él va a por el balón
+          const q = Math.min(1, t/rb.dur), fin = aCancha(SPR.recoge), g = geo();
+          const x = lerp(rb.ini[0], fin[0], 1 - Math.pow(1-q, 1.6));
+          const altura = 14 * (1-q) * Math.abs(Math.sin(q*Math.PI*3));
+          ponerBalon(x, lerp(g.suelo, fin[1], q*q) - altura, -q*540);
+          fot = 'g20';
+          if (moviendo) posX += Math.sign(destino - posX)*Math.min(.05*dt, Math.abs(destino - posX));
+          if (q >= 1){ rb.fase = 'coge'; t0 = now; conBalonEnDibujo(true); }
+        } else {
+          fot = porPasos([['g21',170],['g22',220],['g23',380]], t);
+          if (t > 770){ modo = 'botar'; t0 = now; destino = posX; }
+        }
       }
-      // jugadas por fotogramas clave (tiro, celebración, lamento)
-      const S = SECS[sec]; let [a, dur] = S.pasos[i];
-      let t = (now - t0)/dur;
-      if (t >= 1){
-        if (i < S.pasos.length-1){ i++; t0 = now; desde = null; [a,dur] = S.pasos[i]; t = 0; }
-        else t = 1;
-      }
-      const fin = S.pasos[Math.min(i+1, S.pasos.length-1)][0];
-      const A = a==='@' ? (desde || (desde = Object.assign({}, ultima))) : POSE[a], Bp = POSE[fin==='@' ? a : fin] || A;
-      const e = suave(Math.min(1,t)); p = {};
-      for (const k in POSE.quieto) p[k] = lerp(A[k], Bp[k], e);
-      ultima = Object.assign({}, p);
-      p.salto *= .7;
-      d = dibujarSilueta(p); pintar(d);
-      if (modoBalon==='manos'){
-        const [ax,ay] = aCancha(d.mano), [bx,by] = aCancha(d.manoAtras);
-        ponerBalon((ax+bx)/2 + 4, Math.min(ay,by) - R*.6, 0);
-      }
+      pintar(now);
     }
-    function pintar(d){
-      const sk = escala();
-      $('#silueta').innerHTML = `<g transform="translate(${sk.x},${sk.piso}) scale(${sk.k})">${d.svg}</g>`;
-      ultimo = d;
-    }
-    // Balón botando con física: cae acelerando, se aplasta contra el suelo y sube frenando hasta la mano
-    function balonBote(d){
-      const g = geo(), f = B.fase;
-      const manoA = aCancha(B.mano==='d' ? d.mano : d.manoAtras);
-      const otra = aCancha(B.mano==='d' ? d.manoAtras : d.mano);
-      const manoFin = B.cruce ? otra : manoA;                 // en un cambio de mano, sube a la otra
-      const yMano = manoA[1] + R + 2, yFin = manoFin[1] + R + 2, yS = g.suelo;
-      const T_BAJA = .44, T_SUELO = .08;
-      let x, y, sx = 1, sy = 1;
-      if (f < T_BAJA){ const q = f/T_BAJA; y = lerp(yMano, yS, Math.pow(q, 1.6)); x = lerp(manoA[0]+3, B.cruce ? (manoA[0]+manoFin[0])/2+3 : manoA[0]+3, q); }
-      else if (f < T_BAJA + T_SUELO){
-        const q = (f - T_BAJA)/T_SUELO, apl = Math.sin(q*Math.PI);           // aplastado contra el suelo
-        y = yS + 2*apl; sx = 1 + .22*apl; sy = 1 - .26*apl; x = B.cruce ? (manoA[0]+manoFin[0])/2+3 : manoA[0]+3;
-        if (!B.tocado){ B.tocado = true; if (sonido && AJ.bote!=='no') tono(95, .07, 0, 'sine', .05); }
-      } else {
-        const q = (f - T_BAJA - T_SUELO)/(1 - T_BAJA - T_SUELO);
-        y = lerp(yS, yFin, 1 - Math.pow(1-q, 2)); x = lerp(B.cruce ? (manoA[0]+manoFin[0])/2+3 : manoA[0]+3, manoFin[0]+3, q);
-        if (q < .15){ const r2 = 1 - q/.15; sx = 1 + .06*r2; sy = 1 - .08*r2; }    // recupera la forma
-      }
-      ponerBalon(x, y, (f < .5 ? 1 : -1) * 160 * f, sx, sy);
-    }
+    addEventListener('pointerdown', () => { ultimaActividad = performance.now(); }, true);
+    addEventListener('keydown', () => { ultimaActividad = performance.now(); }, true);
     return {
       iniciar(){ cancelAnimationFrame(id); id = requestAnimationFrame(frame); },
-      botar(){ sec = 'botar'; modoBalon = 'bote'; desde = null; B.fase = 0; B.mano = 'd'; B.cruce = false; B.pausa = 0; B.cuenta = 0; B.tocado = false;
-        posX = Math.min(posX, limiteX()); destino = posX; },
-      tirar(){ sec = 'tiro'; i = 0; t0 = performance.now(); modoBalon = 'manos'; desde = null; destino = posX; },
-      soltar(){ modoBalon = 'libre'; return this.posBalon(); },
-      reaccion(ok){ sec = ok ? (Math.random()<.5 ? 'celebra' : 'celebraB') : (Math.random()<.5 ? 'lamenta' : 'lamentaB'); i = 0; t0 = performance.now(); desde = null; },
-      posBalon(){ if (!ultimo) return [60,60]; const [ax,ay] = aCancha(ultimo.mano), [bx,by] = aCancha(ultimo.manoAtras); return [(ax+bx)/2 + 4, Math.min(ay,by) - R*.6]; },
-      cabeza(){ return ultimo ? aCancha(ultimo.cabeza) : [40,40]; },
+      botar(){ if (modo === 'rebote' && rb && rb.fase === 'coge') return;
+        accion = null; bolaDedo = null; fuego = false; mirando = 'der';
+        modo = 'botar'; t0 = performance.now(); conBalonEnDibujo(true); posX = Math.min(posX, limiteX()); destino = posX; },
+      tirar(){ accion = null; bolaDedo = null; modo = 'tiro'; t0 = performance.now(); destino = posX; conBalonEnDibujo(true); },
+      soltar(){ conBalonEnDibujo(false); dy = -10; const [bx,by] = SPR.bola; return aCancha([bx, by]); },
+      reaccion(ok){ modo = 'reaccion'; t0 = performance.now();
+        sec = ok ? (celebraEspecial ? CELEBRA_TRIPLE : CELEBRA) : LAMENTOS[Math.floor(Math.random()*LAMENTOS.length)];
+        tReac = ok ? 1800 : 1500; entrenador(ok ? 'bien' : 'mal'); },
+      piensa(){ if (modo === 'botar') hacer([['a20',1000],['a21',800]]); },
+      susto(){ hacer([['a22',450],['a23',1000]]); },
+      posBalon(){ return aCancha(SPR.bola); },
+      cabeza(){ return aCancha(SPR.cabeza); },
+      escala,
     };
   })();
+
+  // ===== Canasta dibujada (capa de atrás y capa de delante con la red) =====
+  const ARO = { celda: 362, izq: 68, dch: 174, cy: 143 };
+  function colocarAroSpr(){
+    const g = geo(), s = (g.aroW + 6)/(ARO.dch - ARO.izq), w = ARO.celda*s;
+    for (const id of ['aro-fondo','aro-frente']){ const e = $('#'+id); e.style.width = w+'px'; e.style.height = w+'px';
+      e.style.left = (g.aroIzq - 3 - ARO.izq*s)+'px'; e.style.top = (g.aroY - ARO.cy*s)+'px'; }
+  }
+  function aroGolpe(){
+    for (const id of ['aro-fondo','aro-frente']){ const e = $('#'+id); e.classList.remove('vibra-spr'); void e.offsetWidth; e.classList.add('vibra-spr'); }
+    const [x,y] = ultBalon; efecto(1, x, y, 70, 260);
+  }
+  function redMueve(){
+    const fr = $('#aro-frente'), g = geo(); let i = 1;
+    const paso = () => { fr.src = FOT('red' + (i < 5 ? i : 0)); if (i++ < 5) setTimeout(paso, 75); };
+    paso(); efecto(2, g.aroCx, g.aroY + 6, 110, 420);
+    setTimeout(() => { fuego = false; pintarFuego(0,0); }, 250);
+  }
+  // ===== Efectos dibujados: 0 polvo · 1 chispas · 2 estrellas =====
+  function efecto(fila, x, y, tam, dur, suelo){
+    const c = $('#cancha'); if (!c || menosMov()) return;
+    const im = document.createElement('img'); im.className = 'fx-spr';
+    im.style.width = im.style.height = tam+'px'; im.style.left = (x - tam/2)+'px'; im.style.top = (suelo ? y - tam*0.86 : y - tam/2)+'px';
+    c.appendChild(im); let i = 0;
+    const paso = () => { if (i > 3){ im.remove(); return; } im.src = FOT('x'+fila+i); i++; setTimeout(paso, dur/4); };
+    paso();
+  }
+  // ===== Fuego alrededor del balón en las rachas =====
+  function pintarFuego(x, y){
+    const f = $('#fuego'); if (!f) return;
+    const on = fuego && !$('#cancha').classList.contains('sprite-balon');
+    f.style.display = on ? '' : 'none'; if (!on) return;
+    const k = (2*R + 6)/106, w = 313*k;
+    f.src = FOT('x3' + (Math.floor(performance.now()/70) % 4));
+    f.style.width = f.style.height = w+'px'; f.style.left = (x - 192*k)+'px'; f.style.top = (y - 162.5*k)+'px';
+  }
+  // ===== El entrenador (solo en el entrenamiento) =====
+  let tEntrenador = 0;
+  function entrenador(que){
+    const e = $('#entrenador'); if (!e) return;
+    if (!J || J.modo !== 'entreno'){ e.style.display = 'none'; return; }
+    const g = geo(), k = jugador.escala().k*0.72, w = 420*k;
+    e.style.display = ''; e.style.width = e.style.height = w+'px';
+    e.style.left = (-60*k)+'px'; e.style.top = (g.piso - 12 - 405*k)+'px'; e.style.transform = 'scaleX(-1)';
+    // e00 silbato · e01 señala la pizarra · e02 pulgar arriba · e03 aplaude · e10 enseña la pizarra · e11 escribe · e12 piensa · e13 «¡a por ella!»
+    const seq = { silbato: [['e00',900],['e12',0]], explica: [['e10',2200],['e01',1800],['e11',1600],['e12',0]], bien: [['e03',1300],['e02',1200],['e12',0]],
+                  mal: [['e13',1200],['e10',2400],['e01',1800],['e11',1600],['e12',0]], quieto: [['e12',0]] }[que] || [['e12',0]];
+    clearTimeout(tEntrenador); let i = 0;
+    const paso = () => { const [f,d] = seq[i++]; e.src = FOT(f); if (d && i < seq.length) tEntrenador = setTimeout(paso, d); };
+    paso();
+    if (que === 'silbato' && sonido){ for (let j = 0; j < 6; j++) tono(2300 + (j%2)*180, .07, j*.07, 'square', .03); }
+  }
   jugador.iniciar();
 
   function bocadillo(ok){
@@ -1562,8 +1653,8 @@
   function lanzar(ok){
     const g = geo(); colocarCanasta(); clearTimeout(poseTimer);
     const red = $('#red'), aros = [$('#aro-atras'), $('#aro-delante')], balon = $('#balon');
-    const golpeAro = () => aros.forEach(a=>{ a.classList.remove('vibra'); void a.offsetWidth; a.classList.add('vibra'); });
-    const mueveRed = () => { red.classList.remove('mueve'); void red.offsetWidth; red.classList.add('mueve'); };
+    const golpeAro = () => aroGolpe();
+    const mueveRed = () => redMueve();
     // 1) se prepara y se agacha  2) salta con el balón sobre la cabeza  3) lo suelta arriba del todo
     jugador.tirar();
     const enManos = (dur) => ({ dur, balon: () => null });          // mientras tanto, el balón lo lleva el jugador
@@ -1649,7 +1740,7 @@
       const est = J.puntos>=18 ? 3 : J.puntos>=12 ? 2 : 1;
       const clave = J.clave; const prev = store.get(clave)||0;
       const record = J.puntos>prev; if (record) store.set(clave, J.puntos);
-      h = `${est>=2 ? '<img class="final-img" src="img/capitan-triple.jpg" alt="">' : ''}<h2>¡Fin del partido!</h2>
+      h = `<img class="final-spr" src="sprites/${record ? 'a30' : est>=2 ? 'a31' : 'a32'}.webp" alt=""><h2>¡Fin del partido!</h2>
         <div class="estrellas">${'⭐'.repeat(est)}${'☆'.repeat(3-est)}</div>
         <div class="grande">${J.puntos}</div><p>puntos · ${J.aciertos} de 10 canastas</p>
         <p style="font-size:1.2rem;margin-top:10px"><b>${record && prev>0 ? frase(['🏆 ¡NUEVO RÉCORD, Gabi!','🏆 ¡RÉCORD! ¡Hay que enmarcar este partido!','🏆 ¡Récord pulverizado! Avisad a la prensa 📰'])
@@ -1663,7 +1754,7 @@
       const res = g.puntos>r.puntos ? frase([`🏆 ¡GANA GABI! ¡Le has ganado a ${r.nombre}!`,`🏆 ¡Paliza a ${r.nombre}! Que vaya preparando la revancha 😎`,`🏆 ¡GABI CAMPEÓN! ${r.nombre} pide la hoja de reclamaciones 📝`])
         : g.puntos<r.puntos ? frase([`Esta vez gana ${r.nombre}… ¡la revancha está al caer, Gabi! 💪`,`${r.nombre} gana por los pelos… ¡seguro que ha hecho trampa! 😜`,`Gana ${r.nombre}, pero solo porque tiene más años practicando 👴`])
         : frase(['¡EMPATE! 🤝 ¿Desempate?','¡Empate! Esto se decide en la prórroga ⏱️']);
-      h = `${g.puntos>r.puntos ? '<img class="final-img" src="img/capitan-triple.jpg" alt="">' : ''}<h2>¡Fin del reto!</h2>
+      h = `<img class="final-spr" src="sprites/${g.puntos>r.puntos ? 'a30' : 'a32'}.webp" alt=""><h2>¡Fin del reto!</h2>
         <div class="fila" style="margin:10px 0">
           <div><div style="font-weight:700">GABI</div><div class="grande">${g.puntos}</div></div>
           <div style="flex:.3;font-size:2rem">–</div>
@@ -1773,6 +1864,7 @@
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['3.13', ['⛹️ ¡Gabi en dibujos! Bota, corre, cambia de mano, hace trucos con el balón en el dedo y celebra a lo grande', '🔥 En las rachas, ¡el balón vuela en llamas!', '🏀 Canasta, red y balón nuevos, con chispas, estrellas y polvo', '📋 En el entrenamiento te ayuda el entrenador', '🏆 Al acabar, Gabi levanta la copa si bate el récord']],
     ['3.12', ['⏸️ El reloj se para si sales un momento de la app', '❓ Antes de dejar un partido, te pregunta', '💾 Recuerda qué estabas practicando', '👆 Si falta una casilla, parpadea']],
     ['3.11', ['🏆 Trofeos y ajustes, en las esquinas del marcador', '⛹️ Modos de juego en filas, con iconos nuevos']],
     ['3.10', ['✂️ Textos de los modos de juego más cortos y claros']],
