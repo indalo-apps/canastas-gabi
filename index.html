@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="app-version" content="3.13">
+<meta name="app-version" content="3.14">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Canastas Gabi">
@@ -1277,15 +1277,28 @@
     let tablas = '';
     for (let i = -14; i <= 14; i++){ const xb = fuga + i*42, xt = fuga + i*42*0.55; tablas += `<line x1="${xt}" y1="${yParq}" x2="${xb}" y2="${H}" stroke="#b9854e" stroke-width="1" opacity=".45"/>`; }
     for (let k = 1; k < 6; k++){ const y = yParq + (H-yParq)*Math.pow(k/6,1.5); tablas += `<line x1="0" y1="${y}" x2="${W}" y2="${y}" stroke="#c99560" stroke-width=".8" opacity=".35"/>`; }
-    // zona (pintura) bajo la canasta y línea de tiros libres
-    const base = W - 12, libre = W - Math.min(150, W*0.4);
-    const zona = `<path d="M${libre+18} ${yParq+3} L${base-4} ${yParq+3} L${base+10} ${H} L${libre-14} ${H} Z" fill="#c8553d" opacity=".55"/>
-      <path d="M${libre+18} ${yParq+3} L${base-4} ${yParq+3} M${libre+18} ${yParq+3} L${libre-14} ${H}" stroke="#fff" stroke-width="2.2" opacity=".9" fill="none"/>
-      <ellipse cx="${libre+2}" cy="${(yParq+H)/2+2}" rx="22" ry="${(H-yParq)/2-3}" fill="none" stroke="#fff" stroke-width="2" opacity=".85"/>`;
-    // línea de triple (arco) y centro del campo a la izquierda
-    const triple = W - Math.min(250, W*0.68);
-    const arco = `<path d="M${triple+40} ${yParq+3} Q${triple-30} ${(yParq+H)/2} ${triple+10} ${H}" fill="none" stroke="#fff" stroke-width="2.2" opacity=".85"/>
-      <ellipse cx="-30" cy="${(yParq+H)/2+2}" rx="60" ry="${(H-yParq)/2-2}" fill="none" stroke="#fff" stroke-width="2" opacity=".6"/>`;
+    // líneas de la cancha vistas desde el lateral, con la misma perspectiva que las tablas del parqué.
+    // y0 = profundidad donde están Gabi y la canasta; m = píxeles por metro a lo largo; my = por metro en profundidad
+    const fP = y => 0.55 + 0.45*(y - yParq)/(H - yParq), y0 = piso - 2, f0 = fP(y0);
+    const P = (x, y) => [fuga + ((fuga + (x - fuga)/f0) - fuga)*fP(y), y];          // x medida a la altura de y0
+    const pt = (x, y) => P(x, y).map(v => v.toFixed(1)).join(' ');
+    const m = Math.min(26, (g.aroCx - 70)/7.2), hd = (y0 - yParq)*0.5, my = 2*hd/4.9;
+    const xBase = g.aroCx + 1.575*m, xLibre = xBase - 5.8*m, xMedio = xBase - 14*m;
+    const yA = Math.max(yParq + 1, y0 - hd), yB = Math.min(H + 2, y0 + hd);
+    const linea = 'stroke="#fff" stroke-width="2.2" fill="none" opacity=".9"';
+    const elipse = (cx, rx, ry, desde, hasta, n = 40) => { let d = '';
+      for (let i = 0; i <= n; i++){ const a = desde + (hasta - desde)*i/n; d += (i ? 'L' : 'M') + pt(cx + rx*Math.cos(a), y0 + ry*Math.sin(a)); } return d; };
+    const zona = `<defs><clipPath id="suelo-clip"><rect x="0" y="${yParq}" width="${W}" height="${H - yParq}"/></clipPath></defs>
+      <g clip-path="url(#suelo-clip)">
+      <path d="M${pt(xLibre, yA)} L${pt(xBase, yA)} L${pt(xBase, yB)} L${pt(xLibre, yB)} Z" fill="#c8553d" opacity=".55"/>
+      <path d="M${pt(xBase, yA)} L${pt(xLibre, yA)} L${pt(xLibre, yB)} L${pt(xBase, yB)}" ${linea}/>
+      <path d="M${pt(xBase, yParq)} L${pt(xBase, H + 2)}" ${linea}/>
+      <path d="${elipse(xLibre, 1.8*m, 1.8*my, 0, Math.PI*2, 48)}" ${linea} stroke-width="2"/>
+      <path d="${elipse(g.aroCx, 6.75*m, 6.75*my, -Math.PI/2, -Math.PI*1.5, 60)}" ${linea}/>
+      <path d="M${pt(xMedio, yParq)} L${pt(xMedio, H + 2)}" ${linea} opacity=".6"/>
+      <path d="${elipse(xMedio, 1.8*m, 1.8*my, 0, Math.PI*2, 48)}" ${linea} opacity=".6"/>
+      </g>`;
+    const arco = '';
     // canasta: base acolchada, brazo, tablero de cristal
     const tabX = g.aroDcha + 3, tabY = g.aroY - 44, tabW = 7, tabH = 54;
     const canasta = `
@@ -1864,6 +1877,7 @@
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['3.14', ['📐 Líneas de la pista bien dibujadas: zona, tiros libres y triple, centradas en la canasta']],
     ['3.13', ['⛹️ ¡Gabi en dibujos! Bota, corre, cambia de mano, hace trucos con el balón en el dedo y celebra a lo grande', '🔥 En las rachas, ¡el balón vuela en llamas!', '🏀 Canasta, red y balón nuevos, con chispas, estrellas y polvo', '📋 En el entrenamiento te ayuda el entrenador', '🏆 Al acabar, Gabi levanta la copa si bate el récord']],
     ['3.12', ['⏸️ El reloj se para si sales un momento de la app', '❓ Antes de dejar un partido, te pregunta', '💾 Recuerda qué estabas practicando', '👆 Si falta una casilla, parpadea']],
     ['3.11', ['🏆 Trofeos y ajustes, en las esquinas del marcador', '⛹️ Modos de juego en filas, con iconos nuevos']],
