@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="app-version" content="1.1">
+<meta name="theme-color" content="#1d3557">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Canastas Gabi">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Canastas de Gabi: sumas y restas con llevadas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --naranja:#f47b20; --naranja-osc:#c95d0c; --azul:#1d3557; --azul2:#274b7a;
+    --madera:#e9c48f; --madera2:#d9a865; --verde:#2a9d5c; --rojo:#e04848;
+    --crema:#fff8ee; --tinta:#1d2433; --amarillo:#ffd23f;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%}
+  body{
+    font-family:'Baloo 2',system-ui,sans-serif;color:var(--tinta);
+    background:
+      repeating-linear-gradient(90deg,var(--madera) 0 46px,var(--madera2) 46px 48px);
+    min-height:100%;display:flex;justify-content:center;
+  }
+  .app{width:100%;max-width:560px;padding:14px 14px 28px}
+  .pantalla{display:none}
+  .pantalla.activa{display:block;animation:entra .35s ease}
+  @keyframes entra{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+  .tarjeta{background:var(--crema);border-radius:22px;padding:18px;
+    box-shadow:0 6px 0 rgba(0,0,0,.12),0 10px 30px rgba(0,0,0,.12);margin-bottom:14px}
+  h1{margin:0;font-size:2rem;line-height:1.05;color:var(--azul)}
+  h2{margin:0 0 8px;font-size:1.3rem;color:var(--azul)}
+  p{margin:.3em 0}
+  .version{font-size:.8rem;opacity:.55;text-align:center;margin-top:6px}
+
+  .cabecera{display:flex;align-items:center;gap:12px}
+  .balon-logo{width:64px;height:64px;flex:none}
+
+  .opciones{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .opt{border:3px solid transparent;background:#fff;border-radius:16px;padding:10px 8px;
+    font:inherit;font-size:1.05rem;font-weight:700;color:var(--azul);cursor:pointer;
+    box-shadow:0 3px 0 rgba(0,0,0,.12);text-align:center;line-height:1.15}
+  .opt small{display:block;font-weight:500;font-size:.8rem;color:#5b6475}
+  .opt.sel{border-color:var(--naranja);background:#fff1e3}
+  .opt .emoji{font-size:1.6rem;display:block}
+
+  .btn{display:block;width:100%;border:0;border-radius:18px;padding:14px;font:inherit;
+    font-size:1.35rem;font-weight:800;cursor:pointer;color:#fff;background:var(--naranja);
+    box-shadow:0 5px 0 var(--naranja-osc);transition:transform .08s}
+  .btn:active{transform:translateY(3px);box-shadow:0 2px 0 var(--naranja-osc)}
+  .btn.azul{background:var(--azul2);box-shadow:0 5px 0 var(--azul)}
+  .btn.verde{background:var(--verde);box-shadow:0 5px 0 #1d7343}
+  .btn.peq{font-size:1rem;padding:9px 12px;border-radius:14px;display:inline-block;width:auto}
+  .fila{display:flex;gap:10px;align-items:center}
+  .fila > *{flex:1}
+
+  /* Marcador */
+  .marcador{display:flex;justify-content:space-between;align-items:center;
+    background:var(--azul);color:#fff;border-radius:16px;padding:8px 12px;margin-bottom:10px;
+    box-shadow:0 4px 0 rgba(0,0,0,.2)}
+  .marcador .eq{text-align:center;min-width:70px}
+  .marcador .nom{font-size:.85rem;opacity:.8;line-height:1}
+  .marcador .pts{font-size:1.8rem;font-weight:800;color:var(--amarillo);line-height:1.1}
+  .marcador .centro{text-align:center;font-size:.9rem;line-height:1.1}
+  .marcador .centro b{font-size:1.1rem;color:#fff}
+  .eq.turno .nom{opacity:1;color:var(--amarillo)}
+  .eq.turno{outline:2px solid var(--amarillo);border-radius:10px;padding:0 4px}
+  .icono-btn{background:rgba(255,255,255,.15);border:0;color:#fff;border-radius:10px;
+    font-size:1.1rem;padding:4px 8px;cursor:pointer;font-family:inherit}
+
+  /* Pista de baloncesto */
+  .cancha{position:relative;height:110px;border-radius:16px;overflow:hidden;margin-bottom:10px;
+    background:linear-gradient(#8ec5ff,#cfe8ff 70%);}
+  .cancha .suelo{position:absolute;left:0;right:0;bottom:0;height:12px;background:var(--madera2)}
+  .canasta{position:absolute;right:6%;bottom:58px;width:58px;height:50px}
+  .tablero{position:absolute;right:0;top:-30px;width:8px;height:58px;background:#fff;border:2px solid #555;border-radius:2px}
+  .aro{position:absolute;right:8px;top:0;width:46px;height:8px;border:4px solid var(--rojo);border-radius:50%;z-index:3}
+  .red{position:absolute;right:12px;top:6px;width:38px;height:26px;
+    background:repeating-linear-gradient(60deg,transparent 0 5px,#fff 5px 6px),repeating-linear-gradient(-60deg,transparent 0 5px,#fff 5px 6px);
+    clip-path:polygon(0 0,100% 0,82% 100%,18% 100%);opacity:.9;z-index:2}
+  .poste{position:absolute;right:calc(6% - 4px);bottom:12px;width:6px;height:76px;background:#777}
+  .balon-x{position:absolute;left:6%;bottom:12px;width:34px;height:34px;z-index:4}
+  .balon-y{width:34px;height:34px}
+  .balon-y svg{width:100%;height:100%;display:block}
+  .tiro .balon-x{animation:tirox 1s linear forwards}
+  .tiro .balon-y{animation:tiroy 1s cubic-bezier(.3,.6,.5,1) forwards}
+  @keyframes tirox{0%{left:6%}80%{left:calc(94% - 51px)}100%{left:calc(94% - 51px)}}
+  @keyframes tiroy{0%{transform:translateY(0) rotate(0)}45%{transform:translateY(-120px) rotate(200deg)}
+    80%{transform:translateY(-62px) rotate(360deg)}100%{transform:translateY(-28px) rotate(420deg)}}
+  .fallo .balon-x{animation:fallox 1.1s linear forwards}
+  .fallo .balon-y{animation:falloy 1.1s ease-out forwards}
+  @keyframes fallox{0%{left:6%}60%{left:calc(94% - 70px)}100%{left:calc(70% - 34px)}}
+  @keyframes falloy{0%{transform:translateY(0)}35%{transform:translateY(-120px)}60%{transform:translateY(-72px)}
+    75%{transform:translateY(-95px)}100%{transform:translateY(0)}}
+  .red.mueve{animation:red .4s .8s}
+  @keyframes red{50%{transform:scaleY(1.25)}}
+
+  /* Operación en columnas */
+  .opbox{display:flex;justify-content:center;padding:6px 0 2px}
+  .rejilla{display:grid;gap:4px 6px;align-items:center;justify-items:center}
+  .celda{width:54px;height:58px;display:flex;align-items:center;justify-content:center;
+    font-size:2.6rem;font-weight:800;line-height:1}
+  .signo{color:var(--naranja);}
+  .llevo{width:34px;height:30px;border:2px dashed #b9c0cc;border-radius:8px;font-size:1.2rem;font-weight:800;
+    background:transparent;color:var(--rojo);cursor:pointer;font-family:inherit;padding:0}
+  .llevo.on{border-style:solid;border-color:var(--rojo);background:#ffe7e7}
+  .llevo.oculto{visibility:hidden}
+  .raya{grid-column:1/-1;height:5px;width:100%;background:var(--tinta);border-radius:3px}
+  .resp{width:54px;height:62px;border:3px solid #c3cad6;border-radius:12px;background:#fff;
+    font-size:2.4rem;font-weight:800;color:var(--azul);cursor:pointer;font-family:inherit;padding:0}
+  .resp.act{border-color:var(--naranja);box-shadow:0 0 0 4px rgba(244,123,32,.25)}
+  .resp.mal{border-color:var(--rojo);background:#ffecec;color:var(--rojo)}
+  .resp.bien{border-color:var(--verde);background:#e7f7ee;color:var(--verde)}
+  .col-pista{background:#fff3c4;border-radius:10px}
+  .etq-llevo{font-size:.75rem;color:#8a93a3;text-align:center;margin-top:-2px}
+
+  .mensaje{min-height:2.6em;text-align:center;font-size:1.15rem;font-weight:700;margin:6px 0 4px;color:var(--azul)}
+  .mensaje.ok{color:var(--verde)} .mensaje.ko{color:var(--rojo)}
+  .pista-txt{background:#fff3c4;border-radius:12px;padding:8px 12px;font-size:1.05rem;margin:4px 0 8px;display:none}
+  .pista-txt.vis{display:block}
+
+  /* Teclado */
+  .teclado{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:6px}
+  .tecla{border:0;border-radius:14px;padding:10px 0;font:inherit;font-size:1.7rem;font-weight:800;
+    background:#fff;color:var(--azul);box-shadow:0 4px 0 #c3cad6;cursor:pointer}
+  .tecla:active{transform:translateY(3px);box-shadow:0 1px 0 #c3cad6}
+  .tecla.acc{font-size:1.05rem;background:#e8edf5}
+  .acciones{display:grid;grid-template-columns:1fr 2fr;gap:10px;margin-top:12px}
+
+  .estrellas{font-size:3rem;text-align:center;letter-spacing:6px}
+  .grande{font-size:3.4rem;font-weight:800;color:var(--naranja);text-align:center;line-height:1}
+  .centrado{text-align:center}
+  .aviso-turno{position:fixed;inset:0;background:rgba(29,53,87,.92);color:#fff;display:none;
+    align-items:center;justify-content:center;flex-direction:column;z-index:20;text-align:center;padding:20px}
+  .aviso-turno.vis{display:flex}
+  .aviso-turno .quien{font-size:2.6rem;font-weight:800;color:var(--amarillo)}
+  .confeti{position:fixed;top:-20px;width:10px;height:16px;z-index:30;pointer-events:none;
+    animation:cae linear forwards}
+  @keyframes cae{to{transform:translateY(110vh) rotate(720deg)}}
+  .pop{animation:pop .4s}
+  @keyframes pop{50%{transform:scale(1.25)}}
+  .tiembla{animation:tiembla .4s}
+  @keyframes tiembla{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+  .barra-act{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--verde);color:#fff;
+    padding:10px 18px;border-radius:14px;font-weight:800;z-index:40;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+  .dlg{position:fixed;inset:0;background:rgba(29,53,87,.85);display:flex;align-items:center;justify-content:center;z-index:35;padding:20px}
+  .dlg[hidden],.barra-act[hidden]{display:none}
+  .dlg .tarjeta{max-width:440px;width:100%}
+  .dlg h4{margin:10px 0 2px;color:var(--naranja)} .dlg ul{margin:0;padding-left:20px}
+  .version button{background:none;border:0;font:inherit;color:inherit;cursor:pointer;text-decoration:underline}
+  @media (max-width:400px){
+    .celda,.resp{width:46px} .celda{font-size:2.2rem} .resp{font-size:2rem;height:56px}
+    .llevo{width:30px}
+    h1{font-size:1.7rem}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============ INICIO ============ -->
+  <section id="inicio" class="pantalla activa">
+    <div class="tarjeta">
+      <div class="cabecera">
+        <svg class="balon-logo" viewBox="0 0 64 64" aria-hidden="true">
+          <circle cx="32" cy="32" r="30" fill="#f47b20" stroke="#7a3a08" stroke-width="3"/>
+          <path d="M2 32h60M32 2v60M10 10c12 10 12 34 0 44M54 10c-12 10-12 34 0 44" fill="none" stroke="#7a3a08" stroke-width="3"/>
+        </svg>
+        <div>
+          <h1>¡Hola, Gabi!</h1>
+          <p>Cada cuenta bien hecha es una <b>canasta</b>. ¿Jugamos?</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tarjeta">
+      <h2>1. ¿Qué practicamos?</h2>
+      <div class="opciones" id="niveles">
+        <button class="opt sel" data-nivel="suma"><span class="emoji">➕</span>Sumas<small>2 cifras, llevando</small></button>
+        <button class="opt" data-nivel="resta"><span class="emoji">➖</span>Restas<small>2 cifras, llevando</small></button>
+        <button class="opt" data-nivel="mezcla"><span class="emoji">🔀</span>Mezcla<small>sumas y restas</small></button>
+        <button class="opt" data-nivel="estrella"><span class="emoji">⭐</span>Nivel estrella<small>3 cifras</small></button>
+      </div>
+    </div>
+
+    <div class="tarjeta">
+      <h2>2. ¿Cómo jugamos?</h2>
+      <div class="opciones" id="modos">
+        <button class="opt sel" data-modo="partido"><span class="emoji">🏀</span>Partido<small>10 tiros, ¡a por el récord!</small></button>
+        <button class="opt" data-modo="entreno"><span class="emoji">🎯</span>Entrenamiento<small>sin prisa, todas las que quieras</small></button>
+        <button class="opt" data-modo="reto" style="grid-column:1/-1"><span class="emoji">🆚</span>Reto contra papá o mamá<small>por turnos: ellos tienen cuentas más difíciles</small></button>
+      </div>
+      <div id="eleccion-rival" style="display:none;margin-top:10px">
+        <div class="opciones" id="rivales">
+          <button class="opt sel" data-rival="Papá">👨 Papá</button>
+          <button class="opt" data-rival="Mamá">👩 Mamá</button>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn" id="btn-jugar">¡A jugar! 🏀</button>
+    <p class="centrado" id="record-txt" style="margin-top:10px"></p>
+    <div class="version">Canastas de Gabi · <button id="btn-version"></button></div>
+  </section>
+
+  <!-- ============ JUEGO ============ -->
+  <section id="juego" class="pantalla">
+    <div class="marcador" id="marcador"></div>
+
+    <div class="cancha" id="cancha">
+      <div class="poste"></div>
+      <div class="canasta"><div class="tablero"></div><div class="aro"></div><div class="red" id="red"></div></div>
+      <div class="balon-x"><div class="balon-y">
+        <svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#f47b20" stroke="#7a3a08" stroke-width="4"/>
+        <path d="M2 32h60M32 2v60M10 10c12 10 12 34 0 44M54 10c-12 10-12 34 0 44" fill="none" stroke="#7a3a08" stroke-width="4"/></svg>
+      </div></div>
+      <div class="suelo"></div>
+    </div>
+
+    <div class="tarjeta" id="tarjeta-op">
+      <div class="opbox"><div class="rejilla" id="rejilla"></div></div>
+      <div class="mensaje" id="mensaje"></div>
+      <div class="pista-txt" id="pista-txt"></div>
+
+      <div class="teclado" id="teclado"></div>
+      <div class="acciones" id="acciones">
+        <button class="btn azul" id="btn-pista">💡 Pista</button>
+        <button class="btn verde" id="btn-comprobar">¡Tirar! 🏀</button>
+      </div>
+      <div id="acciones-sig" style="display:none;margin-top:12px">
+        <button class="btn" id="btn-siguiente">Siguiente ➜</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FINAL ============ -->
+  <section id="final" class="pantalla">
+    <div class="tarjeta centrado" id="final-contenido"></div>
+    <div class="fila">
+      <button class="btn azul" id="btn-menu">Menú</button>
+      <button class="btn" id="btn-otra">Otra vez 🔁</button>
+    </div>
+  </section>
+</div>
+
+<div class="aviso-turno" id="aviso-turno">
+  <div>Ahora le toca a…</div>
+  <div class="quien" id="aviso-quien"></div>
+  <p id="aviso-sub" style="opacity:.85"></p>
+  <button class="btn" id="btn-listo" style="max-width:280px;margin-top:16px">¡Listo!</button>
+</div>
+
+<div class="dlg" id="dlg-novedades" hidden>
+  <div class="tarjeta">
+    <h2 id="nov-titulo">¡Novedades en el juego!</h2>
+    <div id="nov-lista"></div>
+    <button class="btn" id="nov-cerrar" style="margin-top:14px">¡Genial! 🏀</button>
+  </div>
+</div>
+<div class="barra-act" id="barra-act" hidden role="status">✨ ¡Versión nueva! Actualizando…</div>
+
+<script>
+(function(){
+  // ---------- Utilidades ----------
+  const $ = s => document.querySelector(s);
+  const rnd = (a,b) => a + Math.floor(Math.random()*(b-a+1));
+  const elige = arr => arr[Math.floor(Math.random()*arr.length)];
+  const store = {
+    get(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } },
+    set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+  };
+
+  // ---------- Sonido ----------
+  let ctx = null, sonido = store.get('gabi-sonido'); if (sonido === null) sonido = true;
+  function tono(f, dur, cuando=0, tipo='sine', vol=.15){
+    if (!sonido) return;
+    try{
+      ctx = ctx || new (window.AudioContext||window.webkitAudioContext)();
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = tipo; o.frequency.value = f;
+      g.gain.setValueAtTime(vol, ctx.currentTime+cuando);
+      g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime+cuando+dur);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(ctx.currentTime+cuando); o.stop(ctx.currentTime+cuando+dur);
+    }catch(e){}
+  }
+  const sClic = () => tono(600,.05,0,'triangle',.08);
+  const sBien = () => { tono(523,.15,0); tono(659,.15,.12); tono(784,.25,.24); };
+  const sTriple = () => { [523,659,784,1047].forEach((f,i)=>tono(f,.2,i*.1,'triangle')); };
+  const sMal = () => { tono(220,.25,0,'sawtooth',.08); tono(180,.3,.15,'sawtooth',.08); };
+
+  // ---------- Generadores de cuentas ----------
+  function llevadasSuma(a,b){ let c=0,n=0; while(a||b){ const s=a%10+b%10+c; c = s>=10?1:0; n+=c; a=Math.floor(a/10); b=Math.floor(b/10);} return n; }
+  function llevadasResta(a,b){ let c=0,n=0; while(a){ const da=a%10, db=b%10+c; c = da<db?1:0; n+=c; a=Math.floor(a/10); b=Math.floor(b/10);} return n; }
+
+  function suma2(){ for(;;){ const a=rnd(10,89), b=rnd(10,89); if (a%10+b%10>=10 && a+b<=99) return {a,b,t:'+'}; } }
+  function resta2(){ for(;;){ const a=rnd(21,99), b=rnd(10,a-1); if (a%10 < b%10) return {a,b,t:'-'}; } }
+  function suma3(){ for(;;){ const a=rnd(100,799), b=rnd(100,899); if (a+b<=999 && llevadasSuma(a,b)>=1) return {a,b,t:'+'}; } }
+  function resta3(){ for(;;){ const a=rnd(200,999), b=rnd(100,a-1); if (llevadasResta(a,b)>=1) return {a,b,t:'-'}; } }
+  function dificil(){ // para papá y mamá
+    if (Math.random()<.5){ for(;;){ const a=rnd(300,999), b=rnd(300,999); if (llevadasSuma(a,b)>=3) return {a,b,t:'+'}; } }
+    for(;;){ const a=rnd(1000,9999), b=rnd(100,a-1); if (llevadasResta(a,b)>=2 && b>=1000) return {a,b,t:'-'}; }
+  }
+  function generar(nivel){
+    let op;
+    if (nivel==='suma') op = suma2();
+    else if (nivel==='resta') op = resta2();
+    else if (nivel==='mezcla') op = Math.random()<.5 ? suma2() : resta2();
+    else if (nivel==='estrella') op = Math.random()<.5 ? suma3() : resta3();
+    else op = dificil();
+    op.r = op.t==='+' ? op.a+op.b : op.a-op.b;
+    op.W = Math.max(String(op.a).length, String(op.b).length, String(op.r).length);
+    return op;
+  }
+
+  // ---------- Mensajes ----------
+  const msgBien = ['¡Canasta, Gabi! 🏀','¡Qué crack eres, Gabi!','¡Así se hace, Gabi! 💪','¡Limpia, sin tocar el aro!',
+    '¡Eres un máquina de las cuentas!','¡Genial, Gabi! Sigue así','¡Toma ya! ¡Dos puntos!','¡Muy bien llevadas, Gabi!'];
+  const msgTriple = ['¡TRIPLE! 🔥 ¡Tres seguidas, Gabi!','¡Estás on fire, Gabi! ¡Triple!','¡Triple desde lejos! 🎯'];
+  const msgMal = ['¡Uy, ha tocado el aro! Revisa las llevadas','¡Casi, Gabi! Mira bien las columnas en rojo',
+    '¡Rebote! Tienes otro tiro, tú puedes'];
+  const msgRival = n => [`¡Canasta de ${n}!`,`${n} también sabe…`,`¡Bien, ${n}!`];
+
+  // ---------- Estado ----------
+  const S = { nivel:'suma', modo:'partido', rival:'Papá' };
+  let J = null; // estado de partida
+  let op = null, ans = [], llevo = [], activo = 0, intentos = 0, usoPista = false, resuelta = false;
+
+  // ---------- Menú ----------
+  function marcarSel(cont, attr){
+    cont.addEventListener('click', e => {
+      const b = e.target.closest('.opt'); if(!b) return;
+      sClic();
+      cont.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));
+      b.classList.add('sel');
+      S[attr] = b.dataset[attr];
+      $('#eleccion-rival').style.display = S.modo==='reto' ? 'block':'none';
+      pintarRecord();
+    });
+  }
+  marcarSel($('#niveles'),'nivel'); marcarSel($('#modos'),'modo'); marcarSel($('#rivales'),'rival');
+
+  const nombresNivel = {suma:'Sumas', resta:'Restas', mezcla:'Mezcla', estrella:'Nivel estrella'};
+  function pintarRecord(){
+    const r = store.get('gabi-record-'+S.nivel);
+    $('#record-txt').textContent = r ? `🏆 Tu récord en ${nombresNivel[S.nivel]}: ${r} puntos` : '';
+  }
+  pintarRecord();
+
+  function mostrar(id){ document.querySelectorAll('.pantalla').forEach(p=>p.classList.toggle('activa', p.id===id)); window.scrollTo(0,0); }
+
+  $('#btn-jugar').onclick = () => { sClic(); empezar(); };
+  $('#btn-menu').onclick = () => { sClic(); pintarRecord(); mostrar('inicio'); };
+  $('#btn-otra').onclick = () => { sClic(); empezar(); };
+
+  function empezar(){
+    J = { modo:S.modo, nivel:S.nivel, n:0, total: S.modo==='partido'?10 : S.modo==='reto'?10 : Infinity,
+          puntos:0, aciertos:0, racha:0,
+          jug:[{nombre:'Gabi',puntos:0,racha:0},{nombre:S.rival,puntos:0,racha:0}], turno:0 };
+    mostrar('juego');
+    nuevaCuenta();
+  }
+
+  // ---------- Marcador ----------
+  function pintarMarcador(){
+    const m = $('#marcador');
+    const snd = `<button class="icono-btn" id="btn-sonido" title="Sonido">${sonido?'🔊':'🔇'}</button>`;
+    const salir = `<button class="icono-btn" id="btn-salir" title="Salir">✖</button>`;
+    if (J.modo==='reto'){
+      const [g,r] = J.jug;
+      m.innerHTML = `${salir}
+        <div class="eq ${J.turno===0?'turno':''}"><div class="nom">GABI</div><div class="pts">${g.puntos}</div></div>
+        <div class="centro">Ronda<br><b>${Math.min(Math.floor(J.n/2)+1,5)}/5</b></div>
+        <div class="eq ${J.turno===1?'turno':''}"><div class="nom">${r.nombre.toUpperCase()}</div><div class="pts">${r.puntos}</div></div>${snd}`;
+    } else if (J.modo==='partido'){
+      m.innerHTML = `${salir}<div class="eq"><div class="nom">PUNTOS</div><div class="pts">${J.puntos}</div></div>
+        <div class="centro">Tiro<br><b>${Math.min(J.n+1,10)}/10</b></div>
+        <div class="eq"><div class="nom">RACHA</div><div class="pts">${J.racha?'🔥'.repeat(Math.min(J.racha,3)):'–'}</div></div>${snd}`;
+    } else {
+      m.innerHTML = `${salir}<div class="eq"><div class="nom">ACIERTOS</div><div class="pts">${J.aciertos}</div></div>
+        <div class="centro">Entrenamiento<br><b>${nombresNivel[J.nivel]}</b></div>
+        <div class="eq"><div class="nom">CUENTAS</div><div class="pts">${J.n}</div></div>${snd}`;
+    }
+    $('#btn-sonido').onclick = () => { sonido=!sonido; store.set('gabi-sonido',sonido); pintarMarcador(); };
+    $('#btn-salir').onclick = () => { sClic(); if (J.modo==='entreno' && J.n>0) terminar(); else { pintarRecord(); mostrar('inicio'); } };
+  }
+
+  // ---------- Cuenta ----------
+  function quienJuega(){ return J.modo==='reto' ? J.jug[J.turno] : J.jug[0]; }
+
+  function nuevaCuenta(){
+    const esRival = J.modo==='reto' && J.turno===1;
+    op = generar(esRival ? 'dificil' : J.nivel);
+    ans = Array(op.W).fill(''); llevo = Array(op.W).fill(false);
+    activo = op.W-1; intentos = 0; usoPista = false; resuelta = false;
+    $('#mensaje').textContent = esRival ? `Turno de ${J.jug[1].nombre}: ¡cuenta de mayores! 😎`
+      : (J.modo==='reto' ? 'Turno de Gabi. ¡Empieza por las unidades! 👉' : 'Empieza por la derecha: las unidades 👉');
+    $('#mensaje').className = 'mensaje';
+    $('#pista-txt').className = 'pista-txt';
+    $('#acciones').style.display = 'grid'; $('#acciones-sig').style.display = 'none';
+    $('#cancha').classList.remove('tiro','fallo');
+    pintarMarcador(); pintarRejilla();
+  }
+
+  function pintarRejilla(marcas, colPista){
+    const W = op.W, g = $('#rejilla');
+    g.style.gridTemplateColumns = `repeat(${W+1}, auto)`;
+    const a = String(op.a).padStart(W,' '), b = String(op.b).padStart(W,' ');
+    let h = '';
+    // fila de llevadas
+    h += `<div></div>`;
+    for (let i=0;i<W;i++){
+      const oculto = i===W-1 ? 'oculto' : '';
+      h += `<button class="llevo ${llevo[i]?'on':''} ${oculto}" data-l="${i}" aria-label="llevada">${llevo[i]?'1':''}</button>`;
+    }
+    const cls = i => (colPista===i ? ' col-pista' : '');
+    h += `<div class="celda"></div>`;
+    for (let i=0;i<W;i++) h += `<div class="celda${cls(i)}">${a[i].trim()}</div>`;
+    h += `<div class="celda signo">${op.t==='+'?'+':'−'}</div>`;
+    for (let i=0;i<W;i++) h += `<div class="celda${cls(i)}">${b[i].trim()}</div>`;
+    h += `<div class="raya"></div>`;
+    h += `<div></div>`;
+    for (let i=0;i<W;i++){
+      let c = 'resp';
+      if (i===activo && !resuelta) c+=' act';
+      if (marcas && marcas[i]) c+=' '+marcas[i];
+      h += `<button class="${c}" data-r="${i}">${ans[i]}</button>`;
+    }
+    g.innerHTML = h;
+  }
+
+  $('#rejilla').addEventListener('click', e => {
+    if (resuelta) return;
+    const l = e.target.closest('[data-l]'), r = e.target.closest('[data-r]');
+    if (l){ const i=+l.dataset.l; llevo[i]=!llevo[i]; sClic(); pintarRejilla(); }
+    if (r){ activo=+r.dataset.r; sClic(); pintarRejilla(); }
+  });
+
+  // Teclado en pantalla
+  const tec = $('#teclado');
+  [1,2,3,4,5,6,7,8,9,0].forEach(d => tec.insertAdjacentHTML('beforeend', `<button class="tecla" data-d="${d}">${d}</button>`));
+  tec.insertAdjacentHTML('beforeend', `<button class="tecla acc" data-k="izq" style="grid-column:span 2">◀ columna</button>`);
+  tec.insertAdjacentHTML('beforeend', `<button class="tecla acc" data-k="borrar" style="grid-column:span 1">⌫</button>`);
+  tec.insertAdjacentHTML('beforeend', `<button class="tecla acc" data-k="der" style="grid-column:span 2">columna ▶</button>`);
+  tec.addEventListener('click', e => {
+    const b = e.target.closest('.tecla'); if(!b || resuelta) return;
+    sClic();
+    if (b.dataset.d!==undefined) escribir(b.dataset.d);
+    else if (b.dataset.k==='borrar') borrar();
+    else if (b.dataset.k==='izq'){ activo=Math.max(0,activo-1); pintarRejilla(); }
+    else if (b.dataset.k==='der'){ activo=Math.min(op.W-1,activo+1); pintarRejilla(); }
+  });
+  function escribir(d){ ans[activo]=d; if (activo>0) activo--; pintarRejilla(); }
+  function borrar(){
+    if (ans[activo]==='' && activo<op.W-1) activo++;
+    ans[activo]=''; pintarRejilla();
+  }
+  document.addEventListener('keydown', e => {
+    if (!$('#juego').classList.contains('activa')) return;
+    if (['Enter','Backspace','ArrowLeft','ArrowRight'].includes(e.key)) e.preventDefault();
+    if ($('#aviso-turno').classList.contains('vis')){ if(e.key==='Enter') $('#btn-listo').click(); return; }
+    if (resuelta){ if (e.key==='Enter') $('#btn-siguiente').click(); return; }
+    if (/^[0-9]$/.test(e.key)) escribir(e.key);
+    else if (e.key==='Backspace') borrar();
+    else if (e.key==='ArrowLeft'){ activo=Math.max(0,activo-1); pintarRejilla(); }
+    else if (e.key==='ArrowRight'){ activo=Math.min(op.W-1,activo+1); pintarRejilla(); }
+    else if (e.key==='Enter') comprobar();
+  });
+
+  // ---------- Pista ----------
+  function pasos(){
+    // devuelve explicación por columna (índice desde la derecha)
+    const res = []; let a=op.a, b=op.b, c=0, k=0;
+    const W = op.W;
+    while (k < W){
+      const da=a%10, dbOrig=b%10, hayB = b>0 || k < String(op.b).length;
+      let txt;
+      if (op.t==='+'){
+        const s = da + (hayB?dbOrig:0) + c;
+        if (a===0 && b===0 && c===1) txt = `Aquí solo queda la que te llevabas: escribe <b>1</b>.`;
+        else {
+          const expr = hayB ? `${da} + ${dbOrig}` : `${da}`;
+          txt = c ? `${expr} + <b>1</b> que te llevabas = ${s}.` : `${expr} = ${s}.`;
+          txt += s>=10 ? ` Escribe <b>${s%10}</b> y te llevas <b>1</b> a la columna de la izquierda.` : ` Escribe <b>${s}</b>.`;
+        }
+        c = s>=10?1:0;
+      } else {
+        const db = (hayB?dbOrig:0) + c;
+        let pre = c ? (hayB ? `Abajo hay ${dbOrig}, más <b>1</b> que te llevabas = ${db}. ` : `Abajo sumamos el <b>1</b> que te llevabas. `) : '';
+        if (da < db){
+          txt = pre + `${da} es menor que ${db}, así que lo convertimos en ${da+10}: ${da+10} − ${db} = ${da+10-db}. Escribe <b>${da+10-db}</b> y te llevas <b>1</b>.`;
+          c = 1;
+        } else {
+          const r = da-db;
+          const izq = Math.floor(a/10)===0;
+          txt = pre + `${da} − ${db} = ${r}. ` + (r===0 && izq && k>0 ? `Sale 0 y no hay más cifras, así que <b>no hace falta escribirlo</b>.` : `Escribe <b>${r}</b>.`);
+          c = 0;
+        }
+      }
+      res.push(txt);
+      a=Math.floor(a/10); b=Math.floor(b/10); k++;
+    }
+    return res;
+  }
+  const nombreCol = ['unidades','decenas','centenas','unidades de millar'];
+  $('#btn-pista').onclick = () => {
+    if (resuelta) return; sClic();
+    usoPista = true;
+    const k = op.W-1-activo; const p = pasos()[k];
+    $('#pista-txt').innerHTML = `💡 <b>${nombreCol[k][0].toUpperCase()+nombreCol[k].slice(1)}:</b> ${p}`;
+    $('#pista-txt').className = 'pista-txt vis';
+    pintarRejilla(null, activo);
+  };
+
+  // ---------- Comprobar ----------
+  $('#btn-comprobar').onclick = () => { sClic(); comprobar(); };
+  function comprobar(){
+    if (resuelta) return;
+    const escrito = ans.join('');
+    if (escrito===''){ mensaje('Escribe el resultado en las casillas de abajo 👇',''); return; }
+    // huecos en medio: no vale
+    const txt = ans.map(x=>x===''?' ':x).join('').trim();
+    const valido = !txt.includes(' ');
+    const valor = valido ? parseInt(txt,10) : NaN;
+    const esperado = String(op.r).padStart(op.W,' ');
+    const marcas = ans.map((x,i)=> (esperado[i].trim()===x || (esperado[i]===' ' && (x===''||x==='0'))) ? 'bien':'mal');
+    const jugador = quienJuega(); const esRival = J.modo==='reto' && J.turno===1;
+    intentos++;
+    if (valor===op.r){
+      resuelta = true;
+      let pts = 0, triple=false;
+      if (intentos===1 && !usoPista){ jugador.racha++; triple = jugador.racha%3===0; pts = triple?3:2; }
+      else { jugador.racha = 0; pts = 1; }
+      if (J.modo!=='reto'){ J.racha = jugador.racha; J.puntos += pts; }
+      else jugador.puntos += pts;
+      J.aciertos++;
+      pintarRejilla(ans.map(()=> 'bien'));
+      lanzar(true);
+      let m = esRival ? elige(msgRival(jugador.nombre)) : (triple ? elige(msgTriple) : elige(msgBien));
+      if (J.modo!=='entreno') m += pts===1 ? '  (+1, tiro libre)' : `  (+${pts})`;
+      mensaje(m,'ok');
+      triple ? sTriple() : sBien();
+      if (triple) confeti(40);
+      finCuenta();
+    } else {
+      pintarRejilla(marcas);
+      $('#tarjeta-op').classList.remove('tiembla'); void $('#tarjeta-op').offsetWidth; $('#tarjeta-op').classList.add('tiembla');
+      jugador.racha = 0; if (J.modo!=='reto') J.racha = 0;
+      sMal();
+      if (intentos < 2){
+        lanzar(false);
+        mensaje(esRival ? `¡Uy, ${jugador.nombre}! Otro intento…` : elige(msgMal),'ko');
+        // limpiar solo las casillas mal
+        setTimeout(()=>{ if(resuelta) return; ans = ans.map((x,i)=> marcas[i]==='mal' ? '' : x);
+          const pm = ans.map((x,i)=>marcas[i]==='mal'); activo = pm.lastIndexOf(true); if (activo<0) activo=op.W-1;
+          pintarRejilla(); }, 1300);
+        pintarMarcador();
+      } else {
+        resuelta = true;
+        lanzar(false);
+        ans = String(op.r).padStart(op.W,' ').split('').map(x=>x.trim());
+        pintarRejilla(ans.map(()=>'bien'));
+        mensaje(esRival ? `¡Fallo de ${jugador.nombre}! Era ${op.r}.` : `No pasa nada, Gabi. El resultado era <b>${op.r}</b>. ¡A por la siguiente!`,'ko');
+        if (!esRival){
+          $('#pista-txt').innerHTML = '💡 ' + pasos().map((p,k)=>`<b>${nombreCol[k][0].toUpperCase()+nombreCol[k].slice(1)}:</b> ${p}`).join('<br>');
+          $('#pista-txt').className = 'pista-txt vis';
+        }
+        finCuenta();
+      }
+    }
+  }
+  function mensaje(t,c){ const m=$('#mensaje'); m.innerHTML=t; m.className='mensaje '+c; m.classList.remove('pop'); void m.offsetWidth; m.classList.add('pop'); }
+
+  function finCuenta(){
+    J.n++;
+    pintarMarcador();
+    $('#acciones').style.display='none'; $('#acciones-sig').style.display='block';
+    $('#btn-siguiente').textContent = (J.n>=J.total) ? 'Ver resultado 🏆' : 'Siguiente ➜';
+  }
+  $('#btn-siguiente').onclick = () => {
+    sClic();
+    if (J.n>=J.total){ terminar(); return; }
+    if (J.modo==='reto'){
+      J.turno = J.n%2;
+      const quien = J.jug[J.turno].nombre;
+      $('#aviso-quien').textContent = quien==='Gabi' ? '¡GABI! 🏀' : quien.toUpperCase()+' 😎';
+      $('#aviso-sub').textContent = quien==='Gabi' ? 'Pásale la tablet a Gabi' : `Pásale la tablet a ${quien}. ¡Su cuenta es más difícil!`;
+      $('#aviso-turno').classList.add('vis');
+    } else nuevaCuenta();
+  };
+  $('#btn-listo').onclick = () => { sClic(); $('#aviso-turno').classList.remove('vis'); nuevaCuenta(); };
+
+  function lanzar(ok){
+    const c = $('#cancha'); c.classList.remove('tiro','fallo'); $('#red').classList.remove('mueve');
+    void c.offsetWidth; c.classList.add(ok?'tiro':'fallo'); if (ok) $('#red').classList.add('mueve');
+  }
+
+  // ---------- Final ----------
+  function terminar(){
+    let h='';
+    if (J.modo==='partido'){
+      const est = J.puntos>=18 ? 3 : J.puntos>=12 ? 2 : 1;
+      const clave = 'gabi-record-'+J.nivel; const prev = store.get(clave)||0;
+      const record = J.puntos>prev; if (record) store.set(clave, J.puntos);
+      h = `<h2>¡Fin del partido!</h2>
+        <div class="estrellas">${'⭐'.repeat(est)}${'☆'.repeat(3-est)}</div>
+        <div class="grande">${J.puntos}</div><p>puntos · ${J.aciertos} de 10 canastas</p>
+        <p style="font-size:1.2rem;margin-top:10px"><b>${record && prev>0 ? '🏆 ¡NUEVO RÉCORD, Gabi!' : est===3 ? '¡Partidazo, Gabi! Eres el MVP 🏆' : est===2 ? '¡Muy buen partido, Gabi! 💪' : '¡Bien jugado, Gabi! Cada partido lo harás mejor 🏀'}</b></p>
+        ${prev>0 && !record ? `<p>Tu récord: ${prev} puntos</p>`:''}`;
+      if (est===3 || record) confeti(80);
+    } else if (J.modo==='reto'){
+      const [g,r] = J.jug;
+      const res = g.puntos>r.puntos ? `🏆 ¡GANA GABI! ¡Le has ganado a ${r.nombre}!` : g.puntos<r.puntos ? `Esta vez gana ${r.nombre}… ¡la revancha está al caer, Gabi! 💪` : '¡EMPATE! 🤝 ¿Desempate?';
+      h = `<h2>¡Fin del reto!</h2>
+        <div class="fila" style="margin:10px 0">
+          <div><div style="font-weight:700">GABI</div><div class="grande">${g.puntos}</div></div>
+          <div style="flex:.3;font-size:2rem">–</div>
+          <div><div style="font-weight:700">${r.nombre.toUpperCase()}</div><div class="grande">${r.puntos}</div></div>
+        </div><p style="font-size:1.25rem"><b>${res}</b></p>`;
+      if (g.puntos>=r.puntos) confeti(90);
+    } else {
+      h = `<h2>¡Buen entrenamiento, Gabi!</h2><div class="grande">${J.aciertos}/${J.n}</div><p>cuentas bien hechas</p>
+        <p style="font-size:1.2rem"><b>${J.aciertos===J.n ? '¡Todas bien! ¡Eres un crack! 🏆' : '¡Cada día te salen mejor! 💪'}</b></p>`;
+      if (J.aciertos===J.n && J.n>=5) confeti(60);
+    }
+    $('#final-contenido').innerHTML = h;
+    mostrar('final');
+  }
+
+  function confeti(n){
+    const cols = ['#f47b20','#ffd23f','#2a9d5c','#1d3557','#e04848','#8ec5ff'];
+    for (let i=0;i<n;i++){
+      const d = document.createElement('div'); d.className='confeti';
+      d.style.left = Math.random()*100+'vw'; d.style.background = elige(cols);
+      d.style.animationDuration = (1.8+Math.random()*1.8)+'s'; d.style.animationDelay = (Math.random()*.6)+'s';
+      document.body.appendChild(d); setTimeout(()=>d.remove(), 4500);
+    }
+  }
+  // ---------- Actualización automática y novedades ----------
+  const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
+  // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
+  const NOVEDADES = [
+    ['1.1', ['🔄 El juego se actualiza solo y te cuenta las novedades, ¡como ahora!',
+             '📲 Puedes ponerlo en la pantalla de inicio de la tablet, con su propio icono']],
+  ];
+  const verCmp = (a,b) => { const x=a.split('.').map(Number), y=b.split('.').map(Number);
+    for (let i=0;i<3;i++){ const d=(x[i]||0)-(y[i]||0); if (d) return d; } return 0; };
+  $('#btn-version').textContent = 'v' + VERSION + ' · Novedades';
+  function verNovedades(desde){
+    const lista = NOVEDADES.filter(([v]) => !desde || verCmp(v,desde)>0);
+    if (!lista.length) return;
+    $('#nov-titulo').textContent = desde ? '¡Novedades en el juego, Gabi!' : 'Lo último del juego';
+    $('#nov-lista').innerHTML = lista.map(([v,items]) => `<h4>Versión ${v}</h4><ul>${items.map(t=>`<li>${t}</li>`).join('')}</ul>`).join('');
+    $('#dlg-novedades').hidden = false;
+    if (desde) confeti(60);
+  }
+  $('#btn-version').onclick = () => { sClic(); verNovedades(null); };
+  $('#nov-cerrar').onclick = () => { sClic(); $('#dlg-novedades').hidden = true; };
+  // Al abrir una versión nueva por primera vez, se enseñan sus novedades (una sola vez)
+  (function(){
+    const vista = store.get('gabi-sumas-version');
+    store.set('gabi-sumas-version', VERSION);
+    if (vista && verCmp(VERSION, vista) > 0) setTimeout(()=>verNovedades(vista), 700);
+  })();
+
+  // Solo en la web publicada (GitHub Pages) o en pruebas locales
+  const EN_WEB = /\.github\.io$/.test(location.hostname) || location.hostname==='localhost';
+  let actPendiente = false;
+  // Nunca se recarga en mitad de una cuenta: solo en el menú o en la pantalla final
+  const seguroRecargar = () => !$('#juego').classList.contains('activa') && !$('#aviso-turno').classList.contains('vis');
+  function actualizar(){
+    if (!seguroRecargar()){ actPendiente = true; return; }
+    $('#barra-act').hidden = false;
+    setTimeout(()=>location.reload(), 1200);
+  }
+  async function buscarVersion(){
+    if (!EN_WEB) return;
+    try{
+      const txt = await (await fetch(location.pathname + '?v=' + Date.now(), {cache:'no-store'})).text();
+      const m = txt.match(/name="app-version" content="([^"]+)"/);
+      if (m && verCmp(m[1], VERSION) > 0) actualizar();
+    }catch(e){}
+  }
+  // Si había una versión esperando, se aplica al volver al menú o al final
+  new MutationObserver(()=>{ if (actPendiente && seguroRecargar()){ actPendiente=false; actualizar(); } })
+    .observe(document.body, {subtree:true, attributes:true, attributeFilter:['class']});
+  document.addEventListener('visibilitychange', ()=>{ if (document.visibilityState==='visible') buscarVersion(); });
+  setInterval(buscarVersion, 5*60*1000);
+  setTimeout(buscarVersion, 3000);
+  // Sin internet: el service worker guarda el juego para que funcione sin conexión
+  if (EN_WEB && 'serviceWorker' in navigator){
+    addEventListener('load', ()=> navigator.serviceWorker.register('sw.js').then(r=>r.update()).catch(()=>{}));
+  }
+})();
+</script>
+</body>
+</html>
