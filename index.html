@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="app-version" content="3.4">
+<meta name="app-version" content="3.5">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Canastas Gabi">
@@ -154,8 +154,10 @@
     font-size:2.9rem;font-weight:800;line-height:1;border-radius:10px;transition:background .15s}
   .col-act{background:#ffe6cc}
   .signo{color:var(--naranja);}
-  .llevo{width:34px;height:26px;border:2px dashed #b9c0cc;border-radius:8px;font-size:1.2rem;font-weight:800;
-    background:transparent;color:var(--rojo);cursor:pointer;font-family:inherit;padding:0}
+  .llevo{width:56px;height:30px;border:2px dashed #b9c0cc;border-radius:8px;font-size:1.25rem;font-weight:800;
+    background:transparent;color:var(--rojo);cursor:pointer;font-family:inherit;padding:0;
+    display:flex;align-items:center;justify-content:center;line-height:1;justify-self:center}
+  .llevo span{display:block}
   .llevo.on{border-style:solid;border-color:var(--rojo);background:#ffe7e7}
   .llevo.oculto{visibility:hidden}
   .raya{grid-column:1/-1;height:5px;width:100%;background:var(--tinta);border-radius:3px}
@@ -268,7 +270,7 @@
   }
   @media (max-width:400px){
     .celda,.resp{width:46px} .celda{font-size:2.2rem} .resp{font-size:2rem;height:56px}
-    .llevo{width:30px}
+    .llevo{width:46px}
     h1{font-size:1.7rem}
   }
 
@@ -751,7 +753,7 @@
     h += `<div></div>`;
     for (let i=0;i<W;i++){
       const oculto = i===W-1 ? 'oculto' : '';
-      h += `<button class="llevo ${llevo[i]?'on':''} ${oculto}" data-l="${i}" aria-label="llevada">${llevo[i]?'1':''}</button>`;
+      h += `<button class="llevo ${llevo[i]?'on':''} ${oculto}" data-l="${i}" aria-label="llevada">${llevo[i]?'<span>1</span>':''}</button>`;
     }
     const cls = i => (colPista===i ? ' col-pista' : (!resuelta && i===activo ? ' col-act' : ''));
     h += `<div class="celda"></div>`;
