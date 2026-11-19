@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="app-version" content="3.8">
+<meta name="app-version" content="3.9">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Canastas Gabi">
@@ -55,6 +55,15 @@
   .opt small{display:block;font-weight:500;font-size:.8rem;color:#5b6475}
   .opt.sel{border-color:var(--naranja);background:#fff1e3}
   .opt .emoji{font-size:1.6rem;display:block}
+  .opt .signo{width:34px;height:34px;display:block;margin:0 auto 2px;filter:drop-shadow(0 2px 0 rgba(0,0,0,.25))}
+  /* Salida al pabellón: se apaga todo y se encienden los focos uno a uno */
+  .cancha .apagon{position:absolute;inset:0;background:#02040b;z-index:9;opacity:0;pointer-events:none;transition:opacity .5s ease-out}
+  .cancha.salida .apagon{opacity:.82;transition:none}
+  .cancha.salida #focos ellipse{opacity:0}
+  .cancha.encender #focos ellipse{animation:foco .28s steps(2,end) both}
+  @keyframes foco{0%{opacity:0}50%{opacity:1}75%{opacity:.3}100%{opacity:1}}
+  .marcador.arranque .seg{animation:parpadeo .6s steps(3,end) 1}
+  @keyframes parpadeo{0%,40%{opacity:.15}70%{opacity:1}85%{opacity:.4}100%{opacity:1}}
   /* Botones de color con relieve */
   .jugador-in[data-pose=tira]{animation:none}
   .opt[data-nivel],.opt[data-modo]{background:var(--c);color:#fff;border:3px solid transparent;
@@ -423,10 +432,10 @@
     <div class="tarjeta">
       <h2>1. ¿Qué practicamos?</h2>
       <div class="opciones cuatro" id="niveles">
-        <button class="opt sel" data-nivel="suma"><span class="emoji">➕</span>Sumas</button>
-        <button class="opt" data-nivel="resta"><span class="emoji">➖</span>Restas</button>
-        <button class="opt" data-nivel="tablas"><span class="emoji">✖️</span>Tablas</button>
-        <button class="opt" data-nivel="mezcla"><span class="emoji">🔀</span>Mezcla</button>
+        <button class="opt sel" data-nivel="suma"><svg class="signo" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5v15M4.5 12h15" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Sumas</button>
+        <button class="opt" data-nivel="resta"><svg class="signo" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12h15" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Restas</button>
+        <button class="opt" data-nivel="tablas"><svg class="signo" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Tablas</button>
+        <button class="opt" data-nivel="mezcla"><svg class="signo" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 7h3c4.5 0 6.5 10 11 10h3M17.5 13.8l3.2 3.2-3.2 3.2M3.5 17h3c1.6 0 2.8-1.4 3.8-3M13.7 10c1-1.6 2.2-3 3.8-3h3M17.5 3.8l3.2 3.2-3.2 3.2" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Mezcla</button>
       </div>
       <div id="eleccion-cifras" class="sub">
         <span class="sub-tit">¿Cuántas cifras?</span>
@@ -466,7 +475,7 @@
   <section id="juego" class="pantalla">
     <div class="marcador" id="marcador"></div>
 
-    <div class="cancha" id="cancha">
+    <div class="cancha" id="cancha"><div class="apagon"></div>
       <svg class="fondo" id="pabellon" aria-hidden="true"></svg>
 
       <svg class="silueta" id="silueta" aria-hidden="true"></svg>
@@ -798,6 +807,23 @@
     nuevos = [];
     mostrar('juego');
     nuevaCuenta();
+    salidaPabellon();
+  }
+  // Un segundo de «salida al pabellón»: apagón, focos uno a uno, público y marcador que se enciende
+  function salidaPabellon(){
+    const c = $('#cancha'), m = $('#marcador'), lleno = J.modo!=='entreno';
+    if (lleno) aplauso(.55, .8);
+    if (menosMov()) return;
+    const focos = [...document.querySelectorAll('#focos ellipse')];
+    c.classList.remove('encender'); c.classList.add('salida');
+    focos.forEach((f,i) => f.style.animationDelay = (.15 + i*(.55/Math.max(1,focos.length-1))).toFixed(2)+'s');
+    void c.offsetWidth;
+    c.classList.add('encender');
+    setTimeout(()=>{ c.classList.remove('salida'); }, 650);
+    setTimeout(()=>{ c.classList.remove('encender'); focos.forEach(f=>f.style.animationDelay=''); }, 1300);
+    if (sonido) [0,.12,.24].forEach((t,i)=> tono(70 + i*8, .09, .15 + i*.2, 'square', .04));
+    m.classList.remove('arranque'); void m.offsetWidth; m.classList.add('arranque');
+    setTimeout(()=> m.classList.remove('arranque'), 900);
   }
 
   // ---------- Marcador ----------
@@ -1198,7 +1224,7 @@
         <linearGradient id="brillo" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".22"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
       </defs>
       <rect width="${W}" height="${yValla}" fill="url(#pared)"/>${vacio ? `<rect width="${W}" height="${yValla}" fill="#000" opacity=".25"/>` : ''}
-      <g id="grada">${grada}</g>${focos}<g id="flashes">${flashes}</g>
+      <g id="grada">${grada}</g><g id="focos">${focos}</g><g id="flashes">${flashes}</g>
       ${valla}
       <rect y="${yParq}" width="${W}" height="${H-yParq}" fill="url(#parq)"/>${tablas}
       <rect x="${W*0.15}" y="${yParq}" width="${W*0.5}" height="${H-yParq}" fill="url(#brillo)"/>
@@ -1681,6 +1707,7 @@
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['3.9', ['⛹️ Salida al pabellón: se encienden los focos al empezar', '➕ Signos nuevos, más claros, en Sumas, Restas, Tablas y Mezcla']],
     ['3.8', ['🗣️ ¡El jugador habla! Dice sus frases en voz alta y en un bocadillo', '⏱️ Partido con reloj de posesión y pabellón lleno; entrenamiento tranquilo, sin reloj y con ayuda del entrenador', '🔢 El marcador cuenta tus aciertos y tus fallos', '⚙️ Ajustes: tamaño de letra, movimiento y sonidos', '👆 Botones más grandes y fáciles de pulsar', '📱 En el iPad, también en horizontal']],
     ['3.6', ['🏃 El jugador se mueve por la pista mientras piensas', '🏀 Bota de muchas formas: alto, bajo y rápido, cambiando de mano… y a veces se para a mirar la canasta', '👌 El balón bota como uno de verdad']],
     ['3.4', ['😂 ¡Muchas frases nuevas y graciosas! Para las canastas, los fallos, las rachas y para chinchar a papá y mamá', '➕ De vez en cuando sale alguna cuenta sin llevadas']],
