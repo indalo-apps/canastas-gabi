@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="app-version" content="3.14">
+<meta name="app-version" content="3.15">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Canastas Gabi">
@@ -235,7 +235,11 @@
     padding:10px 18px;border-radius:14px;font-weight:800;z-index:40;box-shadow:0 4px 12px rgba(0,0,0,.25)}
   .dlg{position:fixed;inset:0;background:rgba(29,53,87,.85);display:flex;align-items:center;justify-content:center;z-index:35;padding:20px}
   .dlg[hidden],.barra-act[hidden]{display:none}
-  .dlg .tarjeta{max-width:440px;width:100%}
+  .dlg .tarjeta{max-width:440px;width:100%;max-height:calc(100vh - 40px);max-height:calc(100dvh - 40px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+  /* el botón para cerrar queda siempre a la vista, aunque haya mucho que leer */
+  #nov-cerrar,#aj-cerrar{position:sticky;bottom:0;filter:drop-shadow(0 -10px 8px var(--crema))}
+  .dlg{padding:max(20px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom))}
   .dlg h4{margin:10px 0 2px;color:var(--naranja)} .dlg ul{margin:0;padding-left:20px}
   .version button{background:none;border:0;font:inherit;color:inherit;cursor:pointer;text-decoration:underline}
   .led{background:#121212;border-radius:20px;padding:12px 12px 14px;border:4px solid #2c2c2c;margin-bottom:14px;
@@ -348,6 +352,15 @@
   #grada.ola g{animation:ola .45s ease-out 3}
   #grada.ola g:nth-child(2n){animation-delay:.08s} #grada.ola g:nth-child(3n){animation-delay:.16s}
   @keyframes ola{50%{transform:translateY(-4px)}}
+  #valla-cinta{animation:cinta 20s linear infinite}
+  @keyframes cinta{from{transform:translateX(0)}to{transform:translateX(var(--p))}}
+  #valla-aviso{opacity:0}
+  #valla-luz.aviso #valla-aviso{opacity:1}
+  #valla-luz.aviso #valla-aviso-txt{animation:vaviso .32s steps(1,end) infinite}
+  @keyframes vaviso{0%{fill:#ffd23f}50%{fill:#ff3b30}}
+  #valla-luz.parpadea{animation:vparpadeo .18s steps(1,end) 5}
+  @keyframes vparpadeo{0%{opacity:1}50%{opacity:.15}}
+  html.sin-mov #valla-cinta{animation:none}
   #flashes circle{opacity:0}
   #flashes.on circle{animation:flash .25s ease-out}
   @keyframes flash{0%{opacity:1}100%{opacity:0}}
@@ -610,6 +623,24 @@
 
   // ---------- Sonido ----------
   let ctx = null, sonido = store.get('gabi-sonido'); if (sonido === null) sonido = true;
+  // Bote del balón contra el parqué: «tump» grave que baja de tono + chasquido seco (se oye en altavoces pequeños)
+  let ruidoBote = null;
+  function sBote(fuerza=1){
+    if (!sonido || AJ.bote==='no') return;
+    try{
+      ctx = ctx || new (window.AudioContext||window.webkitAudioContext)();
+      if (ctx.state === 'suspended') ctx.resume();
+      const t = ctx.currentTime, o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'sine'; o.frequency.setValueAtTime(200, t); o.frequency.exponentialRampToValueAtTime(70, t + .09);
+      g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.5*fuerza, t + .006); g.gain.exponentialRampToValueAtTime(.001, t + .13);
+      o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + .14);
+      if (!ruidoBote){ const n = Math.floor(ctx.sampleRate*.045); ruidoBote = ctx.createBuffer(1, n, ctx.sampleRate);
+        const d = ruidoBote.getChannelData(0); for (let i = 0; i < n; i++) d[i] = (Math.random()*2 - 1)*Math.pow(1 - i/n, 4); }
+      const src = ctx.createBufferSource(), bp = ctx.createBiquadFilter(), gn = ctx.createGain();
+      src.buffer = ruidoBote; bp.type = 'bandpass'; bp.frequency.value = 750 + Math.random()*150; bp.Q.value = 1.4; gn.gain.value = .55*fuerza;
+      src.connect(bp); bp.connect(gn); gn.connect(ctx.destination); src.start(t);
+    }catch(e){}
+  }
   function tono(f, dur, cuando=0, tipo='sine', vol=.15){
     if (!sonido) return;
     try{
@@ -849,8 +880,22 @@
     salidaPabellon();
   }
   // Un segundo de «salida al pabellón»: apagón, focos uno a uno, público y marcador que se enciende
+  // Valla LED: mensaje grande que parpadea («¡CANASTA!») y parpadeos de vez en cuando
+  let tValla = 0;
+  function vallaAviso(txt, dur=1900){
+    const luz = document.getElementById('valla-luz'), t = document.getElementById('valla-aviso-txt'); if (!luz || !t) return;
+    t.textContent = txt; luz.classList.remove('parpadea'); luz.classList.add('aviso');
+    clearTimeout(tValla); tValla = setTimeout(() => luz.classList.remove('aviso'), dur);
+  }
+  setInterval(() => {
+    const luz = document.getElementById('valla-luz');
+    if (!luz || luz.classList.contains('aviso') || menosMov() || Math.random() < .4) return;
+    luz.classList.remove('parpadea'); void luz.getBoundingClientRect(); luz.classList.add('parpadea');
+    setTimeout(() => luz.classList.remove('parpadea'), 1000);
+  }, 7000);
   function salidaPabellon(){
     const c = $('#cancha'), m = $('#marcador'), lleno = J.modo!=='entreno';
+    setTimeout(() => vallaAviso(J.modo==='partido' ? '¡EMPIEZA EL PARTIDO!' : J.modo==='reto' ? '¡QUE EMPIECE EL RETO!' : '¡A ENTRENAR!', 2200), 700);
     if (lleno) aplauso(.55, .8);
     if (menosMov()) return;
     const focos = [...document.querySelectorAll('#focos ellipse')];
@@ -942,7 +987,7 @@
         if (sg<=5 && sg>0 && sonido) tono(1200, .05, 0, 'square', .03); }
       if (sg===0){ pararReloj(); posesionAgotada = true;
         if (sonido){ tono(220,.9,0,'sawtooth',.08); tono(223,.9,0,'square',.05); }
-        jugador.susto(); mensaje('⏱️ ¡Bocina! Se acabó la posesión: ahora la canasta vale 1 punto. ¡Sin prisa, termínala!','ko'); }
+        jugador.susto(); vallaAviso('¡TIEMPO!'); mensaje('⏱️ ¡Bocina! Se acabó la posesión: ahora la canasta vale 1 punto. ¡Sin prisa, termínala!','ko'); }
     }, 200);
   }
 
@@ -1270,8 +1315,19 @@
     for (let i = 0; i < 9; i++) flashes += `<circle cx="${10 + az()*(W-20)}" cy="${12 + az()*(yValla-26)}" r="${2+az()*2}" fill="#fff" style="animation-delay:${(az()*.5).toFixed(2)}s"/>`;
     // vallas luminosas
     let valla = `<rect x="0" y="${yValla}" width="${W}" height="${hValla}" fill="#0b1226"/><rect x="0" y="${yValla}" width="${W}" height="1.5" fill="#3b4a73"/>`;
-    const textos = vacio ? ['ENTRENAMIENTO','SIN PRISA','PRÁCTICA LIBRE'] : ['CANASTAS DE GABI','★ 2º DE PRIMARIA ★','¡A POR EL TRIPLE!'];
-    for (let x = 8, i = 0; x < W; x += 200, i++) valla += `<text x="${x}" y="${yValla+12}" font-family="Orbitron, monospace" font-weight="900" font-size="11" fill="${i%2?'#ffb000':'#38bdf8'}" letter-spacing="1">${textos[i%textos.length]}</text>`;
+    // valla LED: los anuncios se deslizan sin parar; parpadea a ratos y avisa de las canastas
+    const textos = vacio ? ['ENTRENAMIENTO','SIN PRISA','PRÁCTICA LIBRE','¡TÚ PUEDES, GABI!']
+      : ['CANASTAS DE GABI','★ 2º DE PRIMARIA ★','¡A POR EL TRIPLE!','CALCULA · BOTA · ENCESTA','GABI Nº 3'];
+    const pasoV = 190, PV = pasoV*textos.length, vueltas = Math.ceil(W/PV) + 1;
+    let cinta = '';
+    for (let v = 0; v < vueltas; v++) textos.forEach((t,i) => cinta += `<text x="${v*PV + i*pasoV + 8}" y="${yValla+12}" font-family="Orbitron, monospace" font-weight="900" font-size="11" fill="${['#38bdf8','#ffb000','#39d353','#ff5a8a','#ffffff'][i%5]}" letter-spacing="1">${t}</text>`);
+    let leds = ''; for (let x = 0; x < W; x += 2) leds += `<rect x="${x+1.3}" y="${yValla+1.5}" width=".7" height="${hValla-1.5}" fill="#0b1226" opacity=".55"/>`;
+    valla += `<defs><clipPath id="valla-clip"><rect x="0" y="${yValla+1.5}" width="${W}" height="${hValla-1.5}"/></clipPath></defs>
+      <g clip-path="url(#valla-clip)"><g id="valla-luz">
+        <g id="valla-cinta" style="--p:${-PV}px;animation-duration:${(PV/28).toFixed(1)}s">${cinta}</g>
+        <g id="valla-aviso"><rect x="0" y="${yValla+1.5}" width="${W}" height="${hValla-1.5}" fill="#0b1226"/>
+          <text id="valla-aviso-txt" x="${W/2}" y="${yValla+12.5}" text-anchor="middle" font-family="Orbitron, monospace" font-weight="900" font-size="12" letter-spacing="3"></text></g>
+      </g>${leds}</g>`;
     // parqué en perspectiva con líneas de la cancha
     const fuga = W*0.55;
     let tablas = '';
@@ -1465,7 +1521,7 @@
     function empezarRebote(){
       if (animId) return false;                          // el balón aún está volando: esperamos
       const ini = ultBalon.slice(), dist = Math.abs(ini[0] - aCancha(SPR.recoge)[0]);
-      rb = { ini, dur: Math.max(500, Math.min(1300, dist*2.4)), fase: 'rueda' };
+      rb = { ini, dur: Math.max(500, Math.min(1300, dist*2.4)), fase: 'rueda', botes: -1 };
       destino = Math.min(limiteX(), posX + 26); fuego = false;
       modo = 'rebote'; t0 = performance.now(); conBalonEnDibujo(false);
       setTimeout(() => $('#bocadillo').classList.remove('vis'), 400);
@@ -1504,13 +1560,13 @@
         if (moviendo){
           const fase = Math.floor(t/120);
           fot = (destino < posX ? 't2' : 'g1') + (fase % 4);
-          if (fot.endsWith('2') && fase !== ciclos && sonido && AJ.bote!=='no'){ ciclos = fase; tono(95, .07, 0, 'sine', .05); }
+          if (fot.endsWith('2') && fase !== ciclos){ ciclos = fase; sBote(.9); }
           posX += Math.sign(destino - posX)*Math.min(.065*dt, Math.abs(destino - posX));
           if (Math.abs(destino - posX) <= 2 && mirando === 'izq'){ hacer(GIRO_DER.map(f=>[f,60]), () => { mirando = 'der'; }); }
         } else {
           const fase = Math.floor(t/70), i = fase % 8;
           fot = BOTE[i];
-          if (i === 4 && fase !== ciclos){ ciclos = fase; if (sonido && AJ.bote!=='no') tono(95, .07, 0, 'sine', .05); }
+          if (i === 4 && fase !== ciclos){ ciclos = fase; sBote(); }
           if (i === 7 && fase !== ultDecision){ ultDecision = fase; decidir(now); }
         }
       } else if (modo === 'tiro'){
@@ -1527,6 +1583,7 @@
           const x = lerp(rb.ini[0], fin[0], 1 - Math.pow(1-q, 1.6));
           const altura = 14 * (1-q) * Math.abs(Math.sin(q*Math.PI*3));
           ponerBalon(x, lerp(g.suelo, fin[1], q*q) - altura, -q*540);
+          const nb = Math.floor(q*3); if (nb !== rb.botes && q < 1){ rb.botes = nb; sBote(.55 - nb*.15); }
           fot = 'g20';
           if (moviendo) posX += Math.sign(destino - posX)*Math.min(.05*dt, Math.abs(destino - posX));
           if (q >= 1){ rb.fase = 'coge'; t0 = now; conBalonEnDibujo(true); }
@@ -1546,7 +1603,7 @@
         modo = 'botar'; t0 = performance.now(); conBalonEnDibujo(true); posX = Math.min(posX, limiteX()); destino = posX; },
       tirar(){ accion = null; bolaDedo = null; modo = 'tiro'; t0 = performance.now(); destino = posX; conBalonEnDibujo(true); },
       soltar(){ conBalonEnDibujo(false); dy = -10; const [bx,by] = SPR.bola; return aCancha([bx, by]); },
-      reaccion(ok){ modo = 'reaccion'; t0 = performance.now();
+      reaccion(ok){ modo = 'reaccion'; t0 = performance.now(); if (!ok) vallaAviso(elige(['¡UYYY!','¡CASI!','¡OTRA VEZ!']), 1400);
         sec = ok ? (celebraEspecial ? CELEBRA_TRIPLE : CELEBRA) : LAMENTOS[Math.floor(Math.random()*LAMENTOS.length)];
         tReac = ok ? 1800 : 1500; entrenador(ok ? 'bien' : 'mal'); },
       piensa(){ if (modo === 'botar') hacer([['a20',1000],['a21',800]]); },
@@ -1569,6 +1626,7 @@
     const [x,y] = ultBalon; efecto(1, x, y, 70, 260);
   }
   function redMueve(){
+    vallaAviso(celebraEspecial ? '¡¡TRIPLE!!' : elige(['¡CANASTA!','¡CANASTA DE GABI!','¡DENTRO!','¡CHOF!']));
     const fr = $('#aro-frente'), g = geo(); let i = 1;
     const paso = () => { fr.src = FOT('red' + (i < 5 ? i : 0)); if (i++ < 5) setTimeout(paso, 75); };
     paso(); efecto(2, g.aroCx, g.aroY + 6, 110, 420);
@@ -1877,6 +1935,7 @@
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['3.15', ['📺 La valla de publicidad se mueve como una de verdad: anuncios que pasan, parpadeos y «¡CANASTA!» en grande', '🔊 Ahora se oye el bote del balón', '📜 La ventana de novedades ya cabe en pantallas pequeñas']],
     ['3.14', ['📐 Líneas de la pista bien dibujadas: zona, tiros libres y triple, centradas en la canasta']],
     ['3.13', ['⛹️ ¡Gabi en dibujos! Bota, corre, cambia de mano, hace trucos con el balón en el dedo y celebra a lo grande', '🔥 En las rachas, ¡el balón vuela en llamas!', '🏀 Canasta, red y balón nuevos, con chispas, estrellas y polvo', '📋 En el entrenamiento te ayuda el entrenador', '🏆 Al acabar, Gabi levanta la copa si bate el récord']],
     ['3.12', ['⏸️ El reloj se para si sales un momento de la app', '❓ Antes de dejar un partido, te pregunta', '💾 Recuerda qué estabas practicando', '👆 Si falta una casilla, parpadea']],
@@ -1908,10 +1967,13 @@
     for (let i=0;i<3;i++){ const d=(x[i]||0)-(y[i]||0); if (d) return d; } return 0; };
   $('#btn-version').textContent = 'v' + VERSION + ' · Novedades';
   function verNovedades(desde){
-    const lista = NOVEDADES.filter(([v]) => !desde || verCmp(v,desde)>0);
-    if (!lista.length) return;
+    const todas = NOVEDADES.filter(([v]) => !desde || verCmp(v,desde)>0);
+    if (!todas.length) return;
+    const lista = todas.slice(0, 4);               // solo las 4 últimas versiones, para que quepa
+    const mas = todas.length - lista.length;
     $('#nov-titulo').textContent = desde ? '¡Novedades en el juego, Gabi!' : 'Lo último del juego';
-    $('#nov-lista').innerHTML = lista.map(([v,items]) => `<h4>Versión ${v}</h4><ul>${items.map(t=>`<li>${t}</li>`).join('')}</ul>`).join('');
+    $('#nov-lista').innerHTML = lista.map(([v,items]) => `<h4>Versión ${v}</h4><ul>${items.map(t=>`<li>${t}</li>`).join('')}</ul>`).join('')
+      + (mas > 0 ? `<p style="margin:10px 0 0;color:#5b6475">…y ${mas} ${mas===1 ? 'versión' : 'versiones'} más con otras mejoras 🏀</p>` : '');
     $('#dlg-novedades').hidden = false;
     if (desde) confeti(60);
   }
