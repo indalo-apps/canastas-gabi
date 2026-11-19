@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="app-version" content="1.2">
+<meta name="app-version" content="1.3">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Canastas Gabi">
@@ -76,31 +76,28 @@
     font-size:1.1rem;padding:4px 8px;cursor:pointer;font-family:inherit}
 
   /* Pista de baloncesto */
-  .cancha{position:relative;height:110px;border-radius:16px;overflow:hidden;margin-bottom:10px;
-    background:linear-gradient(#8ec5ff,#cfe8ff 70%);}
-  .cancha .suelo{position:absolute;left:0;right:0;bottom:0;height:12px;background:var(--madera2)}
-  .canasta{position:absolute;right:6%;bottom:58px;width:58px;height:50px}
-  .tablero{position:absolute;right:0;top:-30px;width:8px;height:58px;background:#fff;border:2px solid #555;border-radius:2px}
-  .aro{position:absolute;right:8px;top:0;width:46px;height:8px;border:4px solid var(--rojo);border-radius:50%;z-index:3}
-  .red{position:absolute;right:12px;top:6px;width:38px;height:26px;
-    background:repeating-linear-gradient(60deg,transparent 0 5px,#fff 5px 6px),repeating-linear-gradient(-60deg,transparent 0 5px,#fff 5px 6px);
-    clip-path:polygon(0 0,100% 0,82% 100%,18% 100%);opacity:.9;z-index:2}
-  .poste{position:absolute;right:calc(6% - 4px);bottom:12px;width:6px;height:76px;background:#777}
-  .balon-x{position:absolute;left:6%;bottom:12px;width:34px;height:34px;z-index:4}
-  .balon-y{width:34px;height:34px}
-  .balon-y svg{width:100%;height:100%;display:block}
-  .tiro .balon-x{animation:tirox 1s linear forwards}
-  .tiro .balon-y{animation:tiroy 1s cubic-bezier(.3,.6,.5,1) forwards}
-  @keyframes tirox{0%{left:6%}80%{left:calc(94% - 51px)}100%{left:calc(94% - 51px)}}
-  @keyframes tiroy{0%{transform:translateY(0) rotate(0)}45%{transform:translateY(-120px) rotate(200deg)}
-    80%{transform:translateY(-62px) rotate(360deg)}100%{transform:translateY(-28px) rotate(420deg)}}
-  .fallo .balon-x{animation:fallox 1.1s linear forwards}
-  .fallo .balon-y{animation:falloy 1.1s ease-out forwards}
-  @keyframes fallox{0%{left:6%}60%{left:calc(94% - 70px)}100%{left:calc(70% - 34px)}}
-  @keyframes falloy{0%{transform:translateY(0)}35%{transform:translateY(-120px)}60%{transform:translateY(-72px)}
-    75%{transform:translateY(-95px)}100%{transform:translateY(0)}}
-  .red.mueve{animation:red .4s .8s}
-  @keyframes red{50%{transform:scaleY(1.25)}}
+  .cancha{position:relative;height:130px;border-radius:16px;overflow:hidden;margin-bottom:10px;
+    background:linear-gradient(#8ec5ff,#cfe8ff 75%);}
+  .cancha .suelo{position:absolute;left:0;right:0;bottom:0;height:14px;background:var(--madera2);
+    box-shadow:inset 0 3px 0 rgba(0,0,0,.08)}
+  .cancha .tablero{position:absolute;right:14px;top:16px;width:7px;height:58px;background:#fff;border:2px solid #4a5568;border-radius:2px;z-index:2}
+  .cancha .tablero::after{content:"";position:absolute;left:-1px;top:30px;width:3px;height:16px;border:2px solid var(--rojo);border-right:0}
+  .cancha .poste{position:absolute;right:20px;top:74px;width:6px;bottom:14px;background:#6b7280;z-index:1}
+  .cancha .soporte{position:absolute;right:21px;top:60px;width:12px;height:5px;background:#6b7280;z-index:2}
+  .cancha .aro-atras,.cancha .aro-delante{position:absolute;width:52px;height:12px;border-radius:50%;box-sizing:border-box}
+  .cancha .aro-atras{border:3px solid #b8322f;z-index:3}
+  .cancha .aro-delante{border:3px solid transparent;border-bottom-color:var(--rojo);border-left-color:var(--rojo);border-right-color:var(--rojo);z-index:6}
+  .cancha .red{position:absolute;width:48px;height:30px;z-index:5;transform-origin:50% 0;
+    background:repeating-linear-gradient(65deg,transparent 0 5px,rgba(255,255,255,.95) 5px 6.5px),
+               repeating-linear-gradient(-65deg,transparent 0 5px,rgba(255,255,255,.95) 5px 6.5px);
+    clip-path:polygon(0 0,100% 0,80% 100%,20% 100%)}
+  .cancha .red.mueve{animation:red .45s ease-out}
+  @keyframes red{0%{transform:scaleY(1)}35%{transform:scaleY(1.35) scaleX(.9)}70%{transform:scaleY(.92)}100%{transform:scaleY(1)}}
+  .cancha .aro-atras.vibra,.cancha .aro-delante.vibra{animation:vibra .35s}
+  @keyframes vibra{25%{transform:translateY(2px)}50%{transform:translateY(-1px)}75%{transform:translateY(1px)}}
+  .cancha .balon{position:absolute;left:0;top:0;width:30px;height:30px;z-index:4;will-change:transform}
+  .cancha .balon svg{width:100%;height:100%;display:block}
+  .cancha .sombra{position:absolute;bottom:10px;left:0;width:26px;height:6px;border-radius:50%;background:rgba(0,0,0,.18);z-index:1}
 
   /* Operación en columnas */
   .opbox{display:flex;justify-content:center;padding:6px 0 2px}
@@ -230,12 +227,15 @@
     <div class="marcador" id="marcador"></div>
 
     <div class="cancha" id="cancha">
-      <div class="poste"></div>
-      <div class="canasta"><div class="tablero"></div><div class="aro"></div><div class="red" id="red"></div></div>
-      <div class="balon-x"><div class="balon-y">
+      <div class="poste"></div><div class="soporte"></div><div class="tablero"></div>
+      <div class="aro-atras" id="aro-atras"></div>
+      <div class="sombra" id="sombra"></div>
+      <div class="balon" id="balon">
         <svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#f47b20" stroke="#7a3a08" stroke-width="4"/>
         <path d="M2 32h60M32 2v60M10 10c12 10 12 34 0 44M54 10c-12 10-12 34 0 44" fill="none" stroke="#7a3a08" stroke-width="4"/></svg>
-      </div></div>
+      </div>
+      <div class="red" id="red"></div>
+      <div class="aro-delante" id="aro-delante"></div>
       <div class="suelo"></div>
     </div>
 
@@ -451,7 +451,7 @@
     $('#mensaje').className = 'mensaje';
     $('#pista-txt').className = 'pista-txt';
     $('#acciones').style.display = 'grid'; $('#acciones-sig').style.display = 'none';
-    $('#cancha').classList.remove('tiro','fallo');
+    balonInicio();
     pintarMarcador(); pintarRejilla();
   }
 
@@ -675,9 +675,79 @@
   };
   $('#btn-listo').onclick = () => { sClic(); $('#aviso-turno').classList.remove('vis'); nuevaCuenta(); };
 
+  // ---------- Animación del tiro ----------
+  const R = 15;              // radio del balón
+  let animId = 0;
+  function geo(){
+    const c = $('#cancha'), W = c.clientWidth, H = c.clientHeight;
+    const suelo = H - 14 - R;                 // centro del balón apoyado en el suelo
+    const aroDcha = W - 25, aroW = 52, aroY = 66;  // aroY = centro vertical del aro
+    return { W, H, suelo, aroIzq: aroDcha-aroW, aroDcha, aroW, aroY, aroCx: aroDcha-aroW/2, x0: 34 };
+  }
+  function colocarCanasta(){
+    const g = geo();
+    for (const id of ['aro-atras','aro-delante']){ const e=$('#'+id); e.style.left=g.aroIzq+'px'; e.style.top=(g.aroY-6)+'px'; }
+    const r=$('#red'); r.style.left=(g.aroIzq+2)+'px'; r.style.top=(g.aroY)+'px';
+  }
+  function ponerBalon(x,y,rot){
+    $('#balon').style.transform = `translate(${x-R}px,${y-R}px) rotate(${rot}deg)`;
+    const g = geo(), alt = Math.max(0, g.suelo - y), k = Math.max(.35, 1 - alt/140);
+    const sm = $('#sombra'); sm.style.transform = `translateX(${x-13}px) scale(${k})`; sm.style.opacity = k;
+  }
+  function balonInicio(){
+    cancelAnimationFrame(animId); colocarCanasta();
+    const g = geo(); $('#balon').style.zIndex = 4; ponerBalon(g.x0, g.suelo, 0);
+  }
+  addEventListener('resize', ()=>{ if (!animId) balonInicio(); });
+  // Ejecuta una lista de tramos; cada tramo: {dur, f(t) -> [x,y], alPasar(t)}
+  function animar(tramos, alFinal){
+    cancelAnimationFrame(animId);
+    let i = 0, t0 = performance.now(), rot = 0, last = t0;
+    const paso = now => {
+      const tr = tramos[i]; let t = Math.min(1, (now - t0)/tr.dur);
+      const [x,y] = tr.f(t); rot += (now-last)*(tr.giro ?? .5); last = now;
+      ponerBalon(x,y,rot); tr.alPasar && tr.alPasar(t);
+      if (t >= 1){ i++; t0 = now; if (i >= tramos.length){ animId = 0; alFinal && alFinal(); return; } }
+      animId = requestAnimationFrame(paso);
+    };
+    animId = requestAnimationFrame(paso);
+  }
+  const bez = (p0,p1,p2,t) => (1-t)*(1-t)*p0 + 2*(1-t)*t*p1 + t*t*p2;
+  const easeIn = t => t*t;
+  const bote = (x, suelo, h) => t => [x, suelo - h*4*t*(1-t)];
   function lanzar(ok){
-    const c = $('#cancha'); c.classList.remove('tiro','fallo'); $('#red').classList.remove('mueve');
-    void c.offsetWidth; c.classList.add(ok?'tiro':'fallo'); if (ok) $('#red').classList.add('mueve');
+    const g = geo(); colocarCanasta();
+    const x0 = g.x0, y0 = g.suelo, tope = R + 6;  // altura máxima del tiro (desde arriba)
+    const red = $('#red'), aros = [$('#aro-atras'), $('#aro-delante')];
+    const balon = $('#balon');
+    if (ok){
+      // Entra limpio por el centro: parábola hasta justo encima del aro
+      const x2 = g.aroCx, y2 = g.aroY - R - 2;
+      const cy = 2*tope - (y0 + y2)/2;          // punto de control para que el vértice quede en "tope"
+      const cx = x0 + (x2 - x0)*0.62;
+      let redHecha = false;
+      balon.style.zIndex = 4;                   // pasa por detrás del aro delantero y de la red
+      animar([
+        { dur: 780, f: t => [bez(x0,cx,x2,t), bez(y0,cy,y2,t)], giro: .6 },
+        { dur: 360, f: t => [x2, y2 + (g.suelo - y2)*easeIn(t)], giro: .3,
+          alPasar: t => { if (!redHecha && t > .15){ redHecha = true; red.classList.remove('mueve'); void red.offsetWidth; red.classList.add('mueve'); } } },
+        { dur: 260, f: bote(x2, g.suelo, 16), giro: .2 },
+        { dur: 160, f: bote(x2, g.suelo, 5), giro: .1 },
+      ]);
+    } else {
+      // Choca con la parte delantera del aro y sale rebotado
+      const x2 = g.aroIzq + 2, y2 = g.aroY - R + 2;
+      const cy = 2*tope - (y0 + y2)/2, cx = x0 + (x2 - x0)*0.62;
+      const x3 = x2 - 75;
+      balon.style.zIndex = 7;                   // por delante del aro: rebota fuera
+      animar([
+        { dur: 760, f: t => [bez(x0,cx,x2,t), bez(y0,cy,y2,t)], giro: .6,
+          alPasar: t => { if (t>=1) aros.forEach(a=>{ a.classList.remove('vibra'); void a.offsetWidth; a.classList.add('vibra'); }); } },
+        { dur: 620, f: t => [bez(x2, x2-30, x3, t), bez(y2, y2-45, g.suelo, t)], giro: -.5 },
+        { dur: 300, f: bote(x3, g.suelo, 18), giro: -.3 },
+        { dur: 180, f: bote(x3, g.suelo, 6), giro: -.2 },
+      ]);
+    }
   }
 
   // ---------- Final ----------
@@ -725,6 +795,7 @@
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['1.3', ['🏀 Los tiros son más reales: la pelota entra por el aro, mueve la red y bota en el suelo']],
     ['1.2', ['✖️ ¡Nuevo! Las tablas de multiplicar. Elige qué tablas quieres practicar',
              '🆚 En el reto, papá y mamá tienen multiplicaciones más difíciles']],
     ['1.1', ['🔄 El juego se actualiza solo y te cuenta las novedades, ¡como ahora!',
