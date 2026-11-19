@@ -5,3 +5,8 @@ Juego de baloncesto para practicar sumas y restas con llevadas (2º de primaria)
 Se publica con GitHub Pages: https://indalo-apps.github.io/canastas-gabi/
 
 Para sacar una versión nueva: subir el número en `<meta name="app-version">` (index.html) y en `CACHE` (sw.js), y añadir sus novedades en `NOVEDADES`. Las tablets que lo tengan abierto se actualizan solas al volver al menú.
+
+## Sonidos
+- `sonidos/aplauso.mp3`: «Crowd Cheer and Applause» de DRAGON-STUDIO (Pixabay, licencia de contenido de Pixabay).
+- `sonidos/ooh.mp3`: «Crowd Disappointment Reaction» de Universfield (Pixabay, licencia de contenido de Pixabay).
+Recortados y pasados a mp3 mono.

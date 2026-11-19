@@ -1,7 +1,7 @@
 // Service worker de Canastas de Gabi: permite jugar sin conexión.
 // Al subir una versión nueva, cambia el nombre de la caché y se borra la anterior.
-const CACHE = "canastas-gabi-1.4";
-const PRECACHE = ["./", "index.html", "manifest.webmanifest", "apple-touch-icon.png", "icon-192.png", "icon-512.png",
+const CACHE = "canastas-gabi-1.5";
+const PRECACHE = ["./", "index.html", "manifest.webmanifest", "apple-touch-icon.png", "icon-192.png", "icon-512.png", "sonidos/aplauso.mp3", "sonidos/ooh.mp3",
   "https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap"];
 
 self.addEventListener("install", e => {
