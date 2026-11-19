@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="app-version" content="2.1">
+<meta name="app-version" content="2.2">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Canastas Gabi">
@@ -94,7 +94,7 @@
     font-size:1.1rem;padding:4px 8px;cursor:pointer;font-family:inherit}
 
   /* Pista de baloncesto */
-  .cancha{position:relative;height:118px;border-radius:16px;overflow:hidden;margin-bottom:10px;
+  .cancha{position:relative;height:128px;border-radius:16px;overflow:hidden;margin-bottom:10px;
     background:#fbfaf6;border:3px solid #1b2440;}
   .cancha .suelo{position:absolute;left:0;right:0;bottom:0;height:14px;z-index:1;
     background:repeating-linear-gradient(90deg,#e8bf86 0 38px,#dcae72 38px 40px);border-top:2.5px solid #1b2440}
@@ -115,8 +115,21 @@
   @keyframes vibra{25%{transform:translateY(2px)}50%{transform:translateY(-1px)}75%{transform:translateY(1px)}}
   .cancha .balon{position:absolute;left:0;top:0;width:30px;height:30px;z-index:4;will-change:transform}
   .cancha .balon svg{width:100%;height:100%;display:block}
-  .jugador{position:absolute;left:6px;bottom:12px;width:54px;height:86px;z-index:3;transform-origin:50% 100%}
-  .jugador .ol{stroke:#1b2440;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round}
+  .jugador{position:absolute;left:4px;bottom:12px;width:70px;height:84px;z-index:3;transform-origin:40% 100%}
+  .jugador img{width:100%;height:100%;display:block;filter:drop-shadow(0 3px 0 rgba(27,36,64,.18))}
+  .jugador[data-pose=listo]{animation:respira 2.4s ease-in-out infinite}
+  @keyframes respira{50%{transform:translateY(-3px)}}
+  .jugador[data-pose=tira]{animation:impulso .55s ease-out}
+  @keyframes impulso{35%{transform:translateY(-14px) rotate(-4deg)}}
+  .jugador[data-pose=celebra]{animation:salta .42s ease-out 3}
+  @keyframes salta{50%{transform:translateY(-16px) rotate(3deg)}}
+  .jugador[data-pose=lamenta]{animation:pena .7s ease-in-out}
+  .jugador[data-pose=lamenta] img{filter:saturate(.55) drop-shadow(0 3px 0 rgba(27,36,64,.18))}
+  @keyframes pena{25%{transform:rotate(-5deg) translateY(2px)}75%{transform:rotate(5deg) translateY(2px)}}
+  .bocadillo{position:absolute;left:68px;top:22px;background:#fff;border:2.5px solid #1b2440;border-radius:12px;
+    padding:0 7px;font-weight:800;font-size:.95rem;color:#1b2440;white-space:nowrap;opacity:0;transform:scale(.5);
+    transform-origin:0 100%;transition:opacity .2s, transform .25s cubic-bezier(.3,1.6,.6,1);pointer-events:none}
+  .bocadillo.vis{opacity:1;transform:scale(1)}
   .cancha .fondo{position:absolute;inset:0;width:100%;height:100%;z-index:0}
   .jugador svg{width:100%;height:100%;display:block;overflow:visible}
   .jugador .brazos{display:none}
@@ -240,6 +253,7 @@
   @media (min-width:740px) and (min-height:940px){ .app{zoom:1.32} }
   @media (min-width:1000px) and (min-height:1200px){ .app{zoom:1.6} }
   @media (max-height:720px){
+    .cancha{height:118px}
     .celda{height:46px;font-size:2.5rem} .resp{height:52px;font-size:2.2rem} .llevo{height:22px}
     .tecla{padding:5px 0}
   }
@@ -329,80 +343,8 @@
       </svg>
       <div class="poste"></div><div class="soporte"></div><div class="tablero"></div>
       <div class="jugador" id="jugador" data-pose="listo" aria-hidden="true">
-        <svg viewBox="-6 -16 58 92">
-          
-          <!-- zapatillas grandes azules/blancas con amarillo -->
-          <g class="ol">
-            <path d="M9 68 q0-6 7-6 h3 q2 0 2 3 l1 5 q0 3-3 3 h-9 q-3 0-1-5z" fill="#fff"/>
-            <path d="M9.4 69 q.5-3 4-3.6 l1 6.6 h-4 q-2 0-1-3z" fill="#2f6fd6" stroke="none"/>
-            <path d="M10 70.6 q4 1 11 0" fill="none" stroke="#ffcc29" stroke-width="1.4"/>
-            <path d="M24 68 q0-6 7-6 h3 q2 0 2 3 l1 5 q0 3-3 3 h-9 q-3 0-1-5z" fill="#fff"/>
-            <path d="M24.4 69 q.5-3 4-3.6 l1 6.6 h-4 q-2 0-1-3z" fill="#2f6fd6" stroke="none"/>
-            <path d="M25 70.6 q4 1 11 0" fill="none" stroke="#ffcc29" stroke-width="1.4"/>
-          </g>
-          <path d="M14 64 l4 0" stroke="#ffcc29" stroke-width="2"/><path d="M29 64 l4 0" stroke="#ffcc29" stroke-width="2"/>
-          <!-- calcetines y piernas -->
-          <g class="ol">
-            <rect x="14" y="54" width="6" height="9" rx="2" fill="#f6c79a"/>
-            <rect x="27" y="54" width="6" height="9" rx="2" fill="#f6c79a"/>
-            <rect x="14" y="58" width="6" height="5" rx="1" fill="#fff"/>
-            <rect x="27" y="58" width="6" height="5" rx="1" fill="#fff"/>
-          </g>
-          <!-- pantalón azul con franja blanca -->
-          <path class="ol" d="M11 43 h25 l2 13 h-11 l-3-5 -3 5 h-12z" fill="#2f6fd6"/>
-          <path d="M13 45 l-1.5 10" stroke="#fff" stroke-width="2"/><path d="M34 45 l1.5 10" stroke="#fff" stroke-width="2"/>
-          <!-- camiseta -->
-          <path class="ol" d="M14 23 q9 5 18 0 l3 3 -1 19 h-22 l-1-19z" fill="#2f6fd6"/>
-          <path d="M17 24 q6 5 12 0" fill="none" stroke="#fff" stroke-width="2"/>
-          <path d="M14 26 q2 4 0 8" fill="none" stroke="#fff" stroke-width="1.6"/><path d="M32 26 q-2 4 0 8" fill="none" stroke="#fff" stroke-width="1.6"/>
-          <text x="23.5" y="41" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="11" fill="#fff" stroke="#1b2440" stroke-width=".6" paint-order="stroke" id="dorsal">3</text>
-          <!-- cabeza -->
-          <!-- pelo de punta (detrás) -->
-          <path class="ol" d="M9 12 l-6-3 5-1 -6-6 7 1 -3-7 7 4 0-7 6 5 3-6 3 6 5-4 0 6 5-1 -2 6z" fill="#8a4f24"/>
-          <circle class="ol" cx="23" cy="13" r="11" fill="#f6c79a"/>
-          <!-- oreja -->
-          <ellipse class="ol" cx="12.5" cy="15" rx="2.4" ry="3" fill="#f6c79a"/>
-          <!-- mechones sobre la frente -->
-          <path class="ol" d="M12 6 q4-6 11-6 q8 0 12 6 l-3-1 1 3 -4-2 0 3 -4-3 -1 3 -3-3 -2 3 -2-3 -3 3z" fill="#8a4f24"/>
-          <!-- cinta azul con estrella -->
-          <path class="ol" d="M11.5 7.5 q11.5-6 23 0 l0.3 3.5 q-11.8-5.5-23.6 0z" fill="#2f6fd6"/>
-          <path d="M25 6.4 l.7 1.4 1.5.2 -1.1 1 .3 1.5 -1.4-.7 -1.4.7 .3-1.5 -1.1-1 1.5-.2z" fill="#fff"/>
-          <path class="ol" d="M11.8 9 l-5 -2 1 4 4 -1" fill="#2f6fd6"/>
-          <path class="ol" d="M11.6 10 l-5 3 3 2 2.5-4" fill="#2f6fd6"/>
-          <!-- ojos grandes -->
-          <ellipse class="ol" cx="27" cy="13.5" rx="2.6" ry="3.2" fill="#fff" stroke-width="1.1"/>
-          <ellipse cx="27.6" cy="14" rx="1.6" ry="2.1" fill="#2a74c9"/><circle cx="27.8" cy="14.3" r=".9" fill="#14223d"/><circle cx="28.3" cy="13.3" r=".55" fill="#fff"/>
-          <ellipse class="ol" cx="20.5" cy="13.5" rx="2.2" ry="3" fill="#fff" stroke-width="1.1"/>
-          <ellipse cx="21.1" cy="14" rx="1.4" ry="2" fill="#2a74c9"/><circle cx="21.3" cy="14.3" r=".8" fill="#14223d"/><circle cx="21.7" cy="13.3" r=".5" fill="#fff"/>
-          <path d="M25 9.6 q2-1 4 .2" fill="none" stroke="#5a3418" stroke-width="1"/><path d="M19 9.8 q1.5-.9 3 0" fill="none" stroke="#5a3418" stroke-width="1"/>
-          <!-- mofletes y boca -->
-          <ellipse cx="17.5" cy="18" rx="2" ry="1.1" fill="#f59b8a" opacity=".7"/><ellipse cx="31" cy="18" rx="1.6" ry="1" fill="#f59b8a" opacity=".7"/>
-          <path class="ol" d="M22 18.2 q3.5 .6 7-.6 q-.5 4.2-3.6 4.2 q-3 0-3.4-3.6z" fill="#d8434b" stroke-width="1.1"/>
-          <path d="M22.6 18.6 q3 .4 6-.4 l-.2 1 q-3 .6-5.6 .2z" fill="#fff"/>
-          <!-- brazos: listo -->
-          <g class="brazos b-listo">
-            <path d="M15 27 L22 38 L37 41" fill="none" stroke="#1b2440" stroke-width="6.6" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M15 27 L22 38 L37 41" fill="none" stroke="#f6c79a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M32 27 L43 36" fill="none" stroke="#1b2440" stroke-width="6.6" stroke-linecap="round"/>
-            <path d="M32 27 L43 36" fill="none" stroke="#f6c79a" stroke-width="4" stroke-linecap="round"/>
-          </g>
-          <!-- brazos: arriba (tira / celebra) -->
-          <g class="brazos b-arriba">
-            <path d="M15 26 L9 13 L11 -2" fill="none" stroke="#1b2440" stroke-width="6.6" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M15 26 L9 13 L11 -2" fill="none" stroke="#f6c79a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M32 26 L38 13 L36 -2" fill="none" stroke="#1b2440" stroke-width="6.6" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M32 26 L38 13 L36 -2" fill="none" stroke="#f6c79a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-            <rect class="ol" x="8" y="2" width="5" height="3.4" rx="1" fill="#2f6fd6" transform="rotate(8 10.5 3.7)"/>
-            <rect class="ol" x="34" y="2" width="5" height="3.4" rx="1" fill="#2f6fd6" transform="rotate(-8 36.5 3.7)"/>
-          </g>
-          <!-- brazos: manos a la cabeza -->
-          <g class="brazos b-cabeza">
-            <path d="M15 26 L5 16 L12 3" fill="none" stroke="#1b2440" stroke-width="6.6" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M15 26 L5 16 L12 3" fill="none" stroke="#f6c79a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M32 26 L42 16 L35 3" fill="none" stroke="#1b2440" stroke-width="6.6" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M32 26 L42 16 L35 3" fill="none" stroke="#f6c79a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-          </g>
-        </svg>
+        <img src="img/jugador.png" alt="" width="178" height="215">
+        <div class="bocadillo" id="bocadillo"></div>
       </div>
       <div class="aro-atras" id="aro-atras"></div>
       <div class="sombra" id="sombra"></div>
@@ -915,7 +857,7 @@
     const suelo = H - 14 - R;                 // centro del balón apoyado en el suelo
     const aroDcha = W - 25, aroW = 52, aroY = 54;  // aroY = centro vertical del aro
     // el balón empieza en las manos del jugador
-    return { W, H, suelo, aroIzq: aroDcha-aroW, aroDcha, aroW, aroY, aroCx: aroDcha-aroW/2, x0: 54, yMano: H - 12 - 34, xTiro: 34, yTiro: H - 12 - 80 };
+    return { W, H, suelo, aroIzq: aroDcha-aroW, aroDcha, aroW, aroY, aroCx: aroDcha-aroW/2, x0: 80, yMano: H - 12 - 84, xTiro: 80, yTiro: H - 12 - 86 };
   }
   function colocarCanasta(){
     const g = geo();
@@ -928,7 +870,13 @@
     const sm = $('#sombra'); sm.style.transform = `translateX(${x-13}px) scale(${k})`; sm.style.opacity = k;
   }
   let poseTimer = 0;
-  function pose(p){ const j = $('#jugador'); j.dataset.pose = ''; void j.offsetWidth; j.dataset.pose = p; }
+  function pose(p){
+    const j = $('#jugador'); j.dataset.pose = ''; void j.offsetWidth; j.dataset.pose = p;
+    const b = $('#bocadillo');
+    if (p==='celebra'){ b.textContent = elige(['¡Toma!','¡Sí!','¡Dentro!','¡Chof!']); b.classList.add('vis'); }
+    else if (p==='lamenta'){ b.textContent = elige(['¡Ooh!','¡Casi!','¡Uy!']); b.classList.add('vis'); }
+    else b.classList.remove('vis');
+  }
   function balonInicio(){
     cancelAnimationFrame(animId); clearTimeout(poseTimer); colocarCanasta(); pose('listo');
     const g = geo(); $('#balon').style.zIndex = 4; ponerBalon(g.x0, g.yMano, 0);
@@ -1115,6 +1063,7 @@
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['2.2', ['⛹️ ¡El Capitán Triple baja a la cancha! Ahora tira él, salta cuando encestas y dice lo que piensa']],
     ['2.1', ['🎨 Gráficos nuevos al estilo del Capitán Triple: el jugador, la cancha con rayos y estrellas y la pantalla gigante']],
     ['2.0', ['🏟️ ¡El juego estrena pabellón! Marcador electrónico y suelo de cancha',
              '⛹️ Ahora hay un jugador con tu camiseta que tira, celebra… o se lleva las manos a la cabeza',
