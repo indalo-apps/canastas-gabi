@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="app-version" content="1.1">
+<meta name="app-version" content="1.2">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Canastas Gabi">
@@ -148,6 +148,16 @@
   @keyframes pop{50%{transform:scale(1.25)}}
   .tiembla{animation:tiembla .4s}
   @keyframes tiembla{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .chip{border:3px solid transparent;background:#fff;border-radius:12px;min-width:48px;padding:6px 8px;font:inherit;
+    font-size:1.2rem;font-weight:800;color:var(--azul);cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.12)}
+  .chip.sel{border-color:var(--naranja);background:#fff1e3}
+  .chip.todas{font-size:1rem}
+  .celda.ancha{width:auto;min-width:54px;padding:0 2px}
+  .rejilla.horiz{gap:4px}
+  .rejilla.horiz .celda{font-size:2.3rem}
+  .rejilla.horiz .celda:not(.ancha){width:34px}
+  .rejilla.horiz .resp{width:48px}
   .barra-act{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--verde);color:#fff;
     padding:10px 18px;border-radius:14px;font-weight:800;z-index:40;box-shadow:0 4px 12px rgba(0,0,0,.25)}
   .dlg{position:fixed;inset:0;background:rgba(29,53,87,.85);display:flex;align-items:center;justify-content:center;z-index:35;padding:20px}
@@ -187,6 +197,11 @@
         <button class="opt" data-nivel="resta"><span class="emoji">➖</span>Restas<small>2 cifras, llevando</small></button>
         <button class="opt" data-nivel="mezcla"><span class="emoji">🔀</span>Mezcla<small>sumas y restas</small></button>
         <button class="opt" data-nivel="estrella"><span class="emoji">⭐</span>Nivel estrella<small>3 cifras</small></button>
+        <button class="opt" data-nivel="tablas" style="grid-column:1/-1"><span class="emoji">✖️</span>Tablas de multiplicar<small>elige qué tablas</small></button>
+      </div>
+      <div id="eleccion-tablas" style="display:none">
+        <p style="margin-top:12px"><b>¿Qué tablas?</b> Toca para elegir una o varias.</p>
+        <div class="chips" id="chips-tablas"></div>
       </div>
     </div>
 
@@ -308,8 +323,22 @@
     if (Math.random()<.5){ for(;;){ const a=rnd(300,999), b=rnd(300,999); if (llevadasSuma(a,b)>=3) return {a,b,t:'+'}; } }
     for(;;){ const a=rnd(1000,9999), b=rnd(100,a-1); if (llevadasResta(a,b)>=2 && b>=1000) return {a,b,t:'-'}; }
   }
+  function tabla(){
+    for(let i=0;i<20;i++){
+      const t = elige(S.tablas), m = rnd(1,10);
+      const [a,b] = Math.random()<.7 ? [t,m] : [m,t];
+      const k = a+'x'+b;
+      if (!recientes.includes(k) || i===19){ recientes = [...recientes.slice(-5), k]; return {a,b,t:'×',tabla:t,veces:(a===t?b:a),horiz:true}; }
+    }
+  }
+  function tablaDificil(){ const a=rnd(12,25), b=rnd(3,9); return {a,b,t:'×',horiz:true,tabla:b,veces:a}; }
   function generar(nivel){
     let op;
+    if (nivel==='tablas' || nivel==='tablasDificil'){
+      op = nivel==='tablas' ? tabla() : tablaDificil();
+      op.r = op.a*op.b; op.W = op.r>=100 ? 3 : 2;
+      return op;
+    }
     if (nivel==='suma') op = suma2();
     else if (nivel==='resta') op = resta2();
     else if (nivel==='mezcla') op = Math.random()<.5 ? suma2() : resta2();
@@ -329,7 +358,8 @@
   const msgRival = n => [`¡Canasta de ${n}!`,`${n} también sabe…`,`¡Bien, ${n}!`];
 
   // ---------- Estado ----------
-  const S = { nivel:'suma', modo:'partido', rival:'Papá' };
+  const S = { nivel:'suma', modo:'partido', rival:'Papá', tablas: store.get('gabi-tablas') || [2,3,4,5] };
+  let recientes = [];
   let J = null; // estado de partida
   let op = null, ans = [], llevo = [], activo = 0, intentos = 0, usoPista = false, resuelta = false;
 
@@ -342,12 +372,27 @@
       b.classList.add('sel');
       S[attr] = b.dataset[attr];
       $('#eleccion-rival').style.display = S.modo==='reto' ? 'block':'none';
+      $('#eleccion-tablas').style.display = S.nivel==='tablas' ? 'block':'none';
       pintarRecord();
     });
   }
   marcarSel($('#niveles'),'nivel'); marcarSel($('#modos'),'modo'); marcarSel($('#rivales'),'rival');
 
-  const nombresNivel = {suma:'Sumas', resta:'Restas', mezcla:'Mezcla', estrella:'Nivel estrella'};
+  const nombresNivel = {suma:'Sumas', resta:'Restas', mezcla:'Mezcla', estrella:'Nivel estrella', tablas:'Tablas'};
+  // Selector de tablas
+  function pintarChips(){
+    const todas = S.tablas.length===10;
+    $('#chips-tablas').innerHTML = [1,2,3,4,5,6,7,8,9,10].map(n=>`<button class="chip ${S.tablas.includes(n)?'sel':''}" data-t="${n}">${n}</button>`).join('')
+      + `<button class="chip todas ${todas?'sel':''}" data-t="todas">Todas</button>`;
+  }
+  $('#chips-tablas').addEventListener('click', e => {
+    const b = e.target.closest('.chip'); if(!b) return; sClic();
+    if (b.dataset.t==='todas') S.tablas = S.tablas.length===10 ? [2] : [1,2,3,4,5,6,7,8,9,10];
+    else { const n=+b.dataset.t; S.tablas = S.tablas.includes(n) ? S.tablas.filter(x=>x!==n) : [...S.tablas,n].sort((a,b)=>a-b);
+      if (!S.tablas.length) S.tablas=[n]; }
+    store.set('gabi-tablas', S.tablas); pintarChips();
+  });
+  pintarChips();
   function pintarRecord(){
     const r = store.get('gabi-record-'+S.nivel);
     $('#record-txt').textContent = r ? `🏆 Tu récord en ${nombresNivel[S.nivel]}: ${r} puntos` : '';
@@ -397,10 +442,11 @@
 
   function nuevaCuenta(){
     const esRival = J.modo==='reto' && J.turno===1;
-    op = generar(esRival ? 'dificil' : J.nivel);
+    op = generar(esRival ? (J.nivel==='tablas' ? 'tablasDificil' : 'dificil') : J.nivel);
     ans = Array(op.W).fill(''); llevo = Array(op.W).fill(false);
-    activo = op.W-1; intentos = 0; usoPista = false; resuelta = false;
+    activo = op.horiz ? 0 : op.W-1; intentos = 0; usoPista = false; resuelta = false;
     $('#mensaje').textContent = esRival ? `Turno de ${J.jug[1].nombre}: ¡cuenta de mayores! 😎`
+      : op.horiz ? (J.modo==='reto' ? 'Turno de Gabi. ¿Cuánto es? 🤔' : '¿Cuánto es? Escribe el resultado 🤔')
       : (J.modo==='reto' ? 'Turno de Gabi. ¡Empieza por las unidades! 👉' : 'Empieza por la derecha: las unidades 👉');
     $('#mensaje').className = 'mensaje';
     $('#pista-txt').className = 'pista-txt';
@@ -411,6 +457,16 @@
 
   function pintarRejilla(marcas, colPista){
     const W = op.W, g = $('#rejilla');
+    g.classList.toggle('horiz', !!op.horiz);
+    if (op.horiz){
+      g.style.gridTemplateColumns = `repeat(${4+W}, auto)`;
+      let h = `<div class="celda ancha">${op.a}</div><div class="celda signo">×</div><div class="celda ancha">${op.b}</div><div class="celda">=</div>`;
+      for (let i=0;i<W;i++){
+        let c='resp'; if (i===activo && !resuelta) c+=' act'; if (marcas && marcas[i]) c+=' '+marcas[i];
+        h += `<button class="${c}" data-r="${i}">${ans[i]}</button>`;
+      }
+      g.innerHTML = h; return;
+    }
     g.style.gridTemplateColumns = `repeat(${W+1}, auto)`;
     const a = String(op.a).padStart(W,' '), b = String(op.b).padStart(W,' ');
     let h = '';
@@ -457,9 +513,10 @@
     else if (b.dataset.k==='izq'){ activo=Math.max(0,activo-1); pintarRejilla(); }
     else if (b.dataset.k==='der'){ activo=Math.min(op.W-1,activo+1); pintarRejilla(); }
   });
-  function escribir(d){ ans[activo]=d; if (activo>0) activo--; pintarRejilla(); }
+  function escribir(d){ ans[activo]=d; if (op.horiz){ if (activo<op.W-1) activo++; } else if (activo>0) activo--; pintarRejilla(); }
   function borrar(){
-    if (ans[activo]==='' && activo<op.W-1) activo++;
+    if (op.horiz){ if (ans[activo]==='' && activo>0) activo--; }
+    else if (ans[activo]==='' && activo<op.W-1) activo++;
     ans[activo]=''; pintarRejilla();
   }
   document.addEventListener('keydown', e => {
@@ -510,9 +567,27 @@
     return res;
   }
   const nombreCol = ['unidades','decenas','centenas','unidades de millar'];
+  function pistaTabla(){
+    const t = op.tabla, v = op.veces;
+    if (v===1 || t===1) return 'Cualquier número por 1 da el mismo número. ¡Fácil!';
+    if (t===10) return `Para multiplicar por 10, pon un <b>0</b> detrás: ${v} → ${v}0.`;
+    if (t>10) return `Separa el ${t}: ${Math.floor(t/10)*10} × ${v} = ${Math.floor(t/10)*10*v}, y ${t%10} × ${v} = ${(t%10)*v}. Luego súmalos.`;
+    if (v===10) return `Por 10 es fácil: pon un <b>0</b> detrás del ${t}.`;
+    const serie = []; for (let i=1;i<v;i++) serie.push(t*i);
+    return `Cuenta de ${t} en ${t}, ${v} veces: ${serie.join(', ')}, … ¿y el siguiente?`;
+  }
+  function filaTabla(){
+    const t = op.tabla; if (t>10) return '';
+    return `<br>Tabla del ${t}: ` + [1,2,3,4,5,6,7,8,9,10].map(i=> i===op.veces ? `<b>${t}×${i}=${t*i}</b>` : `${t*i}`).join(', ');
+  }
   $('#btn-pista').onclick = () => {
     if (resuelta) return; sClic();
     usoPista = true;
+    if (op.horiz){
+      $('#pista-txt').innerHTML = '💡 ' + pistaTabla();
+      $('#pista-txt').className = 'pista-txt vis';
+      return;
+    }
     const k = op.W-1-activo; const p = pasos()[k];
     $('#pista-txt').innerHTML = `💡 <b>${nombreCol[k][0].toUpperCase()+nombreCol[k].slice(1)}:</b> ${p}`;
     $('#pista-txt').className = 'pista-txt vis';
@@ -530,7 +605,7 @@
     const valido = !txt.includes(' ');
     const valor = valido ? parseInt(txt,10) : NaN;
     const esperado = String(op.r).padStart(op.W,' ');
-    const marcas = ans.map((x,i)=> (esperado[i].trim()===x || (esperado[i]===' ' && (x===''||x==='0'))) ? 'bien':'mal');
+    const marcas = op.horiz ? ans.map(()=> 'mal') : ans.map((x,i)=> (esperado[i].trim()===x || (esperado[i]===' ' && (x===''||x==='0'))) ? 'bien':'mal');
     const jugador = quienJuega(); const esRival = J.modo==='reto' && J.turno===1;
     intentos++;
     if (valor===op.r){
@@ -559,16 +634,19 @@
         mensaje(esRival ? `¡Uy, ${jugador.nombre}! Otro intento…` : elige(msgMal),'ko');
         // limpiar solo las casillas mal
         setTimeout(()=>{ if(resuelta) return; ans = ans.map((x,i)=> marcas[i]==='mal' ? '' : x);
-          const pm = ans.map((x,i)=>marcas[i]==='mal'); activo = pm.lastIndexOf(true); if (activo<0) activo=op.W-1;
+          const pm = ans.map((x,i)=>marcas[i]==='mal'); activo = op.horiz ? 0 : pm.lastIndexOf(true); if (activo<0) activo=op.W-1;
           pintarRejilla(); }, 1300);
         pintarMarcador();
       } else {
         resuelta = true;
         lanzar(false);
-        ans = String(op.r).padStart(op.W,' ').split('').map(x=>x.trim());
+        ans = (op.horiz ? String(op.r).padEnd(op.W,' ') : String(op.r).padStart(op.W,' ')).split('').map(x=>x.trim());
         pintarRejilla(ans.map(()=>'bien'));
         mensaje(esRival ? `¡Fallo de ${jugador.nombre}! Era ${op.r}.` : `No pasa nada, Gabi. El resultado era <b>${op.r}</b>. ¡A por la siguiente!`,'ko');
-        if (!esRival){
+        if (!esRival && op.horiz){
+          $('#pista-txt').innerHTML = `💡 ${op.a} × ${op.b} = <b>${op.r}</b>` + filaTabla();
+          $('#pista-txt').className = 'pista-txt vis';
+        } else if (!esRival){
           $('#pista-txt').innerHTML = '💡 ' + pasos().map((p,k)=>`<b>${nombreCol[k][0].toUpperCase()+nombreCol[k].slice(1)}:</b> ${p}`).join('<br>');
           $('#pista-txt').className = 'pista-txt vis';
         }
@@ -647,6 +725,8 @@
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['1.2', ['✖️ ¡Nuevo! Las tablas de multiplicar. Elige qué tablas quieres practicar',
+             '🆚 En el reto, papá y mamá tienen multiplicaciones más difíciles']],
     ['1.1', ['🔄 El juego se actualiza solo y te cuenta las novedades, ¡como ahora!',
              '📲 Puedes ponerlo en la pantalla de inicio de la tablet, con su propio icono']],
   ];
