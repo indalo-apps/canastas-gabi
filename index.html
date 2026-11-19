@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="app-version" content="3.5">
+<meta name="app-version" content="3.6">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Canastas Gabi">
@@ -225,7 +225,7 @@
     box-shadow:0 6px 0 rgba(0,0,0,.28),inset 0 0 24px rgba(0,0,0,.9);text-align:center;position:relative}
   .led::before,.led::after{content:"";position:absolute;top:-14px;width:10px;height:14px;background:#2c2c2c}
   .led::before{left:30%} .led::after{right:30%}
-  .barra-jugar{position:sticky;bottom:10px;z-index:8;margin-top:4px}
+  .barra-jugar{margin:4px 0 0}
   #btn-jugar{font-size:1.7rem;padding:16px;border:4px solid #fff;
     box-shadow:0 6px 0 var(--naranja-osc),0 10px 26px rgba(0,0,0,.35);animation:llama 1.8s ease-in-out infinite}
   #btn-jugar:active{animation:none}
@@ -364,6 +364,9 @@
       </div>
     </div>
 
+    <div class="barra-jugar"><button class="btn" id="btn-jugar">¡A jugar! 🏀</button></div>
+    <p class="centrado" id="record-txt" style="margin:8px 0 12px"></p>
+
     <div class="tarjeta">
       <h2>2. ¿Cómo jugamos?</h2>
       <div class="opciones" id="modos">
@@ -379,8 +382,6 @@
       </div>
     </div>
 
-    <div class="barra-jugar"><button class="btn" id="btn-jugar">¡A jugar! 🏀</button></div>
-    <p class="centrado" id="record-txt" style="margin-top:10px"></p>
     <div class="version">Canastas de Gabi · <button id="btn-version"></button></div>
   </section>
 
@@ -1128,43 +1129,126 @@
   const jugador = (() => {
     let sec = 'botar', i = 0, t0 = performance.now(), desde = null, ultima = POSE.boteArriba, ultimo = null, id = 0;
     let modoBalon = 'bote';   // 'bote' | 'manos' | 'libre'
-    const escala = () => { const g = geo(); return { k: (g.H - 14)*0.6/178, x: 4, piso: g.piso }; };
+    // posición del jugador en la pista (px desde la izquierda) y movimiento
+    let posX = 0, destino = 0, pasoFase = 0, last = performance.now();
+    // estado del bote: fase del bote (0..1), mano que bota ('d' delante, 't' detrás), altura, cruce y pausas
+    const B = { fase: 0, dur: 560, mano: 'd', cruce: false, bajo: 0, objBajo: 0, ciclosBajo: 0, pausa: 0, tocado: false, cuenta: 0 };
+    const escala = () => { const g = geo(); return { k: (g.H - 14)*0.6/178, x: 4 + posX, piso: g.piso }; };
     const aCancha = ([x,y]) => { const e = escala(); return [e.x + e.k*x, e.piso + e.k*y]; };
+    const limiteX = () => Math.max(0, geo().W*0.36);
+
+    // Decide qué hace en el siguiente bote: moverse, cambiar de mano, botar bajo o pararse a mirar la canasta
+    function siguienteBote(){
+      B.cuenta++; B.cruce = false;
+      if (B.ciclosBajo > 0 && --B.ciclosBajo === 0) B.objBajo = 0;
+      const moviendo = Math.abs(destino - posX) > 2, r = Math.random();
+      if (!moviendo && B.cuenta > 2){
+        if (r < .24){ destino = Math.random()*limiteX(); if (Math.abs(destino-posX) < 18) destino = posX < limiteX()/2 ? posX+30 : posX-30; }
+        else if (r < .40){ B.cruce = true; }
+        else if (r < .54){ B.objBajo = 1; B.ciclosBajo = 3 + Math.floor(Math.random()*3); }
+        else if (r < .62){ B.pausa = 900; }
+      } else if (moviendo && r < .2){ B.cruce = true; }
+      B.dur = B.objBajo ? 380 : (moviendo ? 460 : 560);
+    }
+    // Postura procedimental mientras bota (y camina si se está moviendo)
+    function poseBote(dt){
+      B.bajo += (B.objBajo - B.bajo)*Math.min(1, dt/180);
+      const moviendo = Math.abs(destino - posX) > 2;
+      if (moviendo){ const v = .055*dt*(B.objBajo ? .8 : 1); posX += Math.sign(destino-posX)*Math.min(v, Math.abs(destino-posX)); pasoFase += dt/(B.objBajo ? 300 : 360); }
+      const b = B.bajo, f = B.fase;
+      // empuje del balón: la mano baja al principio del bote y sube a recogerlo al final
+      const emp = f < .3 ? Math.sin(f/.3*Math.PI/2) : Math.cos((f-.3)/.7*Math.PI/2);
+      const brazoArr = { b: lerp(42, 30, b), a: lerp(86, 52, b) }, brazoAb = { b: lerp(26, 20, b), a: lerp(18, 6, b) };
+      const bd = lerp(brazoArr.b, brazoAb.b, emp), ad = lerp(brazoArr.a, brazoAb.a, emp);
+      const protege = moviendo ? { b: 34, a: 76 } : { b: -14, a: 18 };          // el otro brazo protege el balón
+      const s = Math.sin(pasoFase*Math.PI*2), c = Math.cos(pasoFase*Math.PI*2);
+      const paso = moviendo ? 1 : 0;
+      const p = {
+        tronco: lerp(12, 26, b) + 2*emp + (moviendo ? 4 : 0), cabeza: lerp(-6, -10, b),
+        md: lerp(16, 36, b) + paso*18*s, pd: lerp(-6, -26, b) + paso*(-10 - 14*Math.max(0, c)),
+        mt: lerp(-12, 6, b) - paso*18*s, pt: lerp(-24, -42, b) + paso*(-10 - 14*Math.max(0, -c)),
+        salto: moviendo ? -2*Math.abs(s) : 0, avance: 0,
+      };
+      if (B.mano === 'd'){ p.bd = bd; p.ad = ad; p.bt = protege.b; p.at = protege.a; }
+      else { p.bt = bd - 4; p.at = ad; p.bd = protege.b + 10; p.ad = protege.a; }
+      return p;
+    }
     function frame(now){
       id = requestAnimationFrame(frame);
+      const dt = Math.min(50, now - last); last = now;
       if (!$('#juego').classList.contains('activa')) return;
+      let p, d;
+      if (sec === 'botar' && B.pausa > 0){
+        // pausa: sujeta el balón con las dos manos y mira la canasta («triple amenaza»)
+        B.pausa -= dt;
+        const k = Math.min(1, (900 - B.pausa)/200, B.pausa/200);
+        p = {}; for (const key in POSE.quieto) p[key] = lerp(poseBote(0)[key], POSE.recoge[key], k);
+        p.cabeza = -14; p.avance = 0;
+        d = dibujarSilueta(p); pintar(d);
+        const [ax,ay] = aCancha(d.mano), [bx,by] = aCancha(d.manoAtras), g = geo();
+        const yb = lerp(ay + R + 2, Math.min(ay,by) - R*.6, k);
+        ponerBalon(lerp(ax+3, (ax+bx)/2+4, k), yb, 0);
+        if (B.pausa <= 0){ B.fase = 0; siguienteBote(); }
+        ultima = p; return;
+      }
+      if (sec === 'botar'){
+        const antes = B.fase;
+        B.fase += dt / B.dur;
+        if (B.fase >= 1){ B.fase -= 1; if (B.cruce) B.mano = B.mano==='d' ? 't' : 'd'; siguienteBote(); B.tocado = false; }
+        p = poseBote(dt); d = dibujarSilueta(p); pintar(d); ultima = p;
+        if (modoBalon === 'bote') balonBote(d);
+        return;
+      }
+      // jugadas por fotogramas clave (tiro, celebración, lamento)
       const S = SECS[sec]; let [a, dur] = S.pasos[i];
       let t = (now - t0)/dur;
       if (t >= 1){
         if (i < S.pasos.length-1){ i++; t0 = now; desde = null; [a,dur] = S.pasos[i]; t = 0; }
-        else if (S.repite){ i = 0; t0 = now; desde = null; [a,dur] = S.pasos[0]; t = 0; }
         else t = 1;
       }
-      const sig = S.pasos[Math.min(i+1, S.pasos.length-1)][0], fin = S.repite ? S.pasos[(i+1)%S.pasos.length][0] : sig;
-      const A = a==='@' ? (desde || (desde = Object.assign({}, ultima))) : POSE[a], B = POSE[fin==='@' ? a : fin] || A;
-      const e = suave(Math.min(1,t)), p = {};
-      for (const k in POSE.quieto) p[k] = lerp(A[k], B[k], e);
-      ultima = p;
+      const fin = S.pasos[Math.min(i+1, S.pasos.length-1)][0];
+      const A = a==='@' ? (desde || (desde = Object.assign({}, ultima))) : POSE[a], Bp = POSE[fin==='@' ? a : fin] || A;
+      const e = suave(Math.min(1,t)); p = {};
+      for (const k in POSE.quieto) p[k] = lerp(A[k], Bp[k], e);
+      ultima = Object.assign({}, p);
       p.salto *= .7;
-      const d = dibujarSilueta(p), sk = escala();
-      $('#silueta').innerHTML = `<g transform="translate(${sk.x},${sk.piso}) scale(${sk.k})">${d.svg}</g>`;
-      ultimo = d;
-      // el balón acompaña a las manos mientras no ha salido
-      if (modoBalon==='bote'){
-        const g = geo(), [mx,my] = aCancha(d.mano), arribaY = my + R + 2, sueloY = g.suelo;
-        const baja = a!=='boteAbajo';
-        const y = baja ? lerp(arribaY, sueloY, t*t) : lerp(sueloY, arribaY, 1-Math.pow(1-t,2));
-        const pegado = sueloY - y < 3;                   // al tocar el suelo se aplasta un poco
-        ponerBalon(mx + 3, y + (pegado ? 1.5 : 0), (baja ? 1 : -1) * t * 120, pegado ? 1.14 : 1, pegado ? .84 : 1);
-      } else if (modoBalon==='manos'){
+      d = dibujarSilueta(p); pintar(d);
+      if (modoBalon==='manos'){
         const [ax,ay] = aCancha(d.mano), [bx,by] = aCancha(d.manoAtras);
         ponerBalon((ax+bx)/2 + 4, Math.min(ay,by) - R*.6, 0);
       }
     }
+    function pintar(d){
+      const sk = escala();
+      $('#silueta').innerHTML = `<g transform="translate(${sk.x},${sk.piso}) scale(${sk.k})">${d.svg}</g>`;
+      ultimo = d;
+    }
+    // Balón botando con física: cae acelerando, se aplasta contra el suelo y sube frenando hasta la mano
+    function balonBote(d){
+      const g = geo(), f = B.fase;
+      const manoA = aCancha(B.mano==='d' ? d.mano : d.manoAtras);
+      const otra = aCancha(B.mano==='d' ? d.manoAtras : d.mano);
+      const manoFin = B.cruce ? otra : manoA;                 // en un cambio de mano, sube a la otra
+      const yMano = manoA[1] + R + 2, yFin = manoFin[1] + R + 2, yS = g.suelo;
+      const T_BAJA = .44, T_SUELO = .08;
+      let x, y, sx = 1, sy = 1;
+      if (f < T_BAJA){ const q = f/T_BAJA; y = lerp(yMano, yS, Math.pow(q, 1.6)); x = lerp(manoA[0]+3, B.cruce ? (manoA[0]+manoFin[0])/2+3 : manoA[0]+3, q); }
+      else if (f < T_BAJA + T_SUELO){
+        const q = (f - T_BAJA)/T_SUELO, apl = Math.sin(q*Math.PI);           // aplastado contra el suelo
+        y = yS + 2*apl; sx = 1 + .22*apl; sy = 1 - .26*apl; x = B.cruce ? (manoA[0]+manoFin[0])/2+3 : manoA[0]+3;
+        if (!B.tocado){ B.tocado = true; if (sonido) tono(95, .07, 0, 'sine', .05); }
+      } else {
+        const q = (f - T_BAJA - T_SUELO)/(1 - T_BAJA - T_SUELO);
+        y = lerp(yS, yFin, 1 - Math.pow(1-q, 2)); x = lerp(B.cruce ? (manoA[0]+manoFin[0])/2+3 : manoA[0]+3, manoFin[0]+3, q);
+        if (q < .15){ const r2 = 1 - q/.15; sx = 1 + .06*r2; sy = 1 - .08*r2; }    // recupera la forma
+      }
+      ponerBalon(x, y, (f < .5 ? 1 : -1) * 160 * f, sx, sy);
+    }
     return {
       iniciar(){ cancelAnimationFrame(id); id = requestAnimationFrame(frame); },
-      botar(){ sec = 'botar'; i = 0; t0 = performance.now(); modoBalon = 'bote'; desde = null; },
-      tirar(){ sec = 'tiro'; i = 0; t0 = performance.now(); modoBalon = 'manos'; desde = null; },
+      botar(){ sec = 'botar'; modoBalon = 'bote'; desde = null; B.fase = 0; B.mano = 'd'; B.cruce = false; B.pausa = 0; B.cuenta = 0; B.tocado = false;
+        posX = Math.min(posX, limiteX()); destino = posX; },
+      tirar(){ sec = 'tiro'; i = 0; t0 = performance.now(); modoBalon = 'manos'; desde = null; destino = posX; },
       soltar(){ modoBalon = 'libre'; return this.posBalon(); },
       reaccion(ok){ sec = ok ? (Math.random()<.5 ? 'celebra' : 'celebraB') : (Math.random()<.5 ? 'lamenta' : 'lamentaB'); i = 0; t0 = performance.now(); desde = null; },
       posBalon(){ if (!ultimo) return [60,60]; const [ax,ay] = aCancha(ultimo.mano), [bx,by] = aCancha(ultimo.manoAtras); return [(ax+bx)/2 + 4, Math.min(ay,by) - R*.6]; },
@@ -1416,6 +1500,7 @@
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['3.6', ['🏃 El jugador se mueve por la pista mientras piensas', '🏀 Bota de muchas formas: alto, bajo y rápido, cambiando de mano… y a veces se para a mirar la canasta', '👌 El balón bota como uno de verdad']],
     ['3.4', ['😂 ¡Muchas frases nuevas y graciosas! Para las canastas, los fallos, las rachas y para chinchar a papá y mamá', '➕ De vez en cuando sale alguna cuenta sin llevadas']],
     ['3.3', ['🏟️ ¡Pabellón nuevo! Con grada, público, focos y parqué con las líneas de la cancha', '⛹️ Tiros en suspensión más reales y nuevas celebraciones', '🔢 Marcador como el de un partido de verdad']],
     ['3.2', ['⛹️ ¡Jugador nuevo! Bota el balón mientras piensas, salta, tira en suspensión… y celebra o se lleva las manos a la cabeza']],
