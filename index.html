@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="app-version" content="3.16">
+<meta name="app-version" content="3.17">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Canastas Gabi">
@@ -352,15 +352,6 @@
   #grada.ola g{animation:ola .45s ease-out 3}
   #grada.ola g:nth-child(2n){animation-delay:.08s} #grada.ola g:nth-child(3n){animation-delay:.16s}
   @keyframes ola{50%{transform:translateY(-4px)}}
-  #valla-cinta{animation:cinta 20s linear infinite}
-  @keyframes cinta{from{transform:translateX(0)}to{transform:translateX(var(--p))}}
-  #valla-aviso{opacity:0}
-  #valla-luz.aviso #valla-aviso{opacity:1}
-  #valla-luz.aviso #valla-aviso-txt{animation:vaviso .32s steps(1,end) infinite}
-  @keyframes vaviso{0%{fill:#ffd23f}50%{fill:#ff3b30}}
-  #valla-luz.parpadea{animation:vparpadeo .18s steps(1,end) 5}
-  @keyframes vparpadeo{0%{opacity:1}50%{opacity:.15}}
-  html.sin-mov #valla-cinta{animation:none}
   #flashes circle{opacity:0}
   #flashes.on circle{animation:flash .25s ease-out}
   @keyframes flash{0%{opacity:1}100%{opacity:0}}
@@ -446,6 +437,7 @@
   .aro-spr{position:absolute;pointer-events:none} #aro-fondo{z-index:1} #aro-frente{z-index:6}
   .ent-spr{position:absolute;z-index:2;pointer-events:none;filter:brightness(.92)}
   #fuego{position:absolute;z-index:5;pointer-events:none}
+  #cometa{position:absolute;z-index:3;pointer-events:none;opacity:.9} #mareo{position:absolute;z-index:8;pointer-events:none}
   .fx-spr{position:absolute;z-index:7;pointer-events:none;opacity:.92}
   .vibra-spr{animation:vibraSpr .35s}
   @keyframes vibraSpr{0%{transform:translateY(0)}25%{transform:translateY(2px)}50%{transform:translateY(-1.5px)}75%{transform:translateY(1px)}100%{transform:translateY(0)}}
@@ -525,7 +517,7 @@
         <img src="sprites/bal0.webp" alt="" style="width:100%;height:100%;display:block">
       </div>
       <div class="red" id="red"></div>
-      <div class="aro-delante" id="aro-delante"></div><img class="aro-spr" id="aro-frente" src="sprites/red0.webp" alt=""><img id="fuego" alt="" style="display:none">
+      <div class="aro-delante" id="aro-delante"></div><img class="aro-spr" id="aro-frente" src="sprites/red0.webp" alt=""><img id="fuego" alt="" style="display:none"><img id="cometa" alt="" style="display:none"><img id="mareo" alt="" style="display:none">
       <svg class="frente" id="frente" aria-hidden="true"></svg>
     </div>
 
@@ -881,17 +873,33 @@
   }
   // Un segundo de «salida al pabellón»: apagón, focos uno a uno, público y marcador que se enciende
   // Valla LED: mensaje grande que parpadea («¡CANASTA!») y parpadeos de vez en cuando
-  let tValla = 0;
+  let tValla = 0, iValla = 0, avisoValla = false;
   function vallaAviso(txt, dur=1900){
-    const luz = document.getElementById('valla-luz'), t = document.getElementById('valla-aviso-txt'); if (!luz || !t) return;
-    t.textContent = txt; luz.classList.remove('parpadea'); luz.classList.add('aviso');
-    clearTimeout(tValla); tValla = setTimeout(() => luz.classList.remove('aviso'), dur);
+    const av = document.getElementById('valla-aviso'), t = document.getElementById('valla-aviso-txt'), luz = document.getElementById('valla-luz');
+    if (!av || !t) return;
+    t.textContent = txt; av.setAttribute('opacity', '1'); luz.setAttribute('opacity', '1'); avisoValla = true;
+    clearInterval(iValla); clearTimeout(tValla); let n = 0;
+    const color = () => t.setAttribute('fill', n++ % 2 ? '#ff3b30' : '#ffd23f'); color();
+    if (!menosMov()) iValla = setInterval(color, 160);
+    tValla = setTimeout(() => { clearInterval(iValla); av.setAttribute('opacity', '0'); avisoValla = false; }, dur);
   }
+  // la cinta de anuncios se desliza (con JavaScript: Safari no anima bien los SVG con CSS)
+  (function deslizarValla(){
+    let x = 0, last = performance.now();
+    const paso = now => {
+      requestAnimationFrame(paso);
+      const dt = Math.min(60, now - last); last = now;
+      const g = document.getElementById('valla-cinta'); if (!g || menosMov()) return;
+      if (!$('#juego').classList.contains('activa')) return;
+      const P = +g.dataset.p || 950; x = (x + dt*0.028) % P;
+      g.setAttribute('transform', `translate(${(-x).toFixed(1)},0)`);
+    };
+    requestAnimationFrame(paso);
+  })();
   setInterval(() => {
     const luz = document.getElementById('valla-luz');
-    if (!luz || luz.classList.contains('aviso') || menosMov() || Math.random() < .4) return;
-    luz.classList.remove('parpadea'); void luz.getBoundingClientRect(); luz.classList.add('parpadea');
-    setTimeout(() => luz.classList.remove('parpadea'), 1000);
+    if (!luz || avisoValla || menosMov() || Math.random() < .4) return;
+    let n = 0; const i = setInterval(() => { luz.setAttribute('opacity', n % 2 ? '1' : '.15'); if (++n > 9){ clearInterval(i); luz.setAttribute('opacity', '1'); } }, 90);
   }, 7000);
   function salidaPabellon(){
     const c = $('#cancha'), m = $('#marcador'), lleno = J.modo!=='entreno';
@@ -1193,7 +1201,7 @@
       else jugador.puntos += pts;
       J.aciertos++;
       if (!esRival){ if (intentos===1 && !usoPista) J.primeras++; logroCanasta(jugador.racha, triple); }
-      celebraEspecial = triple || jugador.racha===5 || jugador.racha===10; fuego = jugador.racha >= 5;
+      celebraEspecial = triple || jugador.racha===5 || jugador.racha===10; fuego = jugador.racha >= 5; cometa = triple && !fuego; prevBalon = null;
       const ev = lanzar(true);
       const rapido = intentos===1 && !usoPista && (performance.now() - tInicio) < (op.horiz ? 4000 : 7000);
       let m = esRival ? frase(msgRival(jugador.nombre))
@@ -1215,10 +1223,13 @@
         mensaje(J.modo==='entreno' ? corto + ' 🏀' : `${corto} +${pts}${pts===1 ? ' (tiro libre)' : ''}`,'ok');
         finCuenta(); }, ev.entra*1000);
     } else {
+      const rachaAntes = jugador.racha;
       jugador.racha = 0; if (J.modo!=='reto') J.racha = 0;
       if (!esRival) J.fallos++;
       celebraEspecial = false; fuego = false;
+      cometa = false;
       const ev = lanzar(false); sMal(ev.aro, ev.toques);
+      setTimeout(() => { mareo = true; if (rachaAntes >= 5) efecto('y3', ultBalon[0], ultBalon[1] - 6, 90, 600); }, ev.aro*1000);
       enVuelo = true; mensaje(elige(['¿Entrará? 🤞','¡Allá va! 🏀','¡Tira…! 🤞']), '');
       const opTiro = op, ultimo = intentos >= 2;
       if (ultimo) resuelta = true;
@@ -1336,8 +1347,8 @@
     let leds = ''; for (let x = 0; x < W; x += 2) leds += `<rect x="${x+1.3}" y="${yValla+1.5}" width=".7" height="${hValla-1.5}" fill="#0b1226" opacity=".55"/>`;
     valla += `<defs><clipPath id="valla-clip"><rect x="0" y="${yValla+1.5}" width="${W}" height="${hValla-1.5}"/></clipPath></defs>
       <g clip-path="url(#valla-clip)"><g id="valla-luz">
-        <g id="valla-cinta" style="--p:${-PV}px;animation-duration:${(PV/28).toFixed(1)}s">${cinta}</g>
-        <g id="valla-aviso"><rect x="0" y="${yValla+1.5}" width="${W}" height="${hValla-1.5}" fill="#0b1226"/>
+        <g id="valla-cinta" data-p="${PV}">${cinta}</g>
+        <g id="valla-aviso" opacity="0"><rect x="0" y="${yValla+1.5}" width="${W}" height="${hValla-1.5}" fill="#0b1226"/>
           <text id="valla-aviso-txt" x="${W/2}" y="${yValla+12.5}" text-anchor="middle" font-family="Orbitron, monospace" font-weight="900" font-size="12" letter-spacing="3"></text></g>
       </g>${leds}</g>`;
     // parqué en perspectiva con líneas de la cancha
@@ -1399,7 +1410,7 @@
     }, retraso*1000);
   }
   function ponerBalon(x,y,rot,sx=1,sy=1){
-    ultBalon = [x,y]; pintarFuego(x,y);
+    ultBalon = [x,y]; pintarFuego(x,y); pintarEstela(x,y);
     $('#balon').style.transform = `translate(${x-R}px,${y-R}px) rotate(${rot}deg) scale(${sx},${sy})`;
     const g = geo(), alt = Math.max(0, g.suelo - y), k = Math.max(.3, 1 - alt/150);
     const sm = $('#sombra'); sm.style.transform = `translateX(${x-9}px) scale(${k})`; sm.style.opacity = k;
@@ -1475,10 +1486,10 @@
   const SPR = { celda: 313, suelo: 298, ejeX: 160, cabeza: [195, 75], bola: [254.5, 33.5], recoge: [245, 265], dedo: {"d03": [232, 73], "d10": [230, 74], "d11": [226, 69], "d12": [234, 63], "d13": [234, 65]} };
   const FOT = n => 'sprites/' + n + '.webp';
   const TODOS = ["f00", "f01", "f02", "f03", "f30", "f31", "f32", "f33", "g00", "g01", "g02", "g03", "g10", "g11", "g12", "g13", "g20", "g21", "g22", "g23", "g30", "g31", "g32", "g33", "a00", "a01", "a02", "a03", "a12", "a13", "a20", "a21", "a22", "a23", "a30", "a31", "a32", "b00", "b01", "b02", "b03", "b10", "b11", "b12", "b13", "b20", "b21", "b22", "b23", "b30", "b31", "b32", "b33", "c00", "c01", "c02", "c03", "c10", "c11", "c12", "c13", "d00", "d01", "d02", "d03", "d10", "d11", "d12", "d13", "d20", "d21", "d22", "d23", "t00", "t01", "t02", "t03", "t10", "t11", "t12", "t13", "t20", "t21", "t22", "t23"];
-  ['bal0','bal1','bal2','bal3','red1','red2','red3','red4','x00','x01','x02','x03','x10','x11','x12','x13','x20','x21','x22','x23','x30','x31','x32','x33','e00','e01','e02','e03','e10','e11','e12','e13']
+  ['y00','y01','y02','y03','y10','y11','y12','y13','y20','y21','y22','y23','y30','y31','y32','y33','bal0','bal1','bal2','bal3','red1','red2','red3','red4','x00','x01','x02','x03','x10','x11','x12','x13','x20','x21','x22','x23','x30','x31','x32','x33','e00','e01','e02','e03','e10','e11','e12','e13']
     .forEach(n => { const im = new Image(); im.src = FOT(n); });
   const SALTOS = new Set(['f31','f32','a01','a02','b30','b31','b32','f22']);
-  let ultBalon = [0,0], celebraEspecial = false, fuego = false;
+  let ultBalon = [0,0], celebraEspecial = false, fuego = false, cometa = false, mareo = false, prevBalon = null;
   const LAMENTOS = [
     [['g00',650],['g01',650],['g03',99999]],
     [['g02',900],['g03',99999]],
@@ -1534,7 +1545,7 @@
       if (animId) return false;                          // el balón aún está volando: esperamos
       const ini = ultBalon.slice(), dist = Math.abs(ini[0] - aCancha(SPR.recoge)[0]);
       rb = { ini, dur: Math.max(500, Math.min(1300, dist*2.4)), fase: 'rueda', botes: -1 };
-      destino = Math.min(limiteX(), posX + 26); fuego = false;
+      destino = Math.min(limiteX(), posX + 26); fuego = false; mareo = false; cometa = false;
       modo = 'rebote'; t0 = performance.now(); conBalonEnDibujo(false);
       setTimeout(() => $('#bocadillo').classList.remove('vis'), 400);
       return true;
@@ -1611,7 +1622,7 @@
     return {
       iniciar(){ cancelAnimationFrame(id); id = requestAnimationFrame(frame); },
       botar(){ if (modo === 'rebote' && rb && rb.fase === 'coge') return;
-        accion = null; bolaDedo = null; fuego = false; mirando = 'der';
+        accion = null; bolaDedo = null; fuego = false; mareo = false; cometa = false; mirando = 'der';
         modo = 'botar'; t0 = performance.now(); conBalonEnDibujo(true); posX = Math.min(posX, limiteX()); destino = posX; },
       tirar(){ accion = null; bolaDedo = null; modo = 'tiro'; t0 = performance.now(); destino = posX; conBalonEnDibujo(true); },
       soltar(){ conBalonEnDibujo(false); dy = -10; const [bx,by] = SPR.bola; return aCancha([bx, by]); },
@@ -1638,6 +1649,8 @@
     const [x,y] = ultBalon; efecto(1, x, y, 70, 260);
   }
   function redMueve(){
+    cometa = false; pintarEstela(...ultBalon);
+    if (celebraEspecial){ const g = geo(); efecto('y0', g.aroCx, g.aroY + 4, Math.min(170, g.H*0.75), 420); }
     vallaAviso(celebraEspecial ? '¡¡TRIPLE!!' : elige(['¡CANASTA!','¡CANASTA DE GABI!','¡DENTRO!','¡CHOF!']));
     const fr = $('#aro-frente'), g = geo(); let i = 1;
     const paso = () => { fr.src = FOT('red' + (i < 5 ? i : 0)); if (i++ < 5) setTimeout(paso, 75); };
@@ -1650,10 +1663,29 @@
     const im = document.createElement('img'); im.className = 'fx-spr';
     im.style.width = im.style.height = tam+'px'; im.style.left = (x - tam/2)+'px'; im.style.top = (suelo ? y - tam*0.86 : y - tam/2)+'px';
     c.appendChild(im); let i = 0;
-    const paso = () => { if (i > 3){ im.remove(); return; } im.src = FOT('x'+fila+i); i++; setTimeout(paso, dur/4); };
+    const pref = typeof fila === 'string' ? fila : 'x' + fila;
+    const paso = () => { if (i > 3){ im.remove(); return; } im.src = FOT(pref+i); i++; setTimeout(paso, dur/4); };
     paso();
   }
   // ===== Fuego alrededor del balón en las rachas =====
+  function pintarEstela(x, y){
+    const c = $('#cometa'), m = $('#mareo'); if (!c || !m) return;
+    const libre = !$('#cancha').classList.contains('sprite-balon'), t = performance.now();
+    // cola de cometa: el hueco del dibujo (220,156; Ø104) va sobre el balón y la cola apunta hacia atrás
+    if (cometa && libre && prevBalon && (Math.abs(x-prevBalon[0]) + Math.abs(y-prevBalon[1])) > .5){
+      const k = (2*R + 4)/104, w = 313*k, ang = Math.atan2(y - prevBalon[1], x - prevBalon[0])*180/Math.PI;
+      c.style.display = ''; c.src = FOT('y1' + (Math.floor(t/70) % 4));
+      c.style.width = c.style.height = w+'px'; c.style.left = (x - 220*k)+'px'; c.style.top = (y - 156*k)+'px';
+      c.style.transformOrigin = `${220*k}px ${156*k}px`; c.style.transform = `rotate(${ang}deg)`;
+    } else if (!cometa || !libre) c.style.display = 'none';
+    // estrellas de mareo alrededor del balón (centro del dibujo 158,148; elipse de 230 px)
+    if (mareo && libre){
+      const k = (2*R*2.7)/230, w = 313*k;
+      m.style.display = ''; m.src = FOT('y2' + (Math.floor(t/110) % 4));
+      m.style.width = m.style.height = w+'px'; m.style.left = (x - 158*k)+'px'; m.style.top = (y - 148*k - R*.6)+'px';
+    } else m.style.display = 'none';
+    prevBalon = [x, y];
+  }
   function pintarFuego(x, y){
     const f = $('#fuego'); if (!f) return;
     const on = fuego && !$('#cancha').classList.contains('sprite-balon');
@@ -1947,6 +1979,7 @@
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['3.17', ['💥 Explosión en la red en los triples y las rachas', '☄️ En los triples, el balón vuela con cola de cometa', '💫 Si falla, el balón se marea con estrellitas', '💨 Humo cuando se apaga una racha en llamas', '📺 La valla de publicidad ya se mueve también en el iPad y el iPhone']],
     ['3.16', ['🤞 La cuenta espera al tiro: se pone en verde o en rojo cuando el balón entra o se sale del aro']],
     ['3.15', ['📺 La valla de publicidad se mueve como una de verdad: anuncios que pasan, parpadeos y «¡CANASTA!» en grande', '🔊 Ahora se oye el bote del balón', '📜 La ventana de novedades ya cabe en pantallas pequeñas']],
     ['3.14', ['📐 Líneas de la pista bien dibujadas: zona, tiros libres y triple, centradas en la canasta']],
