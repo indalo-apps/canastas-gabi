@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="app-version" content="3.17">
+<meta name="app-version" content="3.18">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Canastas Gabi">
@@ -872,6 +872,22 @@
     salidaPabellon();
   }
   // Un segundo de «salida al pabellón»: apagón, focos uno a uno, público y marcador que se enciende
+  // Flashes de cámaras en la grada cuando Gabi va a tirar: en sitios y momentos al azar
+  function flashesPublico(){
+    const f = document.getElementById('pabellon'); if (!f || menosMov() || !J) return;
+    const W = f.clientWidth || 300, alto = +f.dataset.grada || 80, ns = 'http://www.w3.org/2000/svg';
+    const n = J.modo === 'entreno' ? (Math.random() < .5 ? 1 : 0) : 3 + Math.floor(Math.random()*5);
+    for (let i = 0; i < n; i++){
+      setTimeout(() => {
+        const g = document.createElementNS(ns, 'g'), x = 8 + Math.random()*(W - 16), y = 10 + Math.random()*(alto - 22), r = 2.6 + Math.random()*2;
+        g.innerHTML = `<circle cx="${x}" cy="${y}" r="${r*6}" fill="#fff" opacity=".28"/><circle cx="${x}" cy="${y}" r="${r*3}" fill="#fff" opacity=".7"/>
+          <path d="M${x-r*7} ${y}H${x+r*7}M${x} ${y-r*7}V${y+r*7}" stroke="#fff" stroke-width="1.6"/>
+          <path d="M${x-r*3} ${y-r*3}L${x+r*3} ${y+r*3}M${x+r*3} ${y-r*3}L${x-r*3} ${y+r*3}" stroke="#fff" stroke-width="1" opacity=".8"/><circle cx="${x}" cy="${y}" r="${r*1.4}" fill="#fff"/>`;
+        f.appendChild(g);
+        let op = 1.4; const baja = setInterval(() => { op -= .2; g.setAttribute('opacity', Math.max(0, Math.min(1, op))); if (op <= 0){ clearInterval(baja); g.remove(); } }, 40);
+      }, Math.random()*850);
+    }
+  }
   // Valla LED: mensaje grande que parpadea («¡CANASTA!») y parpadeos de vez en cuando
   let tValla = 0, iValla = 0, avisoValla = false;
   function vallaAviso(txt, dur=1900){
@@ -1311,6 +1327,7 @@
     const vacio = J && J.modo==='entreno';
     if (!W || fondo.dataset.k === W+'x'+H+vacio) return; fondo.dataset.k = W+'x'+H+vacio;
     fondo.setAttribute('viewBox',`0 0 ${W} ${H}`); frente.setAttribute('viewBox',`0 0 ${W} ${H}`);
+    fondo.dataset.grada = Math.round(H*0.47);
     const yValla = Math.round(H*0.47), hValla = 16, yParq = yValla + hValla, piso = g.piso;
     let sd = 11; const az = () => (sd = (sd*9301+49297)%233280)/233280;
     // grada con público (filas de cabezas y camisetas)
@@ -1624,7 +1641,7 @@
       botar(){ if (modo === 'rebote' && rb && rb.fase === 'coge') return;
         accion = null; bolaDedo = null; fuego = false; mareo = false; cometa = false; mirando = 'der';
         modo = 'botar'; t0 = performance.now(); conBalonEnDibujo(true); posX = Math.min(posX, limiteX()); destino = posX; },
-      tirar(){ accion = null; bolaDedo = null; modo = 'tiro'; t0 = performance.now(); destino = posX; conBalonEnDibujo(true); },
+      tirar(){ flashesPublico(); accion = null; bolaDedo = null; modo = 'tiro'; t0 = performance.now(); destino = posX; conBalonEnDibujo(true); },
       soltar(){ conBalonEnDibujo(false); dy = -10; const [bx,by] = SPR.bola; return aCancha([bx, by]); },
       reaccion(ok){ modo = 'reaccion'; t0 = performance.now(); if (!ok) vallaAviso(elige(['¡UYYY!','¡CASI!','¡OTRA VEZ!']), 1400);
         sec = ok ? (celebraEspecial ? CELEBRA_TRIPLE : CELEBRA) : LAMENTOS[Math.floor(Math.random()*LAMENTOS.length)];
@@ -1979,6 +1996,7 @@
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['3.18', ['📸 Cuando Gabi va a tirar, saltan flashes de cámaras en la grada']],
     ['3.17', ['💥 Explosión en la red en los triples y las rachas', '☄️ En los triples, el balón vuela con cola de cometa', '💫 Si falla, el balón se marea con estrellitas', '💨 Humo cuando se apaga una racha en llamas', '📺 La valla de publicidad ya se mueve también en el iPad y el iPhone']],
     ['3.16', ['🤞 La cuenta espera al tiro: se pone en verde o en rojo cuando el balón entra o se sale del aro']],
     ['3.15', ['📺 La valla de publicidad se mueve como una de verdad: anuncios que pasan, parpadeos y «¡CANASTA!» en grande', '🔊 Ahora se oye el bote del balón', '📜 La ventana de novedades ya cabe en pantallas pequeñas']],
