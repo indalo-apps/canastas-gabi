@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="app-version" content="3.30">
+<meta name="app-version" content="3.31">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Canastas Gabi">
@@ -76,6 +76,7 @@
   .opt[data-nivel=tablas]{--c:#7b5cff;--o:#5539c9} .opt[data-nivel=mezcla]{--c:#f47b20;--o:#b9560e}
   .opt[data-modo=partido]{--c:#f47b20;--o:#b9560e} .opt[data-modo=entreno]{--c:#14a3a3;--o:#0c7373}
   .opt[data-modo=reto]{--c:#e04848;--o:#a32f2f}
+  .opt[data-modo=rapido]{--c:#7c3aed;--o:#4c1d95}
 
   .btn{display:block;width:100%;border:0;border-radius:18px;padding:14px;font:inherit;
     font-size:1.35rem;font-weight:800;cursor:pointer;color:#fff;background:var(--naranja);
@@ -438,6 +439,9 @@
   #acciones .btn{margin:0;width:100%;padding-left:6px;padding-right:6px;white-space:nowrap}
   #btn-mate{background:#7c3aed !important;box-shadow:0 6px 0 #4c1d95 !important}
   #acciones-sig .btn{margin:0;width:100%}
+  .modo-rapido #btn-pista{visibility:hidden}
+  #tarjeta-op.flash-ok{animation:flashOk .35s ease-out}
+  @keyframes flashOk{0%{box-shadow:0 0 0 6px #39d353}100%{box-shadow:0 0 0 0 rgba(57,211,83,0)}}
   #acciones-sig{margin-top:12px}
   #acciones-sig{animation:sigEntra .25s ease-out}
   @keyframes sigEntra{from{transform:scale(.9);opacity:0}to{transform:none;opacity:1}}
@@ -521,6 +525,7 @@
       <div class="opciones" id="modos">
         <button class="opt sel modo" data-modo="partido"><span class="modo-ico"><svg class="signo" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="#fff" stroke-width="2"/><path d="M3 12h18M12 3v18M5.6 5.6c3 2.6 3 10.2 0 12.8M18.4 5.6c-3 2.6-3 10.2 0 12.8" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="modo-txt"><b>Partido</b><small>10 tiros con reloj y público</small></span></button>
         <button class="opt modo" data-modo="entreno"><span class="modo-ico"><svg class="signo" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.2 3.5h3.6l4.7 14.5h-13z" fill="#fff"/><path d="M8.9 8.2h6.2l1 3.2H7.9z" fill="#1f7f7f"/><rect x="3" y="18" width="18" height="3" rx="1.2" fill="#fff"/></svg></span><span class="modo-txt"><b>Entrenamiento</b><small>Sin prisa; el entrenador te ayuda</small></span></button>
+        <button class="opt modo" data-modo="rapido"><span class="modo-ico"><svg class="signo" viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 2.5L5 13.5h6l-1.5 8 8.5-11h-6z" fill="#fff" stroke="#fff" stroke-width="1.2" stroke-linejoin="round"/></svg></span><span class="modo-txt"><b>Contrarreloj</b><small>Cálculo mental: ¿cuántas en 1 minuto?</small></span></button>
         <button class="opt modo" data-modo="reto"><span class="modo-ico"><svg class="signo" viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="8" r="3" fill="none" stroke="#fff" stroke-width="2.1"/><circle cx="17" cy="9" r="2.5" fill="none" stroke="#fff" stroke-width="2.1"/><path d="M3 19c0-3 2.2-5 5-5s5 2 5 5M14.6 19c.3-2.5 1.6-4 3.4-4s3 1.5 3 4" fill="none" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="modo-txt"><b>Reto contra papá o mamá</b><small>Por turnos; ellos, cuentas más difíciles</small></span></button>
       </div>
       <div id="eleccion-rival" style="display:none;margin-top:10px">
@@ -779,6 +784,23 @@
     }
   }
   function tablaDificil(){ const a=rnd(12,25), b=rnd(3,9); return {a,b,t:'×',horiz:true,tabla:b,veces:a}; }
+  // Contrarreloj: cálculo mental en una línea; se pone un poco más difícil con la racha
+  function generarRapido(){
+    const nivel = S.nivel, dura = J.racha >= 6;
+    const suma = () => { if (dura && Math.random() < .4){ const a = rnd(1,8)*10, b = rnd(1,9-a/10)*10; return {a,b,t:'+'}; }
+      const a = rnd(2, dura ? 15 : 9), b = rnd(2, 9); return {a,b,t:'+'}; };
+    const resta = () => { if (dura && Math.random() < .4){ const a = rnd(3,9)*10, b = rnd(1,a/10-1)*10; return {a,b,t:'-'}; }
+      const b = rnd(2, 9), a = b + rnd(1, dura ? 15 : 9); return {a,b,t:'-'}; };
+    let o;
+    for (let i = 0; i < 20; i++){
+      o = nivel==='tablas' ? tabla() : nivel==='suma' ? suma() : nivel==='resta' ? resta()
+        : [suma, resta, () => tabla(TODAS)][rnd(0,2)]();
+      const k = o.a + o.t + o.b; if (!recientes.includes(k)){ recientes = [...recientes.slice(-6), k]; break; }
+    }
+    o.horiz = true;
+    o.r = o.t==='+' ? o.a+o.b : o.t==='-' ? o.a-o.b : o.a*o.b; o.W = String(o.r).length;
+    return o;
+  }
   function generar(nivel){
     let op;
     if (nivel==='tablas' || nivel==='tablasDificil'){
@@ -861,7 +883,7 @@
       S[attr] = b.dataset[attr]; store.set('gabi-'+attr, S[attr]);
       $('#eleccion-rival').style.display = S.modo==='reto' ? 'block':'none';
       $('#eleccion-tablas').style.display = S.nivel==='tablas' ? 'block':'none';
-      $('#eleccion-cifras').style.display = S.nivel==='tablas' ? 'none':'block';
+      $('#eleccion-cifras').style.display = S.nivel==='tablas' || S.modo==='rapido' ? 'none':'block';
       pintarRecord();
     });
   }
@@ -871,7 +893,7 @@
     document.querySelectorAll(c+' .opt').forEach(x => x.classList.toggle('sel', x.dataset[a]===S[a])));
   $('#eleccion-rival').style.display = S.modo==='reto' ? 'block':'none';
   $('#eleccion-tablas').style.display = S.nivel==='tablas' ? 'block':'none';
-  $('#eleccion-cifras').style.display = S.nivel==='tablas' ? 'none':'block';
+  $('#eleccion-cifras').style.display = S.nivel==='tablas' || S.modo==='rapido' ? 'none':'block';
 
   // Nivel real según lo elegido: suma, suma3, resta, resta3, mezcla, mezcla3, tablas
   const nivelReal = () => S.nivel==='tablas' ? 'tablas' : S.nivel + (S.cifras==='3' ? '3' : '');
@@ -879,7 +901,7 @@
     if (S.nivel==='tablas') return S.tabla==='todas' ? 'Todas las tablas' : 'Tabla del ' + S.tabla;
     return {suma:'Sumas', resta:'Restas', mezcla:'Mezcla'}[S.nivel] + (S.cifras==='3' ? ' de 3 cifras' : '');
   }
-  const claveRecord = () => 'gabi-record-' + (S.nivel==='tablas' ? 'tabla-' + S.tabla : nivelReal());
+  const claveRecord = () => 'gabi-record-' + (S.modo==='rapido' ? 'rapido-' : '') + (S.nivel==='tablas' ? 'tabla-' + S.tabla : nivelReal());
   // Selector de cifras
   function pintarCifras(){ document.querySelectorAll('#chips-cifras .chip').forEach(c=>c.classList.toggle('sel', c.dataset.cifras===S.cifras)); }
   $('#chips-cifras').addEventListener('click', e => {
@@ -900,7 +922,7 @@
   pintarChips();
   function pintarRecord(){
     const r = store.get(claveRecord());
-    $('#record-txt').textContent = r ? `🏆 Tu récord en ${nombreNivel()}: ${r} puntos` : '';
+    $('#record-txt').textContent = r ? `🏆 Tu récord en ${S.modo==='rapido' ? 'Contrarreloj de ' + nombreNivel().toLowerCase() : nombreNivel()}: ${r} puntos` : '';
   }
   pintarRecord();
 
@@ -911,7 +933,8 @@
   $('#btn-otra').onclick = () => { sClic(); empezar(); };
 
   function empezar(){
-    J = { modo:S.modo, nivel:nivelReal(), etiqueta:nombreNivel(), clave:claveRecord(), n:0, total: S.modo==='partido'?10 : S.modo==='reto'?10 : Infinity,
+    document.body.classList.toggle('modo-rapido', S.modo==='rapido');
+    J = { modo:S.modo, nivel:S.modo==='rapido' ? 'rapido' : nivelReal(), etiqueta:nombreNivel(), clave:claveRecord(), n:0, total: S.modo==='partido'?10 : S.modo==='reto'?10 : Infinity,
           puntos:0, aciertos:0, fallos:0, racha:0, primeras:0, tabla:S.tabla,
           jug:[{nombre:'Gabi',puntos:0,racha:0},{nombre:S.rival,puntos:0,racha:0}], turno:0 };
     nuevos = [];
@@ -1023,6 +1046,14 @@
         <div class="centro"><div class="nom">RONDA</div><div class="panel peq">${seg7(Math.min(Math.floor(J.n/2)+1,5),'#ffb000',26,1)}</div>
           <div class="posesion"><span class="${J.turno===0?'on':''}">◀</span><small>TURNO</small><span class="${J.turno===1?'on':''}">▶</span></div></div>
         ${equipo(r.nombre.toUpperCase(), r.puntos, '#ff3b30', J.turno===1?'turno':'')}${snd}`;
+    } else if (J.modo==='rapido'){
+      const rec = store.get(J.clave) || 0;
+      m.className = 'marcador m-partido';
+      m.innerHTML = `${salir}${equipo('PUNTOS', J.puntos, '#ffb000', '', `RÉCORD ${rec}`, 32)}
+        ${equipo('ACIERTOS', J.aciertos, '#39d353', '', '', 32)}
+        ${equipo('FALLOS', J.fallos, '#ff3b30', '', '', 32)}
+        <div class="centro"><div class="nom">RACHA</div><div class="panel peq">${seg7(Math.min(J.racha,99),'#e8f0ff',22,2)}</div>
+          ${luces(Math.min(J.racha,5),5,'#ffb000')}</div>${snd}`;
     } else if (J.modo==='partido'){
       const rec = store.get(J.clave) || 0;
       m.innerHTML = `${salir}${equipo('PUNTOS', J.puntos, '#ffb000', '', `RÉCORD ${rec}`, 32)}
@@ -1041,9 +1072,11 @@
       const empezado = J.n>0 || ans.some(x=>x!=='') || (J.modo==='reto' && J.jug.some(j=>j.puntos>0));
       if (!empezado){ salirAlMenu(); return; }
       pausarReloj();
-      $('#salir-tit').textContent = J.modo==='reto' ? '¿Dejar el reto?' : '¿Dejar el partido?';
+      if (J.modo==='rapido') rapidoPausa();
+      $('#salir-tit').textContent = J.modo==='reto' ? '¿Dejar el reto?' : J.modo==='rapido' ? '¿Dejar el contrarreloj?' : '¿Dejar el partido?';
       $('#salir-txt').innerHTML = J.modo==='reto'
         ? `Vais <b>Gabi ${J.jug[0].puntos}</b> – <b>${J.jug[1].puntos} ${J.jug[1].nombre}</b>. Si sales, se pierde el reto.`
+        : J.modo==='rapido' ? `Llevas <b>${J.puntos} puntos</b>. Si sales, se pierde esta partida.`
         : `Llevas <b>${J.puntos} puntos</b> en ${J.n} ${J.n===1?'tiro':'tiros'}. Si sales, se pierde el partido.`;
       $('#dlg-salir').hidden = false;
     };
@@ -1057,7 +1090,7 @@
   // Si la app pasa a segundo plano (o sale el aviso de salir), el reloj se para y luego sigue donde estaba
   function pausarReloj(){ if (relojInt && !resuelta){ relojResto = Math.max(0, relojFin - performance.now()); pararReloj(); } }
   function reanudarReloj(){ if (relojResto && !resuelta && !posesionAgotada && J && J.modo==='partido'){ relojFin = performance.now() + relojResto; relojResto = 0; tictac(); } }
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState==='hidden') pausarReloj(); else if ($('#dlg-salir').hidden) reanudarReloj(); });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState==='hidden'){ pausarReloj(); rapidoPausa(); } else if ($('#dlg-salir').hidden){ reanudarReloj(); rapidoSigue(); } });
   function arrancarReloj(){
     pararReloj(); posesionAgotada = false; relojFin = 0; relojResto = 0;
     if (J.modo!=='partido' || AJ.reloj==='no'){ relojDur = 0; pintarPosesion(); return; }
@@ -1088,8 +1121,80 @@
     }, 200);
   }
 
-  function salirAlMenu(){ pararReloj(); relojResto = 0; pintarRecord(); pintarInicio(); mostrar('inicio'); }
-  $('#salir-seguir').onclick = () => { sClic(); $('#dlg-salir').hidden = true; reanudarReloj(); };
+  // ---------- Contrarreloj: 1 minuto de cálculo mental ----------
+  let rpFin = 0, rpResto = 0, rpInt = null, bloqueoRp = false;
+  const RP_DUR = 60000;
+  function rapidoEmpieza(){
+    rapidoPara(); rpResto = RP_DUR;
+    const caja = $('#posesion'); caja.hidden = false; caja.querySelector('.pos-etq').textContent = 'TIEMPO';
+    rapidoPinta(RP_DUR);
+    setTimeout(() => { if (J && J.modo==='rapido' && !rpFin && rpResto === RP_DUR){ vallaAviso('¡YA!', 900); mensaje('¡Ya! ⚡',''); rapidoSigue(); } }, 1500);
+  }
+  function rapidoSigue(){
+    if (!J || J.modo!=='rapido' || rpInt || !rpResto) return;
+    rpFin = performance.now() + rpResto;
+    rpInt = setInterval(() => {
+      const resto = Math.max(0, rpFin - performance.now()); rapidoPinta(resto);
+      if (resto <= 0){ rapidoPara(); rpResto = 0; rapidoFin(); }
+    }, 100);
+  }
+  function rapidoPausa(){ if (rpInt){ rpResto = Math.max(0, rpFin - performance.now()); clearInterval(rpInt); rpInt = null; } }
+  function rapidoPara(){ clearInterval(rpInt); rpInt = null; rpFin = 0; const e = $('#posesion .pos-etq'); if (e) e.textContent = 'POSESIÓN'; }
+  let ultTic = -1;
+  function rapidoPinta(resto){
+    const q = resto/RP_DUR, sg = Math.ceil(resto/1000), color = q > .5 ? '#39d353' : q > .2 ? '#ffb000' : '#ff3b30';
+    $('#pos-relleno').style.width = (q*100).toFixed(1) + '%'; $('#pos-relleno').style.backgroundColor = color;
+    $('#pos-seg').textContent = sg; $('#pos-seg').style.color = color;
+    $('#posesion').classList.toggle('urgente', sg <= 10 && sg > 0);
+    if (sg <= 5 && sg > 0 && sg !== ultTic){ ultTic = sg; if (sonido) tono(1200, .05, 0, 'square', .03); }
+  }
+  function rapidoComprueba(){
+    if (!rpInt || bloqueoRp){ return; }                       // aún no ha empezado, está en pausa o enseñando un fallo
+    const escrito = op.horiz ? ans.join('') : ans.join('');
+    J.n++;
+    if (+escrito === op.r){
+      J.aciertos++; J.racha++; jugador.racha = J.racha;
+      const pts = J.racha >= 5 ? 2 : 1; J.puntos += pts;
+      tiroRapido(J.racha >= 5);
+      const tj = $('#tarjeta-op'); tj.classList.remove('flash-ok'); void tj.offsetWidth; tj.classList.add('flash-ok');
+      mensaje(pts === 2 ? '🔥 ¡+2! ¡Estás on fire!' : '¡Canasta! +1', 'ok');
+      siguienteRapida();
+    } else {
+      J.fallos++; J.racha = 0; jugador.racha = 0;
+      pintarRejilla(ans.map(() => 'mal'));
+      $('#tarjeta-op').classList.remove('tiembla'); void $('#tarjeta-op').offsetWidth; $('#tarjeta-op').classList.add('tiembla');
+      if (sonido){ tono(180, .14, 0, 'square', .05); }
+      mensaje('¡Uy! Otra vez 🔁', 'ko');
+      const opMal = op; bloqueoRp = true;
+      setTimeout(() => { bloqueoRp = false; if (!J || J.modo!=='rapido' || op !== opMal) return; ans = ans.map(() => ''); activo = 0; pintarRejilla(); }, 380);
+    }
+    pintarMarcador();
+  }
+  function siguienteRapida(){
+    op = generarRapido(); ans = Array(op.W).fill(''); activo = 0; resuelta = false; enVuelo = false;
+    pintarRejilla(); pintarMarcador();
+  }
+  // Tiro rápido: el balón sale de las manos de Gabi y entra sin parar el juego
+  function tiroRapido(enLlamas){
+    const g = geo(), balon = $('#balon'), [x0, y0] = jugador.posBalon(), dest = [g.aroCx, g.aroY - R - 3];
+    jugador.conBalon(false); balon.style.zIndex = 4; fuego = enLlamas;
+    const alto = Math.max(14, (y0 + dest[1])/2 - (R + 5));
+    animar([
+      { dur: 520, balon: t => { const [x,y] = vuelo([x0, y0], dest, alto)(t); return [x,y,1,1]; }, giro: -1 },
+      { dur: 240, balon: t => { const [x,y] = caida(dest, [g.aroCx - 2, g.suelo])(t); return [x,y,1,1]; }, giro: -.2,
+        al: t => { if (!balon.dataset.rp){ balon.dataset.rp = 1; const fr = $('#aro-frente'); ['red1','red3','red4','red0'].forEach((f,i) => setTimeout(() => fr.src = FOT(f), i*70)); } } },
+      { dur: 10, balon: () => null, al: () => { delete balon.dataset.rp; fuego = false; jugador.conBalon(true); } }]);
+    sSwish(.5); if (sonido){ tono(880, .1, .52, 'triangle', .08); }
+    if (enLlamas && !menosMov()) reaccionPublico(true, .5);
+  }
+  function rapidoFin(){
+    resuelta = true; mensaje('⏱️ ¡Tiempo!', ''); vallaAviso('¡TIEMPO!', 1500);
+    if (sonido){ tono(220,.9,0,'sawtooth',.08); tono(223,.9,0,'square',.05); }
+    setTimeout(terminar, 1300);
+  }
+
+  function salirAlMenu(){ pararReloj(); relojResto = 0; rapidoPara(); pintarRecord(); pintarInicio(); mostrar('inicio'); }
+  $('#salir-seguir').onclick = () => { sClic(); $('#dlg-salir').hidden = true; reanudarReloj(); rapidoSigue(); };
   $('#salir-si').onclick = () => { sClic(); $('#dlg-salir').hidden = true; salirAlMenu(); };
 
   // ---------- Cuenta ----------
@@ -1097,7 +1202,7 @@
 
   function nuevaCuenta(){
     const esRival = J.modo==='reto' && J.turno===1;
-    op = generar(esRival ? (J.nivel==='tablas' ? 'tablasDificil' : 'dificil') : J.nivel);
+    op = J.modo==='rapido' ? generarRapido() : generar(esRival ? (J.nivel==='tablas' ? 'tablasDificil' : 'dificil') : J.nivel);
     ans = Array(op.W).fill(''); llevo = Array(op.W).fill(false);
     activo = op.horiz ? 0 : op.W-1; intentos = 0; usoPista = false; resuelta = false; enVuelo = false;
     const rivalN = J.modo==='reto' ? J.jug[1].nombre : '';
@@ -1107,9 +1212,11 @@
     tInicio = performance.now();
     $('#mensaje').className = 'mensaje';
     $('#pista-txt').className = 'pista-txt';
-    $('#acciones').style.display = 'grid'; $('#acciones-sig').style.display = 'none';
+    $('#acciones').style.display = J.modo==='rapido' ? 'none' : 'grid'; $('#acciones-sig').style.display = 'none';
+    if (J.modo==='rapido') $('#mensaje').textContent = J.n===0 ? '¡Prepárate! Escribe el resultado y encesta solo ⚡' : '';
     balonInicio();
     pintarMarcador(); pintarRejilla(); arrancarReloj(); entrenador(J.n===0 ? 'silbato' : 'quieto');
+    if (J.modo==='rapido' && J.n===0) rapidoEmpieza();
   }
 
   function pintarRejilla(marcas, colPista){
@@ -1117,7 +1224,7 @@
     g.classList.toggle('horiz', !!op.horiz);
     if (op.horiz){
       g.style.gridTemplateColumns = `repeat(${4+W}, auto)`;
-      let h = `<div class="celda ancha">${op.a}</div><div class="celda signo">×</div><div class="celda ancha">${op.b}</div><div class="celda">=</div>`;
+      let h = `<div class="celda ancha">${op.a}</div><div class="celda signo">${op.t==='+' ? '+' : op.t==='-' ? '−' : '×'}</div><div class="celda ancha">${op.b}</div><div class="celda">=</div>`;
       for (let i=0;i<W;i++){
         let c='resp'; if (i===activo && !resuelta) c+=' act'; if (marcas && marcas[i]) c+=' '+marcas[i];
         h += `<button class="${c}" data-r="${i}">${ans[i]}</button>`;
@@ -1170,7 +1277,8 @@
     else if (b.dataset.k==='izq'){ activo=Math.max(0,activo-1); pintarRejilla(); }
     else if (b.dataset.k==='der'){ activo=Math.min(op.W-1,activo+1); pintarRejilla(); }
   });
-  function escribir(d){ ans[activo]=d; if (op.horiz){ if (activo<op.W-1) activo++; } else if (activo>0) activo--; pintarRejilla(); }
+  function escribir(d){ if (J && J.modo==='rapido' && bloqueoRp) return; ans[activo]=d; if (op.horiz){ if (activo<op.W-1) activo++; } else if (activo>0) activo--; pintarRejilla();
+    if (J && J.modo==='rapido' && ans.every(x=>x!=='')) rapidoComprueba(); }
   function borrar(){
     if (op.horiz){ if (ans[activo]==='' && activo>0) activo--; }
     else if (ans[activo]==='' && activo<op.W-1) activo++;
@@ -1186,8 +1294,8 @@
     else if (e.key==='Backspace') borrar();
     else if (e.key==='ArrowLeft'){ activo=Math.max(0,activo-1); pintarRejilla(); }
     else if (e.key==='ArrowRight'){ activo=Math.min(op.W-1,activo+1); pintarRejilla(); }
-    else if (e.key==='Enter'){ tipoTiro = 'tiro'; comprobar(); }
-    else if (e.key==='m' || e.key==='M'){ tipoTiro = 'mate'; comprobar(); }
+    else if (e.key==='Enter'){ if (J.modo!=='rapido'){ tipoTiro = 'tiro'; comprobar(); } }
+    else if ((e.key==='m' || e.key==='M') && J.modo!=='rapido'){ tipoTiro = 'mate'; comprobar(); }
   });
 
   // ---------- Pista ----------
@@ -2174,6 +2282,16 @@
       : frase(['¡Bien jugado, Gabi! Cada partido lo harás mejor 🏀','¡Los campeones también entrenan! A por el siguiente 💪','¡Buen esfuerzo! El próximo partido es tuyo 🔥'])}</b></p>
         ${prev>0 && !record ? `<p>Tu récord: ${prev} puntos</p>`:''}`;
       if (est===3 || record) confeti(80);
+    } else if (J.modo==='rapido'){
+      const clave = J.clave, prev = store.get(clave) || 0, record = J.puntos > prev; if (record) store.set(clave, J.puntos);
+      const est = J.aciertos >= 25 ? 3 : J.aciertos >= 15 ? 2 : 1;
+      h = `<img class="final-spr" src="sprites/${record ? 'a30' : est>=2 ? 'a31' : 'a32'}.webp" alt=""><h2>¡Tiempo!</h2>
+        <div class="estrellas">${'⭐'.repeat(est)}${'☆'.repeat(3-est)}</div>
+        <div class="grande">${J.puntos}</div><p>puntos · ${J.aciertos} cuentas bien en 1 minuto${J.fallos ? ` · ${J.fallos} fallos` : ''}</p>
+        <p style="font-size:1.2rem;margin-top:10px"><b>${record && prev>0 ? frase(['🏆 ¡NUEVO RÉCORD, Gabi!','🏆 ¡Récord! ¡Más rápido que nunca! ⚡'])
+          : est===3 ? frase(['¡Eres una calculadora humana! ⚡','¡Velocidad de campeón! 🏆']) : est===2 ? frase(['¡Muy rápido, Gabi! 💪','¡Buen ritmo! A por el récord 🔥']) : frase(['¡Bien! Cuanto más juegues, más rápido irás 🏀','¡Buen esfuerzo! La próxima vez, más 💪'])}</b></p>
+        ${prev>0 && !record ? `<p>Tu récord: ${prev} puntos</p>` : ''}`;
+      if (est===3 || record) confeti(80);
     } else if (J.modo==='reto'){
       const [g,r] = J.jug;
       const res = g.puntos>r.puntos ? frase([`🏆 ¡GANA GABI! ¡Le has ganado a ${r.nombre}!`,`🏆 ¡Paliza a ${r.nombre}! Que vaya preparando la revancha 😎`,`🏆 ¡GABI CAMPEÓN! ${r.nombre} pide la hoja de reclamaciones 📝`])
@@ -2289,6 +2407,7 @@
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['3.31', ['⚡ Nuevo modo Contrarreloj: ¿cuántas cuentas de cálculo mental aciertas en 1 minuto?']],
     ['3.30', ['🏀 Tiros más reales: arco más alto y distinto cada vez, con rotación hacia atrás', '💨 «¡Chof!» cuando entra limpio y la red se estira', '🤞 A veces el balón baila en el aro antes de entrar… o de salirse', '✋ Gabi deja la muñeca arriba mientras vuela el balón']],
     ['3.29', ['💥 Mate sin zoom ni cámara lenta']],
     ['3.28', ['🧍 Más cosas mientras espera: pasa el balón por la cintura, te anima, se limpia las zapatillas y, si tardas mucho, se sienta en el balón']],
