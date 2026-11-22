@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="app-version" content="3.22">
+<meta name="app-version" content="3.23">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Canastas Gabi">
@@ -415,6 +415,19 @@
   .ajuste{margin:12px 0}
   .ajuste > b{display:block;margin-bottom:6px;color:var(--azul)}
   .ajuste .chips{margin-top:0}
+  /* Reloj de posesión: barra que se acorta, debajo del marcador */
+  .posesion{display:flex;align-items:center;gap:8px;background:#0b1226;border-radius:12px;padding:5px 10px;margin:-2px 0 8px;box-shadow:inset 0 0 0 2px #1d2a4d}
+  .posesion[hidden]{display:none}
+  .pos-etq{font-family:Orbitron,monospace;font-weight:900;font-size:.7rem;letter-spacing:1px;color:#8fa3c8}
+  .pos-barra{flex:1;height:12px;border-radius:6px;background:#1d2a4d;overflow:hidden}
+  .pos-relleno{height:100%;width:100%;border-radius:6px;background:#39d353;transition:width .2s linear, background-color .4s}
+  .pos-seg{font-family:Orbitron,monospace;font-weight:900;font-size:1.05rem;color:#39d353;min-width:2ch;text-align:right}
+  .posesion.urgente{animation:posUrg .5s steps(1,end) infinite}
+  @keyframes posUrg{50%{box-shadow:inset 0 0 0 2px #ff3b30}}
+  html.sin-mov .posesion.urgente{animation:none}
+  /* Prueba: reloj LED junto al tablero (?reloj=tablero) */
+  .reloj-tab{position:absolute;z-index:6;background:#05070d;border:2px solid #39424f;border-radius:5px;padding:2px 5px;pointer-events:none;
+    font-family:Orbitron,monospace;font-weight:900;color:#ff3b30;text-shadow:0 0 6px rgba(255,59,48,.8);line-height:1}
   /* Tirar o machacar: dos botones, uno al lado del otro */
   #acciones{display:grid !important;grid-template-columns:1fr 1fr;gap:10px}
   #acciones .btn{margin:0;width:100%;padding-left:6px;padding-right:6px;white-space:nowrap}
@@ -512,6 +525,7 @@
   <!-- ============ JUEGO ============ -->
   <section id="juego" class="pantalla">
     <div class="marcador" id="marcador"></div>
+    <div class="posesion" id="posesion" hidden><span class="pos-etq">POSESIÓN</span><div class="pos-barra"><div class="pos-relleno" id="pos-relleno"></div></div><span class="pos-seg" id="pos-seg">24</span></div>
 
     <div class="cancha" id="cancha"><div class="apagon"></div>
       <svg class="fondo" id="pabellon" aria-hidden="true"></svg>
@@ -524,7 +538,7 @@
         <img src="sprites/bal0.webp" alt="" style="width:100%;height:100%;display:block">
       </div>
       <div class="red" id="red"></div>
-      <div class="aro-delante" id="aro-delante"></div><img class="aro-spr" id="aro-frente" src="sprites/red0.webp" alt=""><img id="fuego" alt="" style="display:none"><img class="canon" id="canon-izq" src="sprites/s10.webp" alt=""><img class="canon der" id="canon-der" src="sprites/s10.webp" alt=""><img id="cometa" alt="" style="display:none"><img id="mareo" alt="" style="display:none">
+      <div class="aro-delante" id="aro-delante"></div><img class="aro-spr" id="aro-frente" src="sprites/red0.webp" alt=""><img id="fuego" alt="" style="display:none"><div class="reloj-tab" id="reloj-tab" hidden>24</div><img class="canon" id="canon-izq" src="sprites/s10.webp" alt=""><img class="canon der" id="canon-der" src="sprites/s10.webp" alt=""><img id="cometa" alt="" style="display:none"><img id="mareo" alt="" style="display:none">
       <svg class="frente" id="frente" aria-hidden="true"></svg>
     </div>
 
@@ -987,7 +1001,7 @@
       m.innerHTML = `${salir}${equipo('PUNTOS', J.puntos, '#ffb000', '', `RÉCORD ${rec}`, 32)}
         ${equipo('ACIERTOS', J.aciertos, '#39d353', '', '', 32)}
         ${equipo('FALLOS', J.fallos, '#ff3b30', '', '', 32)}
-        <div class="centro"><div class="nom">TIRO ${Math.min(J.n+1,10)}/10</div>${AJ.reloj!=='no' ? `<div class="panel peq" id="reloj">${seg7(relojSeg(),'#ffb000',24,2)}</div>` : ''}
+        <div class="centro"><div class="nom">TIRO</div><div class="panel peq">${seg7(Math.min(J.n+1,10),'#e8f0ff',22,2)}</div>
           ${luces(Math.min(J.racha,5),5,'#ffb000')}</div>${snd}`;
     } else {
       m.innerHTML = `${salir}${equipo('ACIERTOS', J.aciertos, '#39d353', '', '', 34)}
@@ -1019,18 +1033,28 @@
   document.addEventListener('visibilitychange', () => { if (document.visibilityState==='hidden') pausarReloj(); else if ($('#dlg-salir').hidden) reanudarReloj(); });
   function arrancarReloj(){
     pararReloj(); posesionAgotada = false; relojFin = 0; relojResto = 0;
-    if (J.modo!=='partido' || AJ.reloj==='no') return;
+    if (J.modo!=='partido' || AJ.reloj==='no'){ relojDur = 0; pintarPosesion(); return; }
     relojDur = op.horiz ? 24 : (op.W>=4 ? 60 : 40);
     relojFin = performance.now() + relojDur*1000;
-    tictac();
+    pintarPosesion(); tictac();
+  }
+  function pintarPosesion(){
+    const caja = $('#posesion'), activo = J && J.modo === 'partido' && AJ.reloj !== 'no' && relojDur > 0;
+    caja.hidden = !activo; if (!activo) return;
+    const resto = relojFin ? Math.max(0, relojFin - performance.now()) : (relojResto || relojDur*1000), q = resto/(relojDur*1000), sg = Math.ceil(resto/1000);
+    const color = q > .5 ? '#39d353' : q > .25 ? '#ffb000' : '#ff3b30';
+    $('#pos-relleno').style.width = (q*100).toFixed(1) + '%'; $('#pos-relleno').style.backgroundColor = color;
+    $('#pos-seg').textContent = sg; $('#pos-seg').style.color = color;
+    caja.classList.toggle('urgente', sg <= 5 && sg > 0);
+    const rt = $('#reloj-tab');
+    if (rt){ rt.textContent = String(sg).padStart(2, '0'); rt.style.color = sg <= 5 ? '#ff3b30' : '#ffb000'; }
   }
   function tictac(){
     let ultimo = -1;
     relojInt = setInterval(() => {
       if (resuelta || !$('#juego').classList.contains('activa')){ pararReloj(); return; }
-      const sg = relojSeg(), el = $('#reloj');
-      if (sg !== ultimo && el){ ultimo = sg; el.innerHTML = seg7(sg, sg<=5 ? '#ff3b30' : '#ffb000', 24, 2);
-        if (sg<=5 && sg>0 && sonido) tono(1200, .05, 0, 'square', .03); }
+      const sg = relojSeg(); pintarPosesion();
+      if (sg !== ultimo){ ultimo = sg; if (sg<=5 && sg>0 && sonido) tono(1200, .05, 0, 'square', .03); }
       if (sg===0){ pararReloj(); posesionAgotada = true;
         if (sonido){ tono(220,.9,0,'sawtooth',.08); tono(223,.9,0,'square',.05); }
         jugador.susto(); vallaAviso('¡TIEMPO!'); mensaje('⏱️ ¡Bocina! Se acabó la posesión: ahora la canasta vale 1 punto. ¡Sin prisa, termínala!','ko'); }
@@ -1347,6 +1371,12 @@
     const r=$('#red'); r.style.left=(g.aroIzq+2)+'px'; r.style.top=(g.aroY)+'px';
     $('#silueta').setAttribute('viewBox', `0 0 ${g.W} ${g.H}`);
     pintarPabellon(); colocarAroSpr(); colocarCanones();
+    const rt = $('#reloj-tab');
+    if (rt && /reloj=tablero/.test(location.search)){            // encima del tablero, a la izquierda
+      const sc = (g.aroW + 6)/134, izqTab = g.aroIzq - 3 + (110 - 54)*sc, arriba = g.aroY - (160 - 5)*sc;
+      rt.hidden = false; rt.style.fontSize = Math.round(Math.max(13, 22*sc)) + 'px';
+      rt.style.left = Math.round(izqTab - rt.offsetWidth - 3) + 'px'; rt.style.top = Math.round(arriba + 2) + 'px';
+    }
   }
 
   // ===== Pabellón: grada con público, focos, vallas, parqué con líneas y canasta profesional =====
@@ -2174,6 +2204,7 @@
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['3.23', ['⏱️ El reloj de posesión va en su propia barra, que se acorta y cambia de verde a rojo']],
     ['3.22', ['⛹️ Gabi entra corriendo y saluda al público al empezar', '🎯 Nuevo mate: lanza el balón al tablero y lo machaca en el aire', '🎢 En las rachas se columpia en el aro', '🦸 A veces aterriza como un superhéroe', '🎉 Cañones de confeti en los mates', '👟 Mientras espera, a veces se ata la zapatilla']],
     ['3.21', ['💥 Mates mucho más fluidos: dos pasos, salto, machaque y balanceo en el aro', '🌪️ Cuatro mates al azar: normal, a dos manos, molino y 360°', '💪 Celebración especial después de cada mate']],
     ['3.20', ['🏀 Canasta nueva, más grande y sin poste', '💥 En el mate Gabi se cuelga del aro por delante y se le ve bien la cara']],
