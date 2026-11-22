@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="app-version" content="3.32">
+<meta name="app-version" content="3.33">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Canastas Gabi">
@@ -654,6 +654,18 @@
 
   // ---------- Sonido ----------
   let ctx = null, sonido = store.get('gabi-sonido'); if (sonido === null) sonido = true;
+  // Volumen general: todos los sonidos pasan por aquí, así que al quitar el sonido se corta todo al momento
+  let maestro = null;
+  function salidaAudio(c){
+    if (!maestro || maestro.context !== c){ maestro = c.createGain(); maestro.connect(c.destination); }
+    maestro.gain.value = sonido ? 1 : 0; return maestro;
+  }
+  function ponerSonido(v){
+    sonido = v; store.set('gabi-sonido', v);
+    if (maestro){ try{ maestro.gain.cancelScheduledValues(maestro.context.currentTime); maestro.gain.setValueAtTime(v ? 1 : 0, maestro.context.currentTime); }catch(e){ maestro.gain.value = v ? 1 : 0; } }
+    if (!v){ try{ speechSynthesis.cancel(); }catch(e){} }
+    else { const c = audio(); if (c) salidaAudio(c); }
+  }
   // Bote del balón contra el parqué: «tump» grave que baja de tono + chasquido seco (se oye en altavoces pequeños)
   let ruidoBote = null;
   function sBote(fuerza=1){
@@ -664,12 +676,12 @@
       const t = ctx.currentTime, o = ctx.createOscillator(), g = ctx.createGain();
       o.type = 'sine'; o.frequency.setValueAtTime(200, t); o.frequency.exponentialRampToValueAtTime(70, t + .09);
       g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.5*fuerza, t + .006); g.gain.exponentialRampToValueAtTime(.001, t + .13);
-      o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + .14);
+      o.connect(g); g.connect(salidaAudio(ctx)); o.start(t); o.stop(t + .14);
       if (!ruidoBote){ const n = Math.floor(ctx.sampleRate*.045); ruidoBote = ctx.createBuffer(1, n, ctx.sampleRate);
         const d = ruidoBote.getChannelData(0); for (let i = 0; i < n; i++) d[i] = (Math.random()*2 - 1)*Math.pow(1 - i/n, 4); }
       const src = ctx.createBufferSource(), bp = ctx.createBiquadFilter(), gn = ctx.createGain();
       src.buffer = ruidoBote; bp.type = 'bandpass'; bp.frequency.value = 750 + Math.random()*150; bp.Q.value = 1.4; gn.gain.value = .55*fuerza;
-      src.connect(bp); bp.connect(gn); gn.connect(ctx.destination); src.start(t);
+      src.connect(bp); bp.connect(gn); gn.connect(salidaAudio(ctx)); src.start(t);
     }catch(e){}
   }
   function tono(f, dur, cuando=0, tipo='sine', vol=.15){
@@ -680,7 +692,7 @@
       o.type = tipo; o.frequency.value = f;
       g.gain.setValueAtTime(vol, ctx.currentTime+cuando);
       g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime+cuando+dur);
-      o.connect(g); g.connect(ctx.destination);
+      o.connect(g); g.connect(salidaAudio(ctx));
       o.start(ctx.currentTime+cuando); o.stop(ctx.currentTime+cuando+dur);
     }catch(e){}
   }
@@ -703,7 +715,7 @@
     const t = ac.currentTime + retraso;            // se calcula antes de esperar la carga
     const b = await buffer(k); if (!b) return;
     const src = ac.createBufferSource(), g = ac.createGain();
-    src.buffer = b; g.gain.value = vol; src.connect(g); g.connect(ac.destination);
+    src.buffer = b; g.gain.value = vol; src.connect(g); g.connect(salidaAudio(ac));
     src.start(Math.max(t, ac.currentTime));
   }
   const aplauso = (retraso=0, fuerza=1) => { if (AJ.publico!=='no' && !(J && J.modo==='entreno')) reproducir('aplauso', retraso, Math.min(1, .75*fuerza)); };
@@ -725,7 +737,7 @@
         for (let i = 0; i < n; i++){ const q = i/n; d[i] = (Math.random()*2 - 1)*Math.min(1, q*12)*Math.pow(1 - q, 2.2); } }
       const t = ctx.currentTime + cuando, src = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
       src.buffer = ruidoRed; f.type = 'bandpass'; f.frequency.setValueAtTime(2600, t); f.frequency.exponentialRampToValueAtTime(5200, t + .25); f.Q.value = .8;
-      g.gain.value = .5; src.connect(f); f.connect(g); g.connect(ctx.destination); src.start(t);
+      g.gain.value = .5; src.connect(f); f.connect(g); g.connect(salidaAudio(ctx)); src.start(t);
     }catch(e){}
   }
   const sMal = (t, toques=[]) => { toques.forEach(sAro); oooh(t+.1); };
@@ -749,7 +761,7 @@
   document.querySelectorAll('#dlg-ajustes .chips').forEach(c => c.addEventListener('click', e => {
     const b = e.target.closest('.chip'); if (!b) return;
     const k = c.dataset.aj;
-    if (k==='sonido'){ sonido = b.dataset.v==='si'; store.set('gabi-sonido', sonido); }
+    if (k==='sonido'){ ponerSonido(b.dataset.v==='si'); }
     else { AJ[k] = b.dataset.v; store.set('gabi-ajustes', AJ); }
     sClic(); aplicarAjustes();
   }));
@@ -1066,7 +1078,7 @@
         ${equipo('FALLOS', J.fallos, '#ff3b30', '', '', 34)}
         <div class="centro"><div class="nom">ENTRENO</div><div class="etq">${J.etiqueta}</div></div>${snd}`;
     }
-    $('#btn-sonido').onclick = () => { sonido=!sonido; store.set('gabi-sonido',sonido); pintarMarcador(); };
+    $('#btn-sonido').onclick = () => { ponerSonido(!sonido); pintarMarcador(); if (sonido) sClic(); };
     $('#btn-salir').onclick = () => { sClic();
       if (J.modo==='entreno'){ if (J.n>0) terminar(); else salirAlMenu(); return; }
       const empezado = J.n>0 || ans.some(x=>x!=='') || (J.modo==='reto' && J.jug.some(j=>j.puntos>0));
@@ -2416,6 +2428,7 @@
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['3.33', ['🔇 El botón de sonido ya corta todos los sonidos al momento']],
     ['3.32', ['🏀 En el Contrarreloj, Gabi tira de verdad cada canasta']],
     ['3.31', ['⚡ Nuevo modo Contrarreloj: ¿cuántas cuentas de cálculo mental aciertas en 1 minuto?']],
     ['3.30', ['🏀 Tiros más reales: arco más alto y distinto cada vez, con rotación hacia atrás', '💨 «¡Chof!» cuando entra limpio y la red se estira', '🤞 A veces el balón baila en el aro antes de entrar… o de salirse', '✋ Gabi deja la muñeca arriba mientras vuela el balón']],
