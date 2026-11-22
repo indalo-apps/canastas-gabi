@@ -2,8 +2,8 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="app-version" content="3.33">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="app-version" content="3.34">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Canastas Gabi">
@@ -20,7 +20,8 @@
     --madera:#e9c48f; --madera2:#d9a865; --verde:#2a9d5c; --rojo:#e04848;
     --crema:#fff8ee; --tinta:#1d2433; --amarillo:#ffd23f;
   }
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+  html,body{-webkit-text-size-adjust:100%}
   html,body{margin:0;height:100%}
   body{
     font-family:'Baloo 2',system-ui,sans-serif;color:var(--tinta);
@@ -232,6 +233,67 @@
   .rejilla.horiz .celda{font-size:2.3rem}
   .rejilla.horiz .celda:not(.ancha){width:34px}
   .rejilla.horiz .resp{width:48px}
+  /* Más para practicar */
+  .mas-juegos{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .mas{border:0;border-radius:16px;padding:10px 4px 9px;font:inherit;font-weight:800;font-size:1rem;color:#fff;cursor:pointer;
+    background:var(--c);box-shadow:0 4px 0 var(--o);line-height:1.1}
+  .mas:active{transform:translateY(3px);box-shadow:0 1px 0 var(--o)}
+  .mas .signo{width:32px;height:32px;display:block;margin:0 auto 4px;filter:drop-shadow(0 2px 0 rgba(0,0,0,.25))}
+  .mas b{display:block} .mas small{display:block;font-weight:500;font-size:.78rem;opacity:.92;margin-top:2px}
+  .tablas-mini{margin:0 0 10px;justify-content:center;gap:6px}
+  .tablas-mini .chip{min-width:40px;font-size:1.05rem;padding:4px 6px}
+  /* Mi progreso */
+  .prog-ayuda{margin:0 0 10px;font-size:.92rem;color:#5b6475;line-height:1.3}
+  .prog-tabla{display:grid;grid-template-columns:repeat(11,1fr);gap:3px}
+  .prog-tabla > *{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:6px;font-weight:800;font-size:clamp(.62rem,2.6vw,1rem);line-height:1}
+  .prog-tabla .cab{color:#5b6475;font-size:clamp(.6rem,2.3vw,.9rem)}
+  .prog-tabla button.cab{border:0;font:inherit;font-weight:900;background:var(--azul);color:#fff;cursor:pointer;font-size:clamp(.7rem,2.8vw,1.05rem)}
+  .n0{background:#e6e9ee;color:#8a93a3} .n1{background:#ff8a80;color:#7a120c} .n2{background:#ffd23f;color:#6b4d00} .n3{background:#39b96b;color:#fff}
+  .prog-ley{display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center;margin-top:10px;font-size:.85rem;font-weight:700;color:#5b6475}
+  .prog-ley i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:4px}
+  .pc-grupo{margin:8px 0 12px} .pc-grupo > b{display:block;color:var(--azul);margin-bottom:4px}
+  .pc-fila{display:flex;flex-wrap:wrap;gap:6px}
+  .pc{border-radius:12px;padding:5px 10px;font-weight:800;font-size:.92rem}
+  .pc small{font-weight:600;opacity:.85}
+  .btn-borrar{display:block;margin:14px auto 4px;background:none;border:0;font:inherit;color:#8a5a2b;text-decoration:underline;cursor:pointer;opacity:.8}
+  /* Tarjetas */
+  .tj-barra{height:8px;background:#050505;border-radius:6px;margin:8px 6px 0;overflow:hidden;border:1px solid #2a2a2a}
+  .tj-barra i{display:block;height:100%;width:0;background:#39d353;box-shadow:0 0 8px #39d353;transition:width .3s}
+  .tj-escena{perspective:900px;margin:4px auto 14px;max-width:360px}
+  .tj-carta{position:relative;height:200px;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.3,1.3,.5,1)}
+  .tj-carta.girada{transform:rotateY(180deg)}
+  .sin-mov .tj-carta{transition:none}
+  .tj-cara{position:absolute;inset:0;border-radius:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:0 6px 0 rgba(0,0,0,.18)}
+  .tj-frente{background:#fff;border:4px solid var(--azul)}
+  .tj-detras{background:#121212;border:4px solid #2c2c2c;transform:rotateY(180deg)}
+  .tj-op{font-family:'Orbitron',monospace;font-weight:900;font-size:3.2rem;color:var(--azul);letter-spacing:2px}
+  .tj-detras .tj-op{color:#39ff7a;text-shadow:0 0 12px rgba(57,255,122,.7);font-size:4rem}
+  .tj-cara small{font-size:1rem;color:#5b6475;margin-top:4px} .tj-detras small{color:#cfd3d8}
+  .btn.tj-no{background:#e8edf5;color:var(--azul);box-shadow:0 5px 0 #c3cad6}
+  #tj-botones .btn{font-size:1.1rem;padding:14px 6px}
+  .tj-repaso{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:8px 0 12px}
+  .tj-repaso span{background:#ffe1dd;color:#7a120c;border-radius:10px;padding:3px 9px;font-weight:800}
+  /* Completa la tabla */
+  .cp-modo{justify-content:center;margin:0 0 10px}
+  .cp-lista{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;margin:4px 0 6px}
+  .cp-fila{display:flex;align-items:center;justify-content:flex-end;gap:6px;font-weight:800;font-size:1.45rem;color:var(--azul)}
+  .cp-op{white-space:nowrap}
+  .cp-res{min-width:62px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:#eef1f6;color:var(--azul);
+    font-family:'Orbitron',monospace;font-weight:900;font-size:1.35rem}
+  .cp-res.hueco{background:#fff;border:3px dashed #9aa6b8;cursor:pointer}
+  .cp-res.activo{border:3px solid var(--naranja);background:#fff4e8;box-shadow:0 0 0 3px rgba(244,123,32,.25)}
+  .cp-res.bien{background:#39b96b;color:#fff}
+  .cp-res.mal{background:#ff8a80;color:#7a120c}
+  .cp-res.ayuda{background:#ffd23f;color:#6b4d00}
+  .cp-teclado{grid-template-columns:repeat(6,1fr)}
+  .cp-teclado .tecla.ok{background:var(--verde);color:#fff;box-shadow:0 4px 0 #1d7343}
+  @media (max-width:380px){ .cp-fila{font-size:1.2rem} .cp-res{min-width:52px;height:40px;font-size:1.15rem} .mas small{display:none} }
+  /* Ajustes */
+  .aj-botones{display:flex;flex-wrap:wrap;gap:8px}
+  .aj-guia{background:#fff;border-radius:14px;padding:10px 14px;margin-top:8px;font-size:1rem;line-height:1.35}
+  .aj-guia ol{margin:4px 0 0;padding-left:22px}
+  .aj-acerca{margin:0 0 6px;line-height:1.35} .aj-aviso{margin:0 0 8px;font-size:.88rem;color:#5b6475;line-height:1.3}
   .barra-act{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--verde);color:#fff;
     padding:10px 18px;border-radius:14px;font-weight:800;z-index:40;box-shadow:0 4px 12px rgba(0,0,0,.25)}
   .dlg{position:fixed;inset:0;background:rgba(29,53,87,.85);display:flex;align-items:center;justify-content:center;z-index:35;padding:20px}
@@ -247,7 +309,8 @@
     box-shadow:0 6px 0 rgba(0,0,0,.28),inset 0 0 24px rgba(0,0,0,.9);text-align:center;position:relative}
   .led::before,.led::after{content:"";position:absolute;top:-14px;width:10px;height:14px;background:#2c2c2c}
   .led::before{left:30%} .led::after{right:30%}
-  .barra-jugar{margin:4px 0 0}
+  .barra-jugar{margin:4px 0 0;position:sticky;bottom:max(10px, env(safe-area-inset-bottom));z-index:6}
+  #btn-jugar .bj-txt{display:block;line-height:1.1} #btn-jugar small{display:block;font-size:.95rem;font-weight:700;opacity:.95;margin-top:2px}
   #btn-jugar{font-size:1.7rem;padding:16px;border:4px solid #fff;
     box-shadow:0 6px 0 var(--naranja-osc),0 10px 26px rgba(0,0,0,.35);animation:llama 1.8s ease-in-out infinite}
   #btn-jugar:active{animation:none}
@@ -517,8 +580,6 @@
       </div>
     </div>
 
-    <div class="barra-jugar"><button class="btn" id="btn-jugar">¡A jugar! 🏀</button></div>
-    <p class="centrado" id="record-txt" style="margin:8px 0 12px"></p>
 
     <div class="tarjeta">
       <h2>2. ¿Cómo jugamos?</h2>
@@ -533,6 +594,18 @@
           <button class="opt sel" data-rival="Papá">👨 Papá</button>
           <button class="opt" data-rival="Mamá">👩 Mamá</button>
         </div>
+      </div>
+    </div>
+
+    <div class="barra-jugar"><button class="btn" id="btn-jugar"><span class="bj-txt">¡A jugar! 🏀</span><small id="bj-resumen"></small></button></div>
+    <p class="centrado" id="record-txt" style="margin:8px 0 12px"></p>
+
+    <div class="tarjeta">
+      <h2>3. Más para practicar las tablas</h2>
+      <div class="mas-juegos">
+        <button class="mas" id="btn-tarjetas" style="--c:#0f8fd1;--o:#0a6696"><svg class="signo" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="11" height="15" rx="2" fill="none" stroke="#fff" stroke-width="2.1"/><path d="M8 3.5h9.5a2 2 0 0 1 2 2V18" fill="none" stroke="#fff" stroke-width="2.1" stroke-linecap="round"/><path d="M6.5 13.5h4M8.5 11.5v4" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg><b>Tarjetas</b><small>Repaso rápido</small></button>
+        <button class="mas" id="btn-completa" style="--c:#7b5cff;--o:#5539c9"><svg class="signo" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2.5"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></g><rect x="15" y="9" width="6" height="6" fill="#ffd23f"/></svg><b>Completa la tabla</b><small>Rellena lo que falta</small></button>
+        <button class="mas" id="btn-progreso" style="--c:#2a9d5c;--o:#1b6e40"><svg class="signo" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><rect x="5" y="12" width="3.4" height="6" rx="1" fill="#fff"/><rect x="10.3" y="8" width="3.4" height="10" rx="1" fill="#fff"/><rect x="15.6" y="4" width="3.4" height="14" rx="1" fill="#ffd23f"/></svg><b>Mi progreso</b><small>Lo que ya sabes</small></button>
       </div>
     </div>
 
@@ -573,6 +646,69 @@
         <button class="btn" id="btn-siguiente">Siguiente ➜</button>
       </div>
     </div>
+  </section>
+
+  <!-- ============ MI PROGRESO ============ -->
+  <section id="progreso" class="pantalla">
+    <div class="led" style="margin-bottom:12px">
+      <div class="led-tit">MI PROGRESO</div>
+      <div class="led-sub" id="prog-sub"></div>
+    </div>
+    <div class="tarjeta">
+      <h2>Tablas de multiplicar</h2>
+      <p class="prog-ayuda">Cada casilla se pone verde cuando la aciertas 3 veces seguidas a la primera. Toca un número de la izquierda para completar esa tabla.</p>
+      <div class="prog-tabla" id="prog-tabla"></div>
+      <div class="prog-ley"><span><i class="n3"></i>¡Dominada!</span><span><i class="n2"></i>Aprendiendo</span><span><i class="n1"></i>Te cuesta</span><span><i class="n0"></i>Sin jugar</span></div>
+      <button class="btn verde" id="btn-repasar" style="margin-top:12px">🎯 Repasar las que me cuestan</button>
+    </div>
+    <div class="tarjeta">
+      <h2>Sumas y restas</h2>
+      <div id="prog-cuentas"></div>
+    </div>
+    <button class="btn azul" id="btn-prog-volver">⬅ Volver</button>
+    <button class="btn-borrar" id="btn-prog-borrar">Borrar mi progreso</button>
+  </section>
+
+  <!-- ============ TARJETAS ============ -->
+  <section id="tarjetas" class="pantalla">
+    <div class="led" style="margin-bottom:12px">
+      <div class="led-tit">TARJETAS</div>
+      <div class="led-sub" id="tj-sub"></div>
+      <div class="tj-barra"><i id="tj-barra"></i></div>
+    </div>
+    <div class="tarjeta">
+      <div class="chips tablas-mini" id="tj-tablas"></div>
+      <div id="tj-juego">
+        <div class="tj-escena"><div class="tj-carta" id="tj-carta">
+          <div class="tj-cara tj-frente"><span class="tj-op" id="tj-preg"></span><small>Piensa el resultado… 🤔</small></div>
+          <div class="tj-cara tj-detras"><span class="tj-op" id="tj-resp"></span><small id="tj-op2"></small></div>
+        </div></div>
+        <button class="btn" id="tj-girar">🔄 Dar la vuelta</button>
+        <div class="fila" id="tj-botones" style="display:none">
+          <button class="btn tj-no" id="tj-no">🤔 No me la sabía</button>
+          <button class="btn verde" id="tj-si">😊 ¡Me la sabía!</button>
+        </div>
+      </div>
+      <div class="centrado" id="tj-fin" hidden></div>
+    </div>
+    <button class="btn azul" id="tj-volver">⬅ Menú</button>
+  </section>
+
+  <!-- ============ COMPLETA LA TABLA ============ -->
+  <section id="completa" class="pantalla">
+    <div class="led" style="margin-bottom:12px">
+      <div class="led-tit">COMPLETA LA TABLA</div>
+      <div class="led-sub" id="cp-sub"></div>
+    </div>
+    <div class="tarjeta">
+      <div class="chips tablas-mini" id="cp-tablas"></div>
+      <div class="chips cp-modo" id="cp-modo"><button class="chip ancho" data-m="5">Algunas</button><button class="chip ancho" data-m="10">Toda la tabla ⭐</button></div>
+      <div class="cp-lista" id="cp-lista"></div>
+      <div class="mensaje" id="cp-msg"></div>
+      <div class="teclado cp-teclado" id="cp-teclado"></div>
+      <div class="centrado" id="cp-fin" hidden></div>
+    </div>
+    <button class="btn azul" id="cp-volver">⬅ Menú</button>
   </section>
 
   <!-- ============ VITRINA ============ -->
@@ -636,6 +772,13 @@
       <div class="chips" data-aj="publico"><button class="chip ancho" data-v="si">Sí</button><button class="chip ancho" data-v="no">No</button></div></div>
     <div class="ajuste"><b>Sonido del bote</b>
       <div class="chips" data-aj="bote"><button class="chip ancho" data-v="si">Sí</button><button class="chip ancho" data-v="no">No</button></div></div>
+    <div class="ajuste"><b>Tenerla en el iPad o en el móvil</b>
+      <div class="aj-botones"><button class="chip ancho" id="aj-instalar">📲 Instalar</button><button class="chip ancho" id="aj-enlace">🔗 Copiar enlace</button></div>
+      <div class="aj-guia" id="aj-guia" hidden></div></div>
+    <div class="ajuste"><b>Acerca de</b>
+      <p class="aj-acerca">🏀 <b>Canastas de Gabi</b> · versión <span id="aj-version"></span><br>Hecho con cariño para que Gabi practique sumas, restas y tablas jugando al baloncesto.</p>
+      <p class="aj-aviso">Es un juego para practicar en casa y puede tener algún error. Si hay dudas, lo que vale es lo que enseñan en el cole.</p>
+      <div class="aj-botones"><button class="chip ancho" id="aj-novedades">✨ Ver novedades</button></div></div>
     <button class="btn" id="aj-cerrar" style="margin-top:8px">Listo ✓</button>
   </div>
 </div>
@@ -643,6 +786,9 @@
 
 <script>
 (function(){
+  // ---------- Sin zoom: ni con doble toque ni pellizcando (en el iPad se hacían zoom sin querer) ----------
+  ['gesturestart','gesturechange'].forEach(ev => document.addEventListener(ev, e => e.preventDefault(), {passive:false}));
+  document.addEventListener('dblclick', e => e.preventDefault(), {passive:false});
   // ---------- Utilidades ----------
   const $ = s => document.querySelector(s);
   const rnd = (a,b) => a + Math.floor(Math.random()*(b-a+1));
@@ -774,13 +920,39 @@
   function llevadasSuma(a,b){ let c=0,n=0; while(a||b){ const s=a%10+b%10+c; c = s>=10?1:0; n+=c; a=Math.floor(a/10); b=Math.floor(b/10);} return n; }
   function llevadasResta(a,b){ let c=0,n=0; while(a){ const da=a%10, db=b%10+c; c = da<db?1:0; n+=c; a=Math.floor(a/10); b=Math.floor(b/10);} return n; }
 
-  // Una de cada cuatro sumas o restas, sin llevadas (para alternar)
-  const SIN_LLEVAR = .25;
-  const conLlevada = () => Math.random() >= SIN_LLEVAR;
-  function suma2(){ const ll = conLlevada(); for(;;){ const a=rnd(10,89), b=rnd(10,89); if (a+b<=99 && (a%10+b%10>=10)===ll) return {a,b,t:'+'}; } }
-  function resta2(){ const ll = conLlevada(); for(;;){ const a=rnd(21,99), b=rnd(10,a-1); if ((a%10 < b%10)===ll) return {a,b,t:'-'}; } }
-  function suma3(){ const ll = conLlevada(); for(;;){ const a=rnd(100,799), b=rnd(100,899); if (a+b<=999 && (llevadasSuma(a,b)>=1)===ll) return {a,b,t:'+'}; } }
-  function resta3(){ const ll = conLlevada(); for(;;){ const a=rnd(200,999), b=rnd(100,a-1); if ((llevadasResta(a,b)>=1)===ll) return {a,b,t:'-'}; } }
+  // ---------- Progreso de cada cuenta: lo que falla sale más a menudo ----------
+  // Tablas: cada multiplicación (7x8 y 8x7 son la misma). Sumas y restas: por cifras y número de llevadas.
+  const PROG = store.get('gabi-progreso') || {};
+  const guardarProg = () => store.set('gabi-progreso', PROG);
+  const claveMul = (a,b) => Math.min(a,b) + 'x' + Math.max(a,b);
+  function claveOp(o){
+    if (o.t==='×') return o.a<=10 && o.b<=10 ? claveMul(o.a,o.b) : null;
+    const d = Math.max(String(o.a).length, String(o.b).length); if (d<2 || d>3) return null;
+    const n = o.t==='+' ? llevadasSuma(o.a,o.b) : llevadasResta(o.a,o.b);
+    return (o.t==='+' ? 's' : 'r') + d + '-' + Math.min(n, d===2 ? 1 : 2);
+  }
+  // Se apunta solo el primer intento de cada cuenta: bien a la primera y sin pista = sabida
+  function apuntar(o, ok){
+    if (!o || o._ap) return; o._ap = true;
+    const k = claveOp(o); if (!k) return;
+    const r = PROG[k] || {s:0, ok:0, ko:0};
+    if (ok){ r.s++; r.ok++; } else { r.s = 0; r.ko++; }
+    r.f = Date.now(); PROG[k] = r; guardarProg();
+  }
+  // 0 sin jugar · 1 la falla · 2 aprendiendo · 3 dominada (3 seguidas bien)
+  const nivelDe = k => { const r = PROG[k]; if (!r) return 0; if (r.s>=3) return 3; if (r.s===0) return 1; return 2; };
+  const pesoTabla = k => { const r = PROG[k]; if (!r) return 4; return [6,3,2,.6][Math.min(r.s,3)]; };
+  const pesoTipo = k => { const r = PROG[k]; if (!r) return 1; return [2.2,1.4,1,.6][Math.min(r.s,3)]; };
+  function sorteo(lista, peso){ const tot = lista.reduce((a,e)=>a+peso(e),0); let x = Math.random()*tot; for (const e of lista){ x -= peso(e); if (x<=0) return e; } return lista[lista.length-1]; }
+  // Más o menos una de cada cuatro sin llevadas; las que le cuestan salen más
+  function llevadasQueTocan(t, d){
+    const ops = d===2 ? [[0,1],[1,3]] : [[0,1],[1,1.5],[2,1.5]];
+    return sorteo(ops, ([n,b]) => b * pesoTipo((t==='+' ? 's' : 'r') + d + '-' + n))[0];
+  }
+  function suma2(){ const ll = llevadasQueTocan('+',2); for(;;){ const a=rnd(10,89), b=rnd(10,89); if (a+b<=99 && llevadasSuma(a,b)===ll) return {a,b,t:'+'}; } }
+  function resta2(){ const ll = llevadasQueTocan('-',2); for(;;){ const a=rnd(21,99), b=rnd(10,a-1); if (llevadasResta(a,b)===ll) return {a,b,t:'-'}; } }
+  function suma3(){ const ll = llevadasQueTocan('+',3); for(;;){ const a=rnd(100,799), b=rnd(100,899); if (a+b<=999 && Math.min(llevadasSuma(a,b),2)===ll) return {a,b,t:'+'}; } }
+  function resta3(){ const ll = llevadasQueTocan('-',3); for(;;){ const a=rnd(200,999), b=rnd(100,a-1); if (Math.min(llevadasResta(a,b),2)===ll) return {a,b,t:'-'}; } }
   function dificil(){ // para papá y mamá
     if (Math.random()<.5){ for(;;){ const a=rnd(300,999), b=rnd(300,999); if (llevadasSuma(a,b)>=3) return {a,b,t:'+'}; } }
     for(;;){ const a=rnd(1000,9999), b=rnd(100,a-1); if (llevadasResta(a,b)>=2 && b>=1000) return {a,b,t:'-'}; }
@@ -788,12 +960,12 @@
   const TODAS = [1,2,3,4,5,6,7,8,9,10];
   function tabla(lista){
     lista = lista || (S.tabla==='todas' ? TODAS : [+S.tabla]);
-    for(let i=0;i<20;i++){
-      const t = elige(lista), m = rnd(1,10);
-      const [a,b] = Math.random()<.7 ? [t,m] : [m,t];
-      const k = a+'x'+b;
-      if (!recientes.includes(k) || i===19){ recientes = [...recientes.slice(-5), k]; return {a,b,t:'×',tabla:t,veces:(a===t?b:a),horiz:true}; }
-    }
+    const cand = []; lista.forEach(t => { for (let m=1; m<=10; m++) cand.push([t,m]); });
+    const libres = cand.filter(([t,m]) => !recientes.includes(claveMul(t,m)));
+    const [t,m] = sorteo(libres.length ? libres : cand, ([t,m]) => pesoTabla(claveMul(t,m)));
+    const [a,b] = Math.random()<.7 ? [t,m] : [m,t];
+    recientes = [...recientes.slice(-5), claveMul(t,m)];
+    return {a,b,t:'×',tabla:t,veces:m,horiz:true};
   }
   function tablaDificil(){ const a=rnd(12,25), b=rnd(3,9); return {a,b,t:'×',horiz:true,tabla:b,veces:a}; }
   // Contrarreloj: cálculo mental en una línea; se pone un poco más difícil con la racha
@@ -933,6 +1105,8 @@
   });
   pintarChips();
   function pintarRecord(){
+    const md = {partido:'Partido', entreno:'Entrenamiento', rapido:'Contrarreloj', reto:'Reto contra ' + (S.rival==='Mamá' ? 'mamá' : 'papá')}[S.modo] || '';
+    const rs = document.getElementById('bj-resumen'); if (rs) rs.textContent = nombreNivel() + ' · ' + md;
     const r = store.get(claveRecord());
     $('#record-txt').textContent = r ? `🏆 Tu récord en ${S.modo==='rapido' ? 'Contrarreloj de ' + nombreNivel().toLowerCase() : nombreNivel()}: ${r} puntos` : '';
   }
@@ -1164,6 +1338,7 @@
     if (!rpInt || bloqueoRp){ return; }                       // aún no ha empezado, está en pausa o enseñando un fallo
     const escrito = op.horiz ? ans.join('') : ans.join('');
     J.n++;
+    if (op.t==='×') apuntar(op, +escrito === op.r);
     if (+escrito === op.r){
       J.aciertos++; J.racha++; jugador.racha = J.racha;
       const pts = J.racha >= 5 ? 2 : 1; J.puntos += pts;
@@ -1407,6 +1582,7 @@
     const marcas = op.horiz ? ans.map(()=> 'mal') : ans.map((x,i)=> (esperado[i].trim()===x || (esperado[i]===' ' && (x===''||x==='0'))) ? 'bien':'mal');
     const jugador = quienJuega(); const esRival = J.modo==='reto' && J.turno===1;
     intentos++;
+    if (!esRival) apuntar(op, valor===op.r && !usoPista);
     if (valor===op.r){
       resuelta = true;
       let pts = 0, triple=false;
@@ -2428,6 +2604,7 @@
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['3.34', ['🎯 Las cuentas que fallas salen más a menudo hasta que te las sabes', '📊 Nuevo «Mi progreso»: la tabla de multiplicar se va poniendo verde', '🃏 Nuevo juego de Tarjetas: ¿te la sabías o no?', '🧩 Nuevo juego «Completa la tabla», con pistas', '📲 En Ajustes: cómo instalarla en el iPad, copiar el enlace y «Acerca de»', '🏀 El botón «¡A jugar!» está siempre a mano, debajo de «¿Cómo jugamos?»', '👆 Tocar dos veces seguidas ya no acerca la pantalla']],
     ['3.33', ['🔇 El botón de sonido ya corta todos los sonidos al momento']],
     ['3.32', ['🏀 En el Contrarreloj, Gabi tira de verdad cada canasta']],
     ['3.31', ['⚡ Nuevo modo Contrarreloj: ¿cuántas cuentas de cálculo mental aciertas en 1 minuto?']],
@@ -2488,6 +2665,274 @@
     $('#dlg-novedades').hidden = false;
     if (desde) confeti(60);
   }
+  // ================= MÁS PARA PRACTICAR: tarjetas, completa la tabla y mi progreso =================
+  const ESTADO = ['Sin jugar','Te cuesta','Aprendiendo','¡Dominada!'];
+  const tablaNum = () => S.tabla==='todas' ? null : +S.tabla;
+  function elegirTabla(t){ S.tabla = t; store.set('gabi-tabla', t); pintarChips(); pintarRecord(); }
+  const chipsTablas = (sel, conTodas, extra='') => TODAS.map(n => `<button class="chip ${sel===n?'sel':''}" data-t="${n}">${n}</button>`).join('')
+    + (conTodas ? `<button class="chip todas ${sel==='todas'?'sel':''}" data-t="todas">Todas</button>` : '') + extra;
+  // La tabla que más le cuesta (para cuando está elegido «Todas»)
+  function tablaFloja(){
+    let mejor = 2, max = -1;
+    for (let t = 2; t <= 9; t++){ let p = 0; for (let m = 1; m <= 10; m++) p += pesoTabla(claveMul(t,m)); p += Math.random()*.5; if (p > max){ max = p; mejor = t; } }
+    return mejor;
+  }
+  const muestraMul = (a,b,t) => (t && b===t && a!==t) || (!t && Math.random()<.5) ? `${b} × ${a}` : `${a} × ${b}`;
+
+  // ---------- Mi progreso ----------
+  function pintarProgreso(){
+    let dom = 0, cuesta = 0;
+    const claves = new Set();
+    let h = '<span class="cab">×</span>' + TODAS.map(n => `<span class="cab">${n}</span>`).join('');
+    TODAS.forEach(t => {
+      h += `<button class="cab" data-t="${t}" aria-label="Completar la tabla del ${t}">${t}</button>`;
+      TODAS.forEach(m => { const k = claveMul(t,m), n = nivelDe(k); claves.add(k);
+        h += `<span class="n${n}" title="${t} × ${m} = ${t*m} · ${ESTADO[n]}">${t*m}</span>`; });
+    });
+    claves.forEach(k => { const n = nivelDe(k); if (n===3) dom++; if (n===1) cuesta++; });
+    $('#prog-tabla').innerHTML = h;
+    $('#prog-sub').textContent = `${dom} de ${claves.size} multiplicaciones dominadas` + (cuesta ? ` · ${cuesta} para repasar` : '');
+    const grupos = [['Sumas de 2 cifras','s2',['Sin llevar','Con llevada']], ['Sumas de 3 cifras ⭐','s3',['Sin llevar','1 llevada','2 llevadas']],
+                    ['Restas de 2 cifras','r2',['Sin llevar','Con llevada']], ['Restas de 3 cifras ⭐','r3',['Sin llevar','1 llevada','2 llevadas']]];
+    $('#prog-cuentas').innerHTML = grupos.map(([tit,pre,tipos]) => `<div class="pc-grupo"><b>${tit}</b><div class="pc-fila">` + tipos.map((nom,i) => {
+      const k = pre+'-'+i, r = PROG[k], n = nivelDe(k);
+      return `<span class="pc n${n}">${nom} <small>· ${r ? `${r.ok} de ${r.ok+r.ko} bien a la primera` : 'sin jugar'}</small></span>`; }).join('') + '</div></div>').join('');
+  }
+  $('#btn-progreso').onclick = () => { sClic(); pintarProgreso(); borrarPaso = 0; $('#btn-prog-borrar').textContent = 'Borrar mi progreso'; mostrar('progreso'); };
+  $('#btn-prog-volver').onclick = () => { sClic(); pintarInicio(); mostrar('inicio'); };
+  $('#prog-tabla').addEventListener('click', e => { const b = e.target.closest('button[data-t]'); if (!b) return; sClic(); elegirTabla(+b.dataset.t); empezarCompleta(); });
+  $('#btn-repasar').onclick = () => { sClic(); empezarTarjetas('repaso'); };
+  let borrarPaso = 0;
+  $('#btn-prog-borrar').onclick = () => {
+    sClic();
+    if (!borrarPaso){ borrarPaso = 1; $('#btn-prog-borrar').textContent = '¿Seguro? Toca otra vez para borrarlo todo'; setTimeout(() => { borrarPaso = 0; $('#btn-prog-borrar').textContent = 'Borrar mi progreso'; }, 4000); return; }
+    Object.keys(PROG).forEach(k => delete PROG[k]); guardarProg(); borrarPaso = 0;
+    $('#btn-prog-borrar').textContent = 'Progreso borrado'; pintarProgreso();
+  };
+
+  // ---------- Tarjetas: me la sabía / no me la sabía ----------
+  let TJ = null;
+  function mazo(modo){
+    let claves = [], aviso = '';
+    if (modo==='repaso'){
+      const todas = []; for (let a=1;a<=10;a++) for (let b=a;b<=10;b++) todas.push(claveMul(a,b));
+      claves = todas.filter(k => { const n = nivelDe(k); return n===1 || n===2; });
+      if (!claves.length) aviso = '¡No tienes ninguna que te cueste! 🎉 Aquí van unas variadas';
+      if (claves.length < 10){ const resto = todas.filter(k => !claves.includes(k)); while (claves.length < 10 && resto.length){ const k = sorteo(resto, pesoTabla); claves.push(k); resto.splice(resto.indexOf(k),1); } }
+    } else {
+      const lista = modo==='todas' ? TODAS : [modo];
+      const cand = [...new Set(lista.flatMap(t => TODAS.map(m => claveMul(t,m))))];
+      while (claves.length < 10 && cand.length){ const k = sorteo(cand, pesoTabla); claves.push(k); cand.splice(cand.indexOf(k),1); }
+    }
+    // las que más cuestan, primero en salir… pero no todas seguidas
+    claves.sort(() => Math.random() - .5);
+    const t = typeof modo==='number' ? modo : null;
+    return { cartas: claves.slice(0,10).map(k => { const [a,b] = k.split('x').map(Number); return {a, b, txt: muestraMul(a,b,t), repe:false}; }), aviso };
+  }
+  function empezarTarjetas(modo){
+    modo = modo || tablaNum() || 'todas';
+    const m = mazo(modo);
+    TJ = { modo, cartas: m.cartas, i: 0, sabidas: 0, falladas: [], fin: false, girada: false };
+    pintarTablasTj(); mostrar('tarjetas');
+    $('#tj-juego').hidden = false; $('#tj-fin').hidden = true;
+    pintarCarta(m.aviso);
+  }
+  function pintarTablasTj(){
+    $('#tj-tablas').innerHTML = chipsTablas(TJ.modo, true, `<button class="chip todas ${TJ.modo==='repaso'?'sel':''}" data-t="repaso">🎯 Las que me cuestan</button>`);
+  }
+  function pintarCarta(aviso){
+    const c = TJ.cartas[TJ.i], nombre = TJ.modo==='repaso' ? 'Las que me cuestan' : TJ.modo==='todas' ? 'Todas las tablas' : 'Tabla del ' + TJ.modo;
+    $('#tj-sub').textContent = aviso || `${nombre} · ${TJ.i+1} de ${TJ.cartas.length}`;
+    $('#tj-barra').style.width = (TJ.i / TJ.cartas.length * 100) + '%';
+    const carta = $('#tj-carta'); carta.style.transition = 'none'; carta.classList.remove('girada'); void carta.offsetWidth; carta.style.transition = '';
+    TJ.girada = false;
+    $('#tj-preg').textContent = c.txt; $('#tj-resp').textContent = c.a*c.b; $('#tj-op2').textContent = c.txt + ' =';
+    $('#tj-girar').style.display = ''; $('#tj-botones').style.display = 'none';
+  }
+  function girarCarta(){
+    if (!TJ || TJ.fin || TJ.girada) return;
+    TJ.girada = true; tono(520,.06,0,'triangle',.07); tono(780,.08,.08,'triangle',.06);
+    $('#tj-carta').classList.add('girada');
+    $('#tj-girar').style.display = 'none'; $('#tj-botones').style.display = 'flex';
+  }
+  function responderCarta(ok){
+    if (!TJ || TJ.fin || !TJ.girada) return;
+    const c = TJ.cartas[TJ.i];
+    if (!c.repe) apuntar({a:c.a, b:c.b, t:'×'}, ok);
+    if (ok){ if (!c.repe) TJ.sabidas++; sBien(0); }
+    else {
+      tono(330,.12,0,'triangle',.06);
+      if (!c.repe){ TJ.falladas.push(c.txt + ' = ' + c.a*c.b); TJ.cartas.push({...c, repe:true}); }   // vuelve a salir al final
+    }
+    TJ.i++;
+    if (TJ.i >= TJ.cartas.length) return finTarjetas();
+    pintarCarta(!ok && !c.repe ? 'Esta volverá a salir al final 😉' : '');
+  }
+  function finTarjetas(){
+    TJ.fin = true; $('#tj-barra').style.width = '100%';
+    const total = TJ.cartas.filter(c => !c.repe).length, n = TJ.sabidas;
+    const est = n===total ? '⭐⭐⭐' : n >= total*.7 ? '⭐⭐' : '⭐';
+    $('#tj-sub').textContent = '¡Ronda terminada!';
+    $('#tj-juego').hidden = true; $('#tj-fin').hidden = false;
+    $('#tj-fin').innerHTML = `<div class="estrellas">${est}</div>
+      <p style="font-size:1.3rem;margin:4px 0"><b>Te sabías ${n} de ${total}</b> ${n===total ? '¡Todas! 🏆' : n >= total*.7 ? '¡Muy bien! 💪' : '¡Sigue practicando, Gabi! 🏀'}</p>
+      ${TJ.falladas.length ? `<p style="margin:8px 0 0">Para repasar:</p><div class="tj-repaso">${TJ.falladas.map(f => `<span>${f}</span>`).join('')}</div>` : ''}
+      <button class="btn" id="tj-otra">Otra ronda 🔁</button>`;
+    $('#tj-otra').onclick = () => { sClic(); empezarTarjetas(TJ.modo); };
+    if (n===total) confeti(60);
+    tono(784,.15,0,'triangle',.1); tono(1047,.25,.15,'triangle',.1);
+  }
+  $('#btn-tarjetas').onclick = () => { sClic(); empezarTarjetas(); };
+  $('#tj-girar').onclick = girarCarta;
+  $('#tj-carta').onclick = () => { if (!TJ.girada) girarCarta(); };
+  $('#tj-si').onclick = () => responderCarta(true);
+  $('#tj-no').onclick = () => responderCarta(false);
+  $('#tj-volver').onclick = () => { sClic(); TJ = null; pintarInicio(); mostrar('inicio'); };
+  $('#tj-tablas').addEventListener('click', e => {
+    const b = e.target.closest('.chip'); if (!b) return; sClic();
+    const v = b.dataset.t, modo = v==='repaso' || v==='todas' ? v : +v;
+    if (typeof modo==='number' || modo==='todas') elegirTabla(modo);
+    empezarTarjetas(modo);
+  });
+
+  // ---------- Completa la tabla ----------
+  let CP = null, cpHuecos = store.get('gabi-completa-huecos') || 5;
+  function empezarCompleta(){
+    const t = tablaNum() || tablaFloja();
+    const ms = TODAS.slice();
+    let huecos;
+    if (cpHuecos >= 10) huecos = ms;
+    else { huecos = []; const cand = ms.slice();
+      while (huecos.length < cpHuecos){ const m = sorteo(cand, m => pesoTabla(claveMul(t,m)) * (m===1 || m===10 ? .4 : 1)); huecos.push(m); cand.splice(cand.indexOf(m),1); } }
+    CP = { t, filas: ms.map(m => ({ m, hueco: huecos.includes(m), val:'', est: huecos.includes(m) ? 'hueco' : 'dada', fallos:0 })), activo: null, hechas: 0, primeras: 0, fin: false };
+    CP.activo = CP.filas.find(f => f.hueco).m;
+    mostrar('completa');
+    $('#cp-tablas').innerHTML = chipsTablas(t, false);
+    $('#cp-modo').querySelectorAll('.chip').forEach(c => c.classList.toggle('sel', +c.dataset.m === (cpHuecos>=10 ? 10 : 5)));
+    $('#cp-fin').hidden = true; $('#cp-teclado').hidden = false; $('#cp-lista').classList.remove('acabada');
+    cpMensaje(cpHuecos >= 10 ? '¡Toda la tabla! Empieza por arriba 💪' : 'Rellena las casillas vacías 👇', '');
+    pintarCompleta();
+  }
+  const huecosCP = () => CP.filas.filter(f => f.hueco).length;
+  function pintarCompleta(){
+    $('#cp-sub').textContent = `Tabla del ${CP.t} · ${CP.hechas} de ${huecosCP()}`;
+    // dos columnas: del 1 al 5 a la izquierda y del 6 al 10 a la derecha
+    const orden = [0,5,1,6,2,7,3,8,4,9].map(i => CP.filas[i]);
+    $('#cp-lista').innerHTML = orden.map(f => {
+      const est = f.est==='hueco' && f.m===CP.activo ? 'hueco activo' : f.est;
+      const txt = f.est==='dada' || f.est==='bien' || f.est==='ayuda' ? CP.t*f.m : f.val;
+      return `<div class="cp-fila"><span class="cp-op">${CP.t} × ${f.m} =</span><span class="cp-res ${est}" data-m="${f.m}">${txt}</span></div>`;
+    }).join('');
+  }
+  function cpMensaje(txt, cl){ const m = $('#cp-msg'); m.textContent = txt; m.className = 'mensaje' + (cl ? ' ' + cl : ''); }
+  function pintarTecladoCP(){
+    $('#cp-teclado').innerHTML = [1,2,3,4,5,6,7,8,9,0].map(n => `<button class="tecla" data-k="${n}">${n}</button>`).join('')
+      + `<button class="tecla acc" data-k="borrar" aria-label="Borrar">⌫</button><button class="tecla acc ok" data-k="ok">OK</button>`;
+  }
+  pintarTecladoCP();
+  function teclaCP(k){
+    if (!CP || CP.fin || CP.activo===null) return;
+    const f = CP.filas[CP.activo-1];
+    if (k==='borrar'){ f.val = f.val.slice(0,-1); if (f.est==='mal') f.est = 'hueco'; sClic(); pintarCompleta(); return; }
+    if (k==='ok') return comprobarCP();
+    if (f.est==='mal'){ f.est = 'hueco'; f.val = ''; }
+    if (f.val.length >= 3) return;
+    f.val += k; sClic(); pintarCompleta();
+  }
+  function siguienteHueco(desde){
+    const pend = CP.filas.filter(f => f.est==='hueco' || f.est==='mal');
+    if (!pend.length) return null;
+    return (pend.find(f => f.m > desde) || pend[0]).m;
+  }
+  function comprobarCP(){
+    const f = CP.filas[CP.activo-1], r = CP.t*f.m;
+    if (f.val===''){ cpMensaje(`¿Cuánto es ${CP.t} × ${f.m}? Escríbelo con los números 👇`, ''); return; }
+    const op = {a:CP.t, b:f.m, t:'×'};
+    if (+f.val === r){
+      if (!f.fallos){ apuntar(op, true); CP.primeras++; }
+      f.est = 'bien'; CP.hechas++; sBien(0);
+      cpMensaje(f.fallos ? '¡Ahora sí! ✅' : elige(['¡Canasta! 🏀','¡Muy bien! ✅','¡Eso es! 💪','¡Perfecto! ⭐']), 'ok');
+    } else {
+      f.fallos++;
+      if (f.fallos===1){ apuntar(op, false); }
+      tono(200,.14,0,'square',.05);
+      const el = document.querySelector(`.cp-res[data-m="${f.m}"]`);
+      if (f.fallos < 2){
+        f.est = 'mal';
+        const pista = f.m > 1 ? `Pista: ${CP.t} × ${f.m-1} = ${CP.t*(f.m-1)}, y le sumas ${CP.t} 💡` : `Pista: cualquier número por 1 es él mismo 💡`;
+        cpMensaje('Casi… ' + pista, 'ko'); pintarCompleta();
+        const e2 = document.querySelector(`.cp-res[data-m="${f.m}"]`); if (e2){ e2.classList.add('tiembla'); }
+        return;
+      }
+      f.est = 'ayuda'; CP.hechas++;
+      cpMensaje(`Era ${r}: ${CP.t} × ${f.m} = ${r}. ¡La próxima vez la sabrás! 💪`, 'ko');
+    }
+    CP.activo = siguienteHueco(f.m);
+    pintarCompleta();
+    if (CP.activo===null) setTimeout(finCompleta, 700);
+  }
+  function finCompleta(){
+    if (!CP || CP.fin) return;
+    CP.fin = true;
+    const total = huecosCP(), n = CP.primeras, est = n===total ? '⭐⭐⭐' : n >= total*.7 ? '⭐⭐' : '⭐';
+    $('#cp-teclado').hidden = true; cpMensaje('', '');
+    $('#cp-sub').textContent = `¡Tabla del ${CP.t} completada!`;
+    const sig = CP.t < 10 ? CP.t + 1 : 1;
+    $('#cp-fin').hidden = false;
+    $('#cp-fin').innerHTML = `<div class="estrellas">${est}</div>
+      <p style="font-size:1.25rem;margin:4px 0 12px"><b>${n} de ${total} a la primera</b> ${n===total ? '¡Perfecta! 🏆' : n >= total*.7 ? '¡Muy bien! 💪' : '¡A seguir practicando! 🏀'}</p>
+      <div class="fila"><button class="btn azul" id="cp-otra">Otra vez 🔁</button><button class="btn" id="cp-sig">Tabla del ${sig} ➜</button></div>`;
+    $('#cp-otra').onclick = () => { sClic(); empezarCompleta(); };
+    $('#cp-sig').onclick = () => { sClic(); elegirTabla(sig); empezarCompleta(); };
+    if (n===total) confeti(70);
+    tono(784,.15,0,'triangle',.1); tono(1047,.25,.15,'triangle',.1);
+  }
+  $('#btn-completa').onclick = () => { sClic(); empezarCompleta(); };
+  $('#cp-volver').onclick = () => { sClic(); CP = null; pintarInicio(); mostrar('inicio'); };
+  $('#cp-teclado').addEventListener('click', e => { const b = e.target.closest('.tecla'); if (b) teclaCP(b.dataset.k); });
+  $('#cp-lista').addEventListener('click', e => {
+    const c = e.target.closest('.cp-res.hueco, .cp-res.mal'); if (!c || !CP || CP.fin) return;
+    CP.activo = +c.dataset.m; sClic(); pintarCompleta();
+  });
+  $('#cp-tablas').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; sClic(); elegirTabla(+b.dataset.t); empezarCompleta(); });
+  $('#cp-modo').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; sClic(); cpHuecos = +b.dataset.m; store.set('gabi-completa-huecos', cpHuecos); empezarCompleta(); });
+  // Teclado del ordenador o del iPad con teclado
+  document.addEventListener('keydown', e => {
+    if (!$('#dlg-ajustes').hidden || !$('#dlg-novedades').hidden) return;
+    if ($('#completa').classList.contains('activa') && CP && !CP.fin){
+      if (/^[0-9]$/.test(e.key)) teclaCP(e.key);
+      else if (e.key==='Backspace'){ e.preventDefault(); teclaCP('borrar'); }
+      else if (e.key==='Enter'){ e.preventDefault(); teclaCP('ok'); }
+    } else if ($('#tarjetas').classList.contains('activa') && TJ && !TJ.fin){
+      if (!TJ.girada && (e.key===' ' || e.key==='Enter')){ e.preventDefault(); girarCarta(); }
+      else if (TJ.girada && (e.key==='ArrowRight' || e.key==='s' || e.key==='Enter')){ e.preventDefault(); responderCarta(true); }
+      else if (TJ.girada && (e.key==='ArrowLeft' || e.key==='n')){ e.preventDefault(); responderCarta(false); }
+    }
+  });
+
+  // ---------- Ajustes: instalar, copiar enlace, acerca de ----------
+  const URL_JUEGO = 'https://indalo-apps.github.io/canastas-gabi/';
+  let avisoInstalar = null;
+  addEventListener('beforeinstallprompt', ev => { ev.preventDefault(); avisoInstalar = ev; });
+  const esIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints > 1);
+  const yaInstalada = () => { try { return matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; } catch(e){ return false; } };
+  function toastCorto(txt){ const el = $('#toast'); el.textContent = txt; el.classList.add('vis'); clearTimeout(toastCorto.t); toastCorto.t = setTimeout(() => el.classList.remove('vis'), 2200); }
+  $('#aj-instalar').onclick = async () => {
+    sClic(); const g = $('#aj-guia');
+    if (yaInstalada()){ g.innerHTML = '✅ ¡Ya la tienes instalada! Ábrela desde su icono en la pantalla de inicio.'; g.hidden = false; return; }
+    if (avisoInstalar){ try { avisoInstalar.prompt(); await avisoInstalar.userChoice; } catch(e){} avisoInstalar = null; g.hidden = true; return; }
+    g.innerHTML = esIOS()
+      ? `<b>En el iPad o el iPhone:</b><ol><li>Abre el juego en <b>Safari</b>.</li><li>Toca el botón <b>Compartir</b> (el cuadrado con la flecha hacia arriba ⬆️).</li><li>Elige <b>«Añadir a pantalla de inicio»</b>.</li><li>Toca <b>Añadir</b>. ¡Ya tienes el icono de Canastas de Gabi! 🏀</li></ol>`
+      : `<b>En el móvil o el ordenador:</b><ol><li>Abre el menú del navegador (los tres puntos ⋮).</li><li>Elige <b>«Instalar aplicación»</b> o <b>«Añadir a pantalla de inicio»</b>.</li><li>Confirma. Aparecerá el icono del juego. 🏀</li></ol>`;
+    g.hidden = false;
+  };
+  $('#aj-enlace').onclick = async () => {
+    sClic();
+    try { await navigator.clipboard.writeText(URL_JUEGO); toastCorto('🔗 ¡Enlace copiado!'); }
+    catch(e){ const g = $('#aj-guia'); g.innerHTML = `Copia este enlace:<br><b style="user-select:all;word-break:break-all">${URL_JUEGO}</b>`; g.hidden = false; }
+  };
+  $('#aj-novedades').onclick = () => { sClic(); $('#dlg-ajustes').hidden = true; verNovedades(null); };
+  $('#aj-version').textContent = VERSION;
   $('#btn-version').onclick = () => { sClic(); verNovedades(null); };
   $('#nov-cerrar').onclick = () => { sClic(); $('#dlg-novedades').hidden = true; };
   // Al abrir una versión nueva por primera vez, se enseñan sus novedades (una sola vez)
@@ -2501,7 +2946,8 @@
   const EN_WEB = /\.github\.io$/.test(location.hostname) || location.hostname==='localhost';
   let actPendiente = false;
   // Nunca se recarga en mitad de una cuenta: solo en el menú o en la pantalla final
-  const seguroRecargar = () => !$('#juego').classList.contains('activa') && !$('#aviso-turno').classList.contains('vis');
+  const seguroRecargar = () => !$('#juego').classList.contains('activa') && !$('#aviso-turno').classList.contains('vis')
+    && !(TJ && !TJ.fin && TJ.i>0 && $('#tarjetas').classList.contains('activa')) && !(CP && !CP.fin && CP.hechas>0 && $('#completa').classList.contains('activa'));
   function actualizar(){
     if (!seguroRecargar()){ actPendiente = true; return; }
     $('#barra-act').hidden = false;
