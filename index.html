@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="app-version" content="3.29">
+<meta name="app-version" content="3.30">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Canastas Gabi">
@@ -161,7 +161,7 @@
   @keyframes impulso{40%{transform:translateY(-8px)}}
   .jugador[data-pose=lamenta]{animation:pena .6s ease-in-out}
   @keyframes pena{30%{transform:rotate(-4deg)}70%{transform:rotate(4deg)}}
-  .cancha .sombra{position:absolute;bottom:10px;left:0;width:18px;height:5px;border-radius:50%;background:rgba(0,0,0,.18);z-index:2}
+  .cancha .sombra{position:absolute;bottom:10px;left:0;width:18px;height:5px;border-radius:50%;background:rgba(0,0,0,.28);z-index:2;filter:blur(.6px)}
 
   /* Operación en columnas */
   .opbox{display:flex;justify-content:center;padding:6px 0 2px}
@@ -469,6 +469,9 @@
   #cometa{position:absolute;z-index:3;pointer-events:none;opacity:.9} #mareo{position:absolute;z-index:8;pointer-events:none}
   .fx-spr{position:absolute;z-index:7;pointer-events:none;opacity:.92}
   .vibra-spr{animation:vibraSpr .35s}
+  #aro-frente.estira{animation:estiraRed .5s ease-out}
+  @keyframes estiraRed{0%{transform:none}30%{transform:scaleY(1.14)}60%{transform:scaleY(.96)}100%{transform:none}}
+  #aro-frente{transform-origin:50% 45%}
   @keyframes vibraSpr{0%{transform:translateY(0)}25%{transform:translateY(2px)}50%{transform:translateY(-1.5px)}75%{transform:translateY(1px)}100%{transform:translateY(0)}}
   .cancha .balon{width:22px !important;height:22px !important;margin:-1px}
   .final-spr{width:170px;display:block;margin:0 auto 2px}
@@ -706,6 +709,20 @@
   const sAro = t => tono(170,.09,t,'square',.05);
   const sBien = (t, toques=[]) => { toques.forEach(sAro); tono(784,.18,t,'triangle',.12); tono(1047,.25,t+.1,'triangle',.12); aplauso(t, 1); };
   const sTriple = (t, toques=[]) => { toques.forEach(sAro); [523,659,784,1047].forEach((f,i)=>tono(f,.2,t+i*.1,'triangle')); aplauso(t, 1.4); };
+  // «¡chof!»: soplido corto y agudo de la red cuando entra limpio
+  let ruidoRed = null;
+  function sSwish(cuando){
+    if (!sonido) return;
+    try{
+      ctx = ctx || new (window.AudioContext||window.webkitAudioContext)();
+      const n = Math.floor(ctx.sampleRate*.28);
+      if (!ruidoRed){ ruidoRed = ctx.createBuffer(1, n, ctx.sampleRate); const d = ruidoRed.getChannelData(0);
+        for (let i = 0; i < n; i++){ const q = i/n; d[i] = (Math.random()*2 - 1)*Math.min(1, q*12)*Math.pow(1 - q, 2.2); } }
+      const t = ctx.currentTime + cuando, src = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+      src.buffer = ruidoRed; f.type = 'bandpass'; f.frequency.setValueAtTime(2600, t); f.frequency.exponentialRampToValueAtTime(5200, t + .25); f.Q.value = .8;
+      g.gain.value = .5; src.connect(f); f.connect(g); g.connect(ctx.destination); src.start(t);
+    }catch(e){}
+  }
   const sMal = (t, toques=[]) => { toques.forEach(sAro); oooh(t+.1); };
 
 
@@ -1501,8 +1518,8 @@
   function ponerBalon(x,y,rot,sx=1,sy=1){
     ultBalon = [x,y]; pintarFuego(x,y); pintarEstela(x,y);
     $('#balon').style.transform = `translate(${x-R}px,${y-R}px) rotate(${rot}deg) scale(${sx},${sy})`;
-    const g = geo(), alt = Math.max(0, g.suelo - y), k = Math.max(.3, 1 - alt/150);
-    const sm = $('#sombra'); sm.style.transform = `translateX(${x-9}px) scale(${k})`; sm.style.opacity = k;
+    const g = geo(), alt = Math.max(0, g.suelo - y), k = Math.max(.22, 1 - alt/110);
+    const sm = $('#sombra'); sm.style.transform = `translateX(${x-9}px) scale(${(.6 + .6*k).toFixed(2)},${k.toFixed(2)})`; sm.style.opacity = (k*.95).toFixed(2);
   }
   const lerp = (a,b,t) => a + (b-a)*t;
   const suave = t => t<.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2;
@@ -1588,7 +1605,7 @@
   ];
   const CELEBRA = [['f30',180],['f31',170],['f32',220],['f31',170],['f30',200],['f31',170],['f32',220],['f31',170],['f33',99999]];
   const CELEBRA_TRIPLE = [['a00',380],['a01',300],['a02',300],['a01',220],['a00',250],['a03',99999]];
-  const TIRO = [['b20',150],['b21',140],['b22',230],['b23',120],['b30',110],['b31',150],['b32',150],['b33',99999]];
+  const TIRO = [['b20',150],['b21',140],['b22',230],['b23',120],['b30',110],['b31',150],['b32',620],['b33',99999]];
   const BOTE = ['b00','b01','b02','b03','b10','b11','b12','b13'];
   const GIRO_IZQ = ['t02','t01','t00','t13','t12'], GIRO_DER = ['t12','t13','t00','t01','t02'];
   // Mate: fotogramas provisionales hasta tener los dibujos del mate (mano = punto que agarra el aro)
@@ -1844,12 +1861,14 @@
     for (const id of ['aro-fondo','aro-frente']){ const e = $('#'+id); e.classList.remove('vibra-spr'); void e.offsetWidth; e.classList.add('vibra-spr'); }
     const [x,y] = ultBalon; efecto(1, x, y, 70, 260);
   }
-  function redMueve(sinRed){
+  function redMueve(sinRed, poco){
     cometa = false; pintarEstela(...ultBalon);
     if (celebraEspecial){ const g = geo(); efecto('y0', g.aroCx, g.aroY + 4, Math.min(170, g.H*0.75), 420); }
     vallaAviso(celebraEspecial ? '¡¡TRIPLE!!' : elige(['¡CANASTA!','¡CANASTA DE GABI!','¡DENTRO!','¡CHOF!']));
     const fr = $('#aro-frente'), g = geo(); let i = 1;
-    const paso = () => { fr.src = FOT('red' + (i < 5 ? i : 0)); if (i++ < 5) setTimeout(paso, 75); };
+    const pasos = poco ? ['red1','red4','red0'] : ['red1','red2','red3','red2','red4','red0'];
+    const paso = () => { fr.src = FOT(pasos[i - 1]); if (i++ < pasos.length) setTimeout(paso, poco ? 90 : 80); };
+    if (!poco && !sinRed && !menosMov()){ fr.classList.remove('estira'); void fr.offsetWidth; fr.classList.add('estira'); }
     if (!sinRed) paso(); efecto(2, g.aroCx, g.aroY + 6, 110, 420);
     setTimeout(() => { fuego = false; pintarFuego(0,0); }, 250);
   }
@@ -1949,7 +1968,7 @@
     let i = 0, t0 = performance.now(), rot = 0, last = t0;
     const paso = now => {
       const tr = tramos[i]; const t = Math.min(1, (now - t0)/tr.dur);
-      rot += (now-last)*(tr.giro ?? 0); last = now;
+      rot += (now-last)*(typeof tr.giro === 'function' ? tr.giro(t) : (tr.giro ?? 0)); last = now;
       if (tr.balon){ const r = tr.balon(t); if (r){ const [x,y,sx,sy] = r; ponerBalon(x,y,rot,sx,sy); } }
       tr.al && tr.al(t);
       if (t >= 1){ i++; t0 = now; if (i >= tramos.length){ animId = 0; return; } }
@@ -1975,30 +1994,39 @@
     const conCaida = tr => tr;
     const arriba = g.aroY - R - 3;
     // altura del arco: lo más alto posible sin salirse por arriba de la cancha
-    const arco = (p0,p1) => Math.max(14, (p0[1]+p1[1])/2 - (R+5));                    // centro del balón justo encima del aro
+    // 1) arco más alto y distinto en cada tiro (a veces se sale un poco por arriba, como en la tele)
+    const subida = Math.pow(Math.random(), 1.4);
+    const arco = (p0,p1) => Math.max(14, (p0[1]+p1[1])/2 - lerp(R + 5, -R*.5, subida));
+    const D = Math.round(720 + 200*subida);           // cuanto más alto, más tarda
+    const giroVuelo = t => -1.25 + .75*t;             // 2) rotación hacia atrás, más rápida al salir de la mano
     const T0 = (150+140+230+120+110)/1000;            // segundos hasta que sale el balón (arriba del todo)
+    const vuela = (destino, extra = {}) => Object.assign({ dur: D, balon: t => { const [x,y] = vuelo(desde(), destino, arco(desde(), destino))(t); return [x,y,1,1]; }, giro: giroVuelo }, extra);
+    const cae = (de, poco) => ({ dur: 300, balon: t => { const [x,y] = caida(de, [g.aroCx-2, g.suelo])(t); return [x,y,1,1]; }, giro: -.2,
+      al: t => { if (t>0 && !red.dataset.ok){ red.dataset.ok = 1; redMueve(false, poco); } } });
     let tramos, ev;
     const variante = Math.random();
+    const atrasP = [g.aroDcha - R + 2, arriba + 4], delanteP = [g.aroIzq + 4, arriba + 3], entrada = [g.aroCx, arriba];
     if (ok){
       balon.style.zIndex = 4;                         // pasa por detrás del aro delantero y de la red
-      const entrada = [g.aroCx, arriba];
-      if (variante < .65){
+      if (variante < .5){
         // ¡Limpia! sin tocar el aro
-        tramos = [agacha, sube,
-          conCaida({ dur: 760, balon: t => { const [x,y] = vuelo(desde(), entrada, arco(desde(), entrada))(t); return [x,y,1,1]; }, giro: -.55 }),
-          { dur: 300, balon: t => { const [x,y] = caida(entrada, [g.aroCx-2, g.suelo])(t); return [x,y,1,1]; }, giro: -.2,
-            al: t => { if (t>0 && !red.dataset.ok){ red.dataset.ok = 1; mueveRed(); } } }];
-        ev = { entra: T0 + .76 + .06, toques: [] };
-      } else {
+        tramos = [agacha, sube, vuela(entrada), cae(entrada, false)];
+        ev = { entra: T0 + D/1000 + .06, toques: [] };
+        sSwish(ev.entra);
+      } else if (variante < .75){
         // toca el aro de atrás, da un botecito y entra
-        const atras = [g.aroDcha - R + 2, arriba + 4];
-        tramos = [agacha, sube,
-          conCaida({ dur: 740, balon: t => { const [x,y] = vuelo(desde(), atras, arco(desde(), atras))(t); return [x,y,1,1]; }, giro: -.55,
-            al: t => { if (t>=1) golpeAro(); } }),
-          { dur: 300, balon: t => { const [x,y] = vuelo(atras, entrada, 16)(t); return [x,y,1,1]; }, giro: .3 },
-          { dur: 300, balon: t => { const [x,y] = caida(entrada, [g.aroCx-2, g.suelo])(t); return [x,y,1,1]; }, giro: -.2,
-            al: t => { if (t>0 && !red.dataset.ok){ red.dataset.ok = 1; mueveRed(); } } }];
-        ev = { entra: T0 + .74 + .30 + .05, toques: [T0 + .74] };
+        tramos = [agacha, sube, vuela(atrasP, { al: t => { if (t>=1) golpeAro(); } }),
+          { dur: 300, balon: t => { const [x,y] = vuelo(atrasP, entrada, 16)(t); return [x,y,1,1]; }, giro: .3 }, cae(entrada, true)];
+        ev = { entra: T0 + D/1000 + .30 + .05, toques: [T0 + D/1000] };
+      } else {
+        // 4) baila en el aro: delante, atrás, delante… y dentro
+        tramos = [agacha, sube, vuela(delanteP, { al: t => { if (t>=1) golpeAro(); } }),
+          { dur: 330, balon: t => { const [x,y] = vuelo(delanteP, atrasP, 22)(t); return [x,y,1,1]; }, giro: .4, al: t => { if (t>=1) golpeAro(); } },
+          { dur: 260, balon: t => { const [x,y] = vuelo(atrasP, [g.aroCx - 6, arriba + 2], 12)(t); return [x,y,1,1]; }, giro: .3, al: t => { if (t>=1) golpeAro(); } },
+          { dur: 220, balon: t => { const [x,y] = vuelo([g.aroCx - 6, arriba + 2], entrada, 5)(t); return [x,y,1,1]; }, giro: .2 },
+          cae(entrada, true)];
+        const t1 = T0 + D/1000;
+        ev = { entra: t1 + .33 + .26 + .22 + .05, toques: [t1, t1 + .33, t1 + .59] };
       }
       // botes en el suelo y rueda un poco hacia el jugador
       const x0 = g.aroCx-2;
@@ -2012,30 +2040,33 @@
       if (!menosMov()) reaccionPublico(true, ev.entra);
     } else {
       balon.style.zIndex = 7;                         // por delante del aro: rebota fuera
-      if (variante < .5){
+      const t1 = T0 + D/1000;
+      if (variante < .4){
         // pega en el aro de delante y sale rebotado hacia atrás
         const golpe = [g.aroIzq + 3, arriba + 3];
-        tramos = [agacha, sube,
-          conCaida({ dur: 720, balon: t => { const [x,y] = vuelo(desde(), golpe, arco(desde(), golpe))(t); return [x,y,1,1]; }, giro: -.55,
-            al: t => { if (t>=1) golpeAro(); } }),
+        tramos = [agacha, sube, vuela(golpe, { al: t => { if (t>=1) golpeAro(); } }),
           { dur: 620, balon: t => { const [x,y] = vuelo(golpe, [golpe[0]-80, g.suelo], 34)(t); return [x,y,1,1]; }, giro: .6 }];
-        ev = { aro: T0 + .72, toques: [T0 + .72] };
+        ev = { aro: t1, toques: [t1] };
         const xf = golpe[0]-80;
         tramos.push(
           { dur: 340, balon: t => { const [x,y] = vuelo([xf, g.suelo], [xf-26, g.suelo], 22)(t); return [x,y,1,1]; }, giro: .5 },
           { dur: 220, balon: t => { const [x,y] = vuelo([xf-26, g.suelo], [xf-40, g.suelo], 7)(t); return [x,y,1,1]; }, giro: .4 });
-      } else {
+      } else if (variante < .7){
         // da en el aro de atrás, salta, toca el de delante… ¡y se sale!
-        const atras = [g.aroDcha - R + 1, arriba + 3], delante = [g.aroIzq + 4, arriba + 2];
-        tramos = [agacha, sube,
-          conCaida({ dur: 740, balon: t => { const [x,y] = vuelo(desde(), atras, arco(desde(), atras))(t); return [x,y,1,1]; }, giro: -.55,
-            al: t => { if (t>=1) golpeAro(); } }),
-          { dur: 380, balon: t => { const [x,y] = vuelo(atras, delante, 24)(t); return [x,y,1,1]; }, giro: .4,
-            al: t => { if (t>=1) golpeAro(); } },
-          { dur: 560, balon: t => { const [x,y] = vuelo(delante, [delante[0]-62, g.suelo], 18)(t); return [x,y,1,1]; }, giro: .6 }];
-        ev = { aro: T0 + .74 + .38, toques: [T0 + .74, T0 + .74 + .38] };
-        const xf = delante[0]-62;
+        tramos = [agacha, sube, vuela(atrasP, { al: t => { if (t>=1) golpeAro(); } }),
+          { dur: 380, balon: t => { const [x,y] = vuelo(atrasP, delanteP, 24)(t); return [x,y,1,1]; }, giro: .4, al: t => { if (t>=1) golpeAro(); } },
+          { dur: 560, balon: t => { const [x,y] = vuelo(delanteP, [delanteP[0]-62, g.suelo], 18)(t); return [x,y,1,1]; }, giro: .6 }];
+        ev = { aro: t1 + .38, toques: [t1, t1 + .38] };
+        const xf = delanteP[0]-62;
         tramos.push({ dur: 300, balon: t => { const [x,y] = vuelo([xf, g.suelo], [xf-22, g.suelo], 18)(t); return [x,y,1,1]; }, giro: .5 });
+      } else {
+        // 4) baila en el aro: atrás, delante, atrás… ¡y se sale por fuera!
+        tramos = [agacha, sube, vuela(atrasP, { al: t => { if (t>=1) golpeAro(); } }),
+          { dur: 340, balon: t => { const [x,y] = vuelo(atrasP, delanteP, 22)(t); return [x,y,1,1]; }, giro: .4, al: t => { if (t>=1) golpeAro(); } },
+          { dur: 300, balon: t => { const [x,y] = vuelo(delanteP, atrasP, 14)(t); return [x,y,1,1]; }, giro: -.3, al: t => { if (t>=1) golpeAro(); } },
+          { dur: 520, balon: t => { const [x,y] = vuelo(atrasP, [atrasP[0] + 26, g.suelo], 16)(t); return [x,y,1,1]; }, giro: .5 },
+          { dur: 300, balon: t => { const [x,y] = vuelo([atrasP[0] + 26, g.suelo], [atrasP[0] - 4, g.suelo], 14)(t); return [x,y,1,1]; }, giro: -.4 }];
+        ev = { aro: t1 + .34 + .30, toques: [t1, t1 + .34, t1 + .64] };
       }
       poseTimer = setTimeout(()=>{ jugador.reaccion(false); bocadillo(false); }, (ev.aro + .15)*1000);
     }
@@ -2258,6 +2289,7 @@
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['3.30', ['🏀 Tiros más reales: arco más alto y distinto cada vez, con rotación hacia atrás', '💨 «¡Chof!» cuando entra limpio y la red se estira', '🤞 A veces el balón baila en el aro antes de entrar… o de salirse', '✋ Gabi deja la muñeca arriba mientras vuela el balón']],
     ['3.29', ['💥 Mate sin zoom ni cámara lenta']],
     ['3.28', ['🧍 Más cosas mientras espera: pasa el balón por la cintura, te anima, se limpia las zapatillas y, si tardas mucho, se sienta en el balón']],
     ['3.27', ['🎬 Mate de película: la cámara se acerca, cámara lenta arriba del todo y golpe metálico del aro', '🏃 Carrera que acelera antes de saltar', '🌑 La sombra se hace pequeña al saltar']],
