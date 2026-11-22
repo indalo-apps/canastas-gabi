@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="app-version" content="3.26">
+<meta name="app-version" content="3.27">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Canastas Gabi">
@@ -415,6 +415,11 @@
   .ajuste{margin:12px 0}
   .ajuste > b{display:block;margin-bottom:6px;color:var(--azul)}
   .ajuste .chips{margin-top:0}
+  #camara{position:absolute;inset:0;transition:transform .45s cubic-bezier(.3,.7,.3,1)}
+  #camara::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:20;opacity:0;transition:opacity .25s;
+    box-shadow:inset 0 0 60px 22px rgba(0,0,0,.55)}
+  .cancha.lenta #camara::after{opacity:1}
+  .cancha.lenta #camara{filter:saturate(1.25) contrast(1.06)}
   /* Reloj de posesión: barra que se acorta, debajo del marcador */
   .posesion{display:flex;align-items:center;gap:8px;background:#0b1226;border-radius:12px;padding:5px 10px;margin:-2px 0 8px;box-shadow:inset 0 0 0 2px #1d2a4d}
   .posesion[hidden]{display:none}
@@ -1620,7 +1625,9 @@
       sv.querySelector('#spr').setAttribute('transform', `translate(${x},${y}) scale(${e.k})`);
       const sm = sv.querySelector('#spr-sombra');
       sm.setAttribute('cx', e.x + 130*e.k); sm.setAttribute('cy', e.piso - 2); sm.setAttribute('ry', 5);
-      sm.setAttribute('rx', 80*e.k*(1 - Math.min(.5, -dy/160)));
+      const sv2 = 1 - Math.min(.65, Math.max(0, -dy)/(SPR.suelo*1.3));
+      sm.setAttribute('rx', 80*e.k*sv2); sm.setAttribute('opacity', (.45 + .55*sv2).toFixed(2));
+      sm.setAttribute('cx', e.x + (130 + offX)*e.k);
       if (visible !== fot){ const nv = sv.querySelector('#fr'+fot); if (!nv) return;
         const vj = visible && sv.querySelector('#fr'+visible); if (vj) vj.style.display = 'none'; nv.style.display = ''; visible = fot; }
       // balón girando en la punta del dedo
@@ -1710,21 +1717,31 @@
         if (t < T0){ fot = 'r00'; }                                                           // lanza el balón al tablero
         else if (t < T.corre && mt.tipo === 'tablero'){ const q = (t - T0)/(T.corre - T0); posX = lerp(mt.x0, mt.x1, q);
           fot = 'r01'; dy = -7*Math.abs(Math.sin((t - T0)/95)); }                            // corre mirando el balón
-        else if (t < T.corre){ const q = (t - T0)/(T.corre - T0); posX = lerp(mt.x0, mt.x1, q);
-          fot = q > .8 ? 'p00' : 'g1' + (Math.floor(t/100) % 4);
-          if (fot === 'g12' && Math.floor(t/100) !== ciclos){ ciclos = Math.floor(t/100); sBote(.9); } }
+        else if (t < T.corre){ const q = (t - T0)/(T.corre - T0), qe = q*q*(1.6 - .6*q);        // arranca despacio y acelera
+          posX = lerp(mt.x0, mt.x1, qe);
+          const paso = Math.floor(qe*Math.max(6, (T.corre - T0)/80));
+          fot = q > .82 ? 'p00' : 'g1' + (paso % 4);
+          if (fot === 'g12' && paso !== ciclos){ ciclos = paso; sBote(.9); } }
         else if (t < T.coge){ posX = mt.x1; fot = t < T.corre + 115 ? 'p01' : 'p02'; }       // recoge el balón: dos pasos y se agacha
         else if (t < T.bate){ fot = 'p03'; dy = mt.alto*.06*((t - T.coge)/(T.bate - T.coge)); }  // batida
-        else if (t < T.slam){ const q = (t - T.bate)/(T.slam - T.bate); dy = mt.alto*(.06 + .94*(1 - Math.pow(1-q, 2)));
-          fot = mt.ok ? SUBE[Math.min(4, Math.floor(q*5))] : (q < .6 ? SUBE[Math.min(2, Math.floor(q*5))] : 'm30'); }
+        else if (t < T.alto){ const q = (t - T.bate)/(T.alto - T.bate); dy = mt.alto*(.06 + .86*(1 - Math.pow(1-q, 2)));
+          fot = SUBE[Math.min(2, Math.floor(q*3))];
+          if (!mt.zoom){ mt.zoom = true; acercar(true); } }
+        else if (t < T.slam){ const q = (t - T.alto)/(T.slam - T.alto);                     // flota arriba, a cámara lenta
+          dy = mt.alto*(.92 + .08*Math.sin(q*Math.PI/2));
+          fot = mt.ok ? (q < .55 ? SUBE[3] : SUBE[4]) : (q < .5 ? SUBE[3] : 'm30');
+          $('#cancha').classList.toggle('lenta', q < .92 && !menosMov()); }
         else if (mt.ok && t < T.suelta){                                                     // machaca y se cuelga del aro
+          if (mt.zoom && !mt.lentaFin){ mt.lentaFin = true; $('#cancha').classList.remove('lenta'); }
           dy = mt.alto + doblez/k; const th = t - T.slam;
           fot = th < 90 ? TIPO.slam : th < 180 ? (mt.columpio ? 'r20' : TIPO.agarra) : CUELGA[Math.floor((th - 180)/(mt.columpio ? 200 : 160)) % CUELGA.length];
           if (fot === 'q03') offY -= Math.sin(th/120)*3; }
         else if (mt.ok){ const q = Math.min(1, (t - T.suelta)/300);                         // se suelta y cae
+          if (mt.zoom){ mt.zoom = false; acercar(false); }
           const fin = mt.heroe ? 'r12' : 'p33';
           dy = mt.alto*(1 - q*q); fot = q < 1 ? 'p32' : fin; if (q >= 1 && prev !== fin) polvo(); }
         else { const th = t - T.slam;                                                         // mate fallido
+          $('#cancha').classList.remove('lenta'); if (mt.zoom && th > 150){ mt.zoom = false; acercar(false); }
           if (th < 160){ dy = mt.alto; fot = 'm30'; }
           else { const q = Math.min(1, (th - 160)/380); dy = mt.alto*(1 - q*q); fot = q < 1 ? 'm31' : 'm32'; if (q >= 1 && prev !== 'm32') polvo(); } }
         // mientras está agarrado, el puño se queda clavado en el aro
@@ -1757,7 +1774,7 @@
     return {
       iniciar(){ cancelAnimationFrame(id); id = requestAnimationFrame(frame); },
       botar(){ if (modo === 'rebote' && rb && rb.fase === 'coge') return;
-        accion = null; bolaDedo = null; fuego = false; mareo = false; cometa = false; mirando = 'der'; $('#cancha').classList.remove('mate-delante');
+        accion = null; bolaDedo = null; fuego = false; mareo = false; cometa = false; mirando = 'der'; $('#cancha').classList.remove('mate-delante', 'lenta'); acercar(false);
         modo = 'botar'; t0 = performance.now(); conBalonEnDibujo(true); posX = Math.min(posX, limiteX()); destino = posX; },
       tirar(){ flashesPublico(); accion = null; bolaDedo = null; modo = 'tiro'; t0 = performance.now(); destino = posX; conBalonEnDibujo(true); },
       soltar(){ conBalonEnDibujo(false); dy = -10; const [bx,by] = SPR.bola; return aCancha([bx, by]); },
@@ -1780,11 +1797,11 @@
         let alto = (g.aroY - 3 - e.piso)/k - (my - SPR.suelo);                 // desplazamiento vertical (negativo = arriba)
         alto = Math.max(alto, (8 - e.piso)/k + SPR.suelo - 40);                 // sin salirse por arriba
         const corre = Math.max(350, Math.min(900, Math.abs(x1 - posX)/0.33));
-        const t = { corre }; t.coge = corre + 230; t.bate = t.coge + 130; t.slam = t.bate + 320; t.suelta = t.slam + 900;
+        const t = { corre }; t.coge = corre + 230; t.bate = t.coge + 130; t.alto = t.bate + 330; t.slam = t.alto + (menosMov() ? 120 : 620); t.suelta = t.slam + 900;
         const tipos = ['normal','dos','molino','giro','tablero'];
         const qs = location.search;
         mt = { ok, x0: posX, x1, alto, t, fzT, columpio: columpio || /columpio/.test(qs), heroe: ok && (/heroe/.test(qs) || (!/sinheroe/.test(qs) && Math.random() < .5)), tipo: ok ? ((location.search.match(/mate=(\w+)/)||[])[1] || tipos[Math.floor(Math.random()*tipos.length)]) : 'normal' };
-        if (mt.tipo === 'tablero'){ const L = 320; for (const kk of ['corre','coge','bate','slam','suelta']) t[kk] += L; t.lanza = L; }
+        if (mt.tipo === 'tablero'){ const L = 320; for (const kk of ['corre','coge','bate','alto','slam','suelta']) t[kk] += L; t.lanza = L; }
         modo = 'mate'; t0 = performance.now(); destino = x1;
         const tierra2 = ok ? t.suelta + 300 : t.slam + 540;
         const plan = { slam: t.slam, suelta: t.suelta, tierra: tierra2, mano: [xMano, g.aroY - 3], tipo: mt.tipo };
@@ -1834,7 +1851,7 @@
     const c = $('#cancha'); if (!c || menosMov()) return;
     const im = document.createElement('img'); im.className = 'fx-spr';
     im.style.width = im.style.height = tam+'px'; im.style.left = (x - tam/2)+'px'; im.style.top = (suelo ? y - tam*0.86 : y - tam/2)+'px';
-    c.appendChild(im); let i = 0;
+    (document.getElementById('camara') || c).appendChild(im); let i = 0;
     const pref = typeof fila === 'string' ? fila : 'x' + fila;
     const paso = () => { if (i > 3){ im.remove(); return; } im.src = FOT(pref+i); i++; setTimeout(paso, dur/4); };
     paso();
@@ -2019,6 +2036,27 @@
     return ev;
   }
 
+  // ---------- Cámara (acercar en el mate) ----------
+  function camara(){
+    let cam = document.getElementById('camara'); if (cam) return cam;
+    const c = $('#cancha'); cam = document.createElement('div'); cam.id = 'camara';
+    while (c.firstChild) cam.appendChild(c.firstChild);
+    c.appendChild(cam); return cam;
+  }
+  function acercar(on){
+    const cam = camara(), g = geo();
+    if (menosMov()) on = false;
+    cam.style.transformOrigin = `${g.aroCx}px ${g.aroY}px`;
+    cam.style.transform = on ? 'scale(1.22)' : '';
+  }
+  // golpe metálico del aro en el mate + rugido del público
+  function sMate(cuando){
+    if (!sonido) return;
+    [523, 784, 1046, 1318].forEach((f, i) => tono(f, .55 - i*.08, cuando, 'triangle', .07 - i*.012));
+    tono(68, .3, cuando, 'sine', .22); tono(140, .12, cuando, 'square', .05);
+    if (AJ.publico !== 'no') reproducir('aplauso', cuando + .05, 1);
+  }
+
   // ---------- Mate ----------
   // El aro se dobla mientras Gabi está colgado, rebota al soltarse y el tablero tiembla
   const DOBLEZ = [3, 8, 14, -3];                        // cuánto baja el aro delantero en cada fotograma (px del dibujo)
@@ -2074,7 +2112,7 @@
       ev = { aro: slam, toques: [slam] };
     }
     delete balon.dataset.mate;
-    if (ok) aroMate(plan.slam + 60, plan.suelta);
+    if (ok){ aroMate(plan.slam + 60, plan.suelta); sMate(slam); }
     poseTimer = setTimeout(()=>{ jugador.reaccion(ok); bocadillo(ok); }, plan.tierra);
     animar(tramos);
     return ev;
@@ -2213,6 +2251,7 @@
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['3.27', ['🎬 Mate de película: la cámara se acerca, cámara lenta arriba del todo y golpe metálico del aro', '🏃 Carrera que acelera antes de saltar', '🌑 La sombra se hace pequeña al saltar']],
     ['3.26', ['➜ El botón «Siguiente» sale en el sitio de Tirar y Mate']],
     ['3.25', ['🏀 Canasta más alta: en el mate Gabi se cuelga del aro con su tamaño de siempre']],
     ['3.24', ['🧹 Fuera los cañones de confeti']],
