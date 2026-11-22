@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="app-version" content="3.19">
+<meta name="app-version" content="3.20">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Canastas Gabi">
@@ -439,6 +439,7 @@
   .cancha.sprite-balon #balon, .cancha.sprite-balon #sombra{visibility:hidden}
   #aro-atras,#aro-delante,#red{display:none !important}
   .aro-spr{position:absolute;pointer-events:none} #aro-fondo{z-index:1} #aro-frente{z-index:6}
+  .cancha.mate-delante .silueta{z-index:7}
   .ent-spr{position:absolute;z-index:2;pointer-events:none;filter:brightness(.92)}
   #fuego{position:absolute;z-index:5;pointer-events:none}
   #cometa{position:absolute;z-index:3;pointer-events:none;opacity:.9} #mareo{position:absolute;z-index:8;pointer-events:none}
@@ -1319,7 +1320,7 @@
     const piso = H - 14;                       // línea del suelo
     const suelo = piso - R;                    // centro del balón apoyado en el suelo
     // la canasta dibujada: el tablero (125 px de alto por cada 106 de aro) tiene que caber por arriba
-    const aroW = Math.round(Math.max(34, Math.min(50, H*0.29))), aroDcha = W - 46, aroY = Math.max(Math.round(H*0.36), Math.round((aroW + 6)*125/106) + 6);
+    const aroW = Math.round(Math.max(34, Math.min(50, H*0.29))), aroDcha = W - Math.round((aroW + 6)*125/134) + 3, aroY = Math.max(Math.round(H*0.36), Math.round((aroW + 6)*155/134) + 4);
     return { W, H, piso, suelo, aroW, aroDcha, aroIzq: aroDcha-aroW, aroCx: aroDcha-aroW/2, aroY };
   }
   function colocarCanasta(){
@@ -1672,21 +1673,21 @@
     return {
       iniciar(){ cancelAnimationFrame(id); id = requestAnimationFrame(frame); },
       botar(){ if (modo === 'rebote' && rb && rb.fase === 'coge') return;
-        accion = null; bolaDedo = null; fuego = false; mareo = false; cometa = false; mirando = 'der';
+        accion = null; bolaDedo = null; fuego = false; mareo = false; cometa = false; mirando = 'der'; $('#cancha').classList.remove('mate-delante');
         modo = 'botar'; t0 = performance.now(); conBalonEnDibujo(true); posX = Math.min(posX, limiteX()); destino = posX; },
       tirar(){ flashesPublico(); accion = null; bolaDedo = null; modo = 'tiro'; t0 = performance.now(); destino = posX; conBalonEnDibujo(true); },
       soltar(){ conBalonEnDibujo(false); dy = -10; const [bx,by] = SPR.bola; return aCancha([bx, by]); },
-      reaccion(ok){ modo = 'reaccion'; t0 = performance.now(); if (!ok) vallaAviso(elige(['¡UYYY!','¡CASI!','¡OTRA VEZ!']), 1400);
+      reaccion(ok){ $('#cancha').classList.remove('mate-delante'); modo = 'reaccion'; t0 = performance.now(); if (!ok) vallaAviso(elige(['¡UYYY!','¡CASI!','¡OTRA VEZ!']), 1400);
         sec = ok ? (celebraEspecial ? CELEBRA_TRIPLE : CELEBRA) : LAMENTOS[Math.floor(Math.random()*LAMENTOS.length)];
         tReac = ok ? 1800 : 1500; entrenador(ok ? 'bien' : 'mal'); },
       piensa(){ if (modo === 'botar') hacer([['a20',1000],['a21',800]]); },
       susto(){ hacer([['a22',450],['a23',1000]]); },
       // Prepara el mate: dónde tiene que estar para llegar al aro y cuándo pasa cada cosa (en ms)
       mate(ok){
-        accion = null; bolaDedo = null; conBalonEnDibujo(true);
+        accion = null; bolaDedo = null; conBalonEnDibujo(true); $('#cancha').classList.add('mate-delante');
         const g = geo(), e = escala(), k = e.k, [mx, my] = MATE.mano;
         casa = posX;
-        const xMano = g.aroIzq + g.aroW*0.3;                                   // agarra la parte delantera del aro
+        const xMano = g.aroIzq + 2;                                   // agarra la parte delantera del aro
         const x1 = xMano - 4 - hueco() - k*(mx - SPR.ejeX + 130);
         let alto = (g.aroY - 3 - e.piso)/k - (my - SPR.suelo);                 // desplazamiento vertical (negativo = arriba)
         alto = Math.max(alto, (8 - e.piso)/k + SPR.suelo - 40);                 // sin salirse por arriba
@@ -1705,7 +1706,7 @@
   })();
 
   // ===== Canasta dibujada (capa de atrás y capa de delante con la red) =====
-  const ARO = { celda: 362, izq: 68, dch: 174, cy: 143 };
+  const ARO = { celda: 313, izq: 54, dch: 188, cy: 160 };
   function colocarAroSpr(){
     const g = geo(), s = (g.aroW + 6)/(ARO.dch - ARO.izq), w = ARO.celda*s;
     for (const id of ['aro-fondo','aro-frente']){ const e = $('#'+id); e.style.width = w+'px'; e.style.height = w+'px';
@@ -1916,7 +1917,7 @@
 
   // ---------- Mate ----------
   // El aro se dobla mientras Gabi está colgado, rebota al soltarse y el tablero tiembla
-  const DOBLEZ = [3, 13, 25, -6];                        // cuánto baja el aro delantero en cada fotograma (px del dibujo)
+  const DOBLEZ = [3, 8, 14, -3];                        // cuánto baja el aro delantero en cada fotograma (px del dibujo)
   function aroMate(desde, hasta){
     const g = geo(), s = (g.aroW + 6)/(ARO.dch - ARO.izq), fondo = $('#aro-fondo'), frente = $('#aro-frente');
     const pon = (atras, delante, d) => { fondo.src = FOT(atras); frente.src = FOT(delante); doblez = d*s; };
@@ -2095,6 +2096,7 @@
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['3.20', ['🏀 Canasta nueva, más grande y sin poste', '💥 En el mate Gabi se cuelga del aro por delante y se le ve bien la cara']],
     ['3.19', ['💥 ¡Nuevo botón de MATE! Gabi corre, salta, machaca y se cuelga del aro', '🏀 El aro se dobla y el tablero tiembla con el mate']],
     ['3.18', ['📸 Cuando Gabi va a tirar, saltan flashes de cámaras en la grada']],
     ['3.17', ['💥 Explosión en la red en los triples y las rachas', '☄️ En los triples, el balón vuela con cola de cometa', '💫 Si falla, el balón se marea con estrellitas', '💨 Humo cuando se apaga una racha en llamas', '📺 La valla de publicidad ya se mueve también en el iPad y el iPhone']],
