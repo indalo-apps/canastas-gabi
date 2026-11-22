@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="app-version" content="3.21">
+<meta name="app-version" content="3.22">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Canastas Gabi">
@@ -442,6 +442,8 @@
   .cancha.mate-delante .silueta{z-index:7}
   .ent-spr{position:absolute;z-index:2;pointer-events:none;filter:brightness(.92)}
   #fuego{position:absolute;z-index:5;pointer-events:none}
+  .canon{position:absolute;z-index:2;pointer-events:none;bottom:-2px;left:-6px} .canon.der{left:auto;right:-6px;transform:scaleX(-1)}
+  .cancha.vacia .canon{display:none}
   #cometa{position:absolute;z-index:3;pointer-events:none;opacity:.9} #mareo{position:absolute;z-index:8;pointer-events:none}
   .fx-spr{position:absolute;z-index:7;pointer-events:none;opacity:.92}
   .vibra-spr{animation:vibraSpr .35s}
@@ -522,7 +524,7 @@
         <img src="sprites/bal0.webp" alt="" style="width:100%;height:100%;display:block">
       </div>
       <div class="red" id="red"></div>
-      <div class="aro-delante" id="aro-delante"></div><img class="aro-spr" id="aro-frente" src="sprites/red0.webp" alt=""><img id="fuego" alt="" style="display:none"><img id="cometa" alt="" style="display:none"><img id="mareo" alt="" style="display:none">
+      <div class="aro-delante" id="aro-delante"></div><img class="aro-spr" id="aro-frente" src="sprites/red0.webp" alt=""><img id="fuego" alt="" style="display:none"><img class="canon" id="canon-izq" src="sprites/s10.webp" alt=""><img class="canon der" id="canon-der" src="sprites/s10.webp" alt=""><img id="cometa" alt="" style="display:none"><img id="mareo" alt="" style="display:none">
       <svg class="frente" id="frente" aria-hidden="true"></svg>
     </div>
 
@@ -878,6 +880,19 @@
     salidaPabellon();
   }
   // Un segundo de «salida al pabellón»: apagón, focos uno a uno, público y marcador que se enciende
+  // Cañones de confeti a los lados de la pista: disparan en los mates y al batir el récord
+  function colocarCanones(){
+    const g = geo(), w = Math.round(Math.min(110, g.H*0.42));
+    document.querySelectorAll('.canon').forEach(c => { c.style.width = c.style.height = w + 'px'; });
+    $('#cancha').classList.toggle('vacia', !!(J && J.modo === 'entreno'));
+  }
+  function dispararCanones(){
+    colocarCanones();
+    document.querySelectorAll('.canon').forEach((c, i) => {
+      [['s11', 0], ['s12', 90], ['s13', 340], ['s10', 900]].forEach(([f, t]) => setTimeout(() => c.src = FOT(f), t + i*120));
+    });
+    if (sonido) { tono(140, .12, 0, 'square', .07); tono(110, .14, .12, 'square', .06); }
+  }
   // Flashes de cámaras en la grada cuando Gabi va a tirar: en sitios y momentos al azar
   function flashesPublico(){
     const f = document.getElementById('pabellon'); if (!f || menosMov() || !J) return;
@@ -925,6 +940,7 @@
   }, 7000);
   function salidaPabellon(){
     const c = $('#cancha'), m = $('#marcador'), lleno = J.modo!=='entreno';
+    if (J.n === 0) jugador.entrada();
     setTimeout(() => vallaAviso(J.modo==='partido' ? '¡EMPIEZA EL PARTIDO!' : J.modo==='reto' ? '¡QUE EMPIECE EL RETO!' : '¡A ENTRENAR!', 2200), 700);
     if (lleno) aplauso(.55, .8);
     if (menosMov()) return;
@@ -1187,7 +1203,7 @@
   };
 
   // ---------- Comprobar ----------
-  let tipoTiro = 'tiro';
+  let tipoTiro = 'tiro', columpio = false, rachaActual = 0;
   $('#btn-comprobar').onclick = () => { sClic(); tipoTiro = 'tiro'; comprobar(); };
   $('#btn-mate').onclick = () => { sClic(); tipoTiro = 'mate'; comprobar(); };
   // Las casillas vacías parpadean para que se vea cuál falta
@@ -1227,6 +1243,7 @@
       J.aciertos++;
       if (!esRival){ if (intentos===1 && !usoPista) J.primeras++; logroCanasta(jugador.racha, triple); }
       const esMate = tipoTiro === 'mate';
+      columpio = esMate && jugador.racha >= 5; rachaActual = jugador.racha;
       celebraEspecial = esMate || triple || jugador.racha===5 || jugador.racha===10; fuego = !esMate && jugador.racha >= 5; cometa = !esMate && triple && !fuego; prevBalon = null;
       const ev = tipoTiro === 'mate' ? lanzarMate(true) : lanzar(true);
       const rapido = intentos===1 && !usoPista && (performance.now() - tInicio) < (op.horiz ? 4000 : 7000);
@@ -1254,6 +1271,7 @@
       if (!esRival) J.fallos++;
       celebraEspecial = false; fuego = false;
       cometa = false;
+      columpio = false; rachaActual = 0;
       const ev = tipoTiro === 'mate' ? lanzarMate(false) : lanzar(false); sMal(ev.aro, ev.toques);
       setTimeout(() => { mareo = true; if (rachaAntes >= 5) efecto('y3', ultBalon[0], ultBalon[1] - 6, 90, 600); }, ev.aro*1000);
       enVuelo = true; mensaje(elige(['¿Entrará? 🤞','¡Allá va! 🏀','¡Tira…! 🤞']), '');
@@ -1328,7 +1346,7 @@
     for (const id of ['aro-atras','aro-delante']){ const e=$('#'+id); e.style.left=g.aroIzq+'px'; e.style.top=(g.aroY-6)+'px'; }
     const r=$('#red'); r.style.left=(g.aroIzq+2)+'px'; r.style.top=(g.aroY)+'px';
     $('#silueta').setAttribute('viewBox', `0 0 ${g.W} ${g.H}`);
-    pintarPabellon(); colocarAroSpr();
+    pintarPabellon(); colocarAroSpr(); colocarCanones();
   }
 
   // ===== Pabellón: grada con público, focos, vallas, parqué con líneas y canasta profesional =====
@@ -1512,8 +1530,8 @@
   //           c = cambio de mano y entre piernas · d = balón en el dedo · t = giro y carrera a la izquierda
   const SPR = { celda: 313, suelo: 298, ejeX: 160, cabeza: [195, 75], bola: [254.5, 33.5], recoge: [245, 265], dedo: {"d03": [232, 73], "d10": [230, 74], "d11": [226, 69], "d12": [234, 63], "d13": [234, 65]} };
   const FOT = n => 'sprites/' + n + '.webp';
-  const TODOS = ["f00", "f01", "f02", "f03", "f30", "f31", "f32", "f33", "g00", "g01", "g02", "g03", "g10", "g11", "g12", "g13", "g20", "g21", "g22", "g23", "g30", "g31", "g32", "g33", "a00", "a01", "a02", "a03", "a12", "a13", "a20", "a21", "a22", "a23", "a30", "a31", "a32", "b00", "b01", "b02", "b03", "b10", "b11", "b12", "b13", "b20", "b21", "b22", "b23", "b30", "b31", "b32", "b33", "c00", "c01", "c02", "c03", "c10", "c11", "c12", "c13", "d00", "d01", "d02", "d03", "d10", "d11", "d12", "d13", "d20", "d21", "d22", "d23", "t00", "t01", "t02", "t03", "t10", "t11", "t12", "t13", "t20", "t21", "t22", "t23", "m00","m01","m02","m03","m10","m11","m12","m13","m20","m21","m22","m23","m30","m31","m32", "p00", "p01", "p02", "p03", "p10", "p11", "p12", "p13", "p20", "p21", "p22", "p23", "p30", "p31", "p32", "p33", "q00", "q01", "q02", "q03", "q10", "q11", "q12", "q13", "q20", "q21", "q22", "q23", "q30", "q31", "q32", "q33"];
-  ['k00','k01','k02','k03','k10','k11','k12','k13','k20','k21','k22','k23','y00','y01','y02','y03','y10','y11','y12','y13','y20','y21','y22','y23','y30','y31','y32','y33','bal0','bal1','bal2','bal3','red1','red2','red3','red4','x00','x01','x02','x03','x10','x11','x12','x13','x20','x21','x22','x23','x30','x31','x32','x33','e00','e01','e02','e03','e10','e11','e12','e13']
+  const TODOS = ["f00", "f01", "f02", "f03", "f30", "f31", "f32", "f33", "g00", "g01", "g02", "g03", "g10", "g11", "g12", "g13", "g20", "g21", "g22", "g23", "g30", "g31", "g32", "g33", "a00", "a01", "a02", "a03", "a12", "a13", "a20", "a21", "a22", "a23", "a30", "a31", "a32", "b00", "b01", "b02", "b03", "b10", "b11", "b12", "b13", "b20", "b21", "b22", "b23", "b30", "b31", "b32", "b33", "c00", "c01", "c02", "c03", "c10", "c11", "c12", "c13", "d00", "d01", "d02", "d03", "d10", "d11", "d12", "d13", "d20", "d21", "d22", "d23", "t00", "t01", "t02", "t03", "t10", "t11", "t12", "t13", "t20", "t21", "t22", "t23", "m00","m01","m02","m03","m10","m11","m12","m13","m20","m21","m22","m23","m30","m31","m32", "p00", "p01", "p02", "p03", "p10", "p11", "p12", "p13", "p20", "p21", "p22", "p23", "p30", "p31", "p32", "p33", "q00", "q01", "q02", "q03", "q10", "q11", "q12", "q13", "q20", "q21", "q22", "q23", "q30", "q31", "q32", "q33", "r00", "r01", "r02", "r03", "r10", "r11", "r12", "r13", "r20", "r21", "r22", "r23", "r30", "r31", "r32", "r33", "s00","s01","s02","s03"];
+  ['s10','s11','s12','s13','k00','k01','k02','k03','k10','k11','k12','k13','k20','k21','k22','k23','y00','y01','y02','y03','y10','y11','y12','y13','y20','y21','y22','y23','y30','y31','y32','y33','bal0','bal1','bal2','bal3','red1','red2','red3','red4','x00','x01','x02','x03','x10','x11','x12','x13','x20','x21','x22','x23','x30','x31','x32','x33','e00','e01','e02','e03','e10','e11','e12','e13']
     .forEach(n => { const im = new Image(); im.src = FOT(n); });
   const SALTOS = new Set(['f31','f32','a01','a02','b30','b31','b32','f22']);
   let ultBalon = [0,0], celebraEspecial = false, fuego = false, cometa = false, mareo = false, prevBalon = null;
@@ -1532,14 +1550,17 @@
   // Mate: fotogramas provisionales hasta tener los dibujos del mate (mano = punto que agarra el aro)
   // Mate: m = hoja del mate (mano = puño que agarra el aro, en coordenadas del recuadro normal)
   // p = hoja del mate fluido. puno = dónde queda el puño que agarra el aro en cada fotograma (para que no se despegue)
-  const MATE = { mano: [229, 12], puno: { p22:[230,13], p23:[226,12], p30:[228,12], p31:[229,12], p32:[230,7], q03:[204,25] } };
+  const MATE = { mano: [229, 12], puno: { p22:[230,13], p23:[226,12], p30:[228,12], p31:[229,12], p32:[230,7], q03:[204,25], r20:[217,18], r21:[220,18], r22:[217,18], r23:[224,18] } };
   const CELEBRA_MATE = [['q30',480],['q31',420],['q30',300],['q32',460],['q33',99999]];
+  const CELEBRA_HEROE = [['r12',380],['r13',650],['q32',460],['q33',99999]];             // aterrizaje de superhéroe
+  const FALLO_MATE = [['r10',900],['r11',1100],['g03',99999]];                          // mira arriba y se tapa la cara
+  const SALTITO = [['r30',220],['r31',260],['r30',200],['r31',260],['r30',200],['f33',99999]];  // dos seguidas
   let offX = 0, offY = 0;
   let doblez = 0;          // cuánto baja el aro (px) mientras Gabi está colgado
   const jugador = (() => {
     let modo = 'botar', t0 = performance.now(), last = performance.now(), id = 0, fot = 'b00', dy = 0, prev = 'b00';
     let posX = 0, destino = 0, ciclos = -1, sec = null, tReac = 0, rb = null, accion = null, tAcc = 0, mirando = 'der';
-    let ultimaActividad = performance.now(), bolaDedo = null, ultDecision = -1, mt = null, casa = null;
+    let ultimaActividad = performance.now(), bolaDedo = null, ultDecision = -1, mt = null, casa = null, entradaX = null;
     const hueco = () => (J && J.modo === 'entreno') ? 62 : 0;      // sitio para el entrenador en la banda
     let fz = 1;                                                     // tamaño relativo (en el mate se aleja un poco hacia la canasta)
     const escala = () => { const g = geo(); return { k: Math.min(.38, (g.H - 14)*0.62/SPR.suelo)*fz, x: 4 + hueco() + posX, piso: g.piso }; };
@@ -1551,7 +1572,7 @@
     function pintar(now){
       const sv = $('#silueta');
       if (!montado || !sv.querySelector('#spr')){
-        sv.innerHTML = '<ellipse id="spr-sombra" fill="rgba(27,36,64,.18)"/><g id="spr">' + TODOS.map(n => `<image id="fr${n}" href="${FOT(n)}" width="${SPR.celda}" height="${'mpq'.includes(n[0]) ? SPR.celda + 50 : SPR.celda}" y="${'mpq'.includes(n[0]) ? -50 : 0}" style="display:none"/>`).join('')
+        sv.innerHTML = '<ellipse id="spr-sombra" fill="rgba(27,36,64,.18)"/><g id="spr">' + TODOS.map(n => `<image id="fr${n}" href="${FOT(n)}" width="${SPR.celda}" height="${'mpqrs'.includes(n[0]) ? SPR.celda + 50 : SPR.celda}" y="${'mpqrs'.includes(n[0]) ? -50 : 0}" style="display:none"/>`).join('')
           + ['0','1','2','3'].map(i => `<image id="bd${i}" href="${FOT('bal'+i)}" width="62" height="62" style="display:none"/>`).join('') + '</g>';
         montado = true; visible = null;
       }
@@ -1597,6 +1618,7 @@
       else if (r < .32) hacer([['c10',100],['c11',100],['c12',100],['c13',110],['c00',90]]);           // entre las piernas
       else if (r < .38) hacer([['f00',240],['f01',240],['f02',240],['f03',240]]);                    // «triple amenaza»
       else if (r < .42) truco();
+      else if (r < .46) hacer([['r32',1700],['r33',1400]]);                                  // se ata la zapatilla
     }
     function truco(){
       hacer([['d00',220],['d01',220],['d02',200],['d10',300],['d11',300],['d12',300],['d10',300],['d11',300],['d12',300],['d13',520],['d20',200],['d21',220],['d22',240],['d23',200]]);
@@ -1610,6 +1632,7 @@
       if (modo !== 'mate' && fz !== 1){ fz += (1 - fz)*Math.min(1, dt/220); if (Math.abs(1 - fz) < .004) fz = 1; }
       if (accion){                                       // una jugada corta en curso (giro, cambio de mano, truco…)
         const ta = now - tAcc; fot = porPasos(accion.pasos, ta);
+        if (entradaX){ const q = Math.min(1, (now - entradaX.t)/1120); posX = lerp(entradaX.desde, entradaX.hasta, q); if (fot[0] !== 's') entradaX = null; }
         if (fot === 'a22') dy = -12;
         if (ta >= durPasos(accion.pasos)){ const f = accion.fin; accion = null; t0 = now; f && f(); }
         pintar(now); return;
@@ -1639,10 +1662,16 @@
         const TIPO = { normal: { sube: ['p10','p11','p12','p13','p20'], slam: 'p21', agarra: 'p22', cuelga: ['p23','p30','p23','p31'] },
                        dos:    { sube: ['p10','p11','q00','q01','q02'], slam: 'q03', agarra: 'q03', cuelga: ['q03'] },
                        molino: { sube: ['p10','q10','q11','q12','q13'], slam: 'p22', agarra: 'p22', cuelga: ['p23','p30','p23','p31'] },
-                       giro:   { sube: ['q20','q21','q22','q20','q23'], slam: 'p21', agarra: 'p22', cuelga: ['p23','p30','p23','p31'] } }[mt.tipo];
+                       giro:   { sube: ['q20','q21','q22','q20','q23'], slam: 'p21', agarra: 'p22', cuelga: ['p23','p30','p23','p31'] },
+                       tablero:{ sube: ['p03','r01','r02','r02','r03'], slam: 'p21', agarra: 'p22', cuelga: ['p23','p30','p23','p31'] } }[mt.tipo];
+        const CUELGA = mt.columpio && mt.tipo !== 'dos' ? ['r20','r21','r22','r23'] : TIPO.cuelga;
         const SUBE = TIPO.sube;
         fz = lerp(1, mt.fzT, Math.min(1, t/T.coge));
-        if (t < T.corre){ const q = t/T.corre; posX = lerp(mt.x0, mt.x1, q);
+        const T0 = T.lanza || 0;
+        if (t < T0){ fot = 'r00'; }                                                           // lanza el balón al tablero
+        else if (t < T.corre && mt.tipo === 'tablero'){ const q = (t - T0)/(T.corre - T0); posX = lerp(mt.x0, mt.x1, q);
+          fot = 'r01'; dy = -7*Math.abs(Math.sin((t - T0)/95)); }                            // corre mirando el balón
+        else if (t < T.corre){ const q = (t - T0)/(T.corre - T0); posX = lerp(mt.x0, mt.x1, q);
           fot = q > .8 ? 'p00' : 'g1' + (Math.floor(t/100) % 4);
           if (fot === 'g12' && Math.floor(t/100) !== ciclos){ ciclos = Math.floor(t/100); sBote(.9); } }
         else if (t < T.coge){ posX = mt.x1; fot = t < T.corre + 115 ? 'p01' : 'p02'; }       // recoge el balón: dos pasos y se agacha
@@ -1651,10 +1680,11 @@
           fot = mt.ok ? SUBE[Math.min(4, Math.floor(q*5))] : (q < .6 ? SUBE[Math.min(2, Math.floor(q*5))] : 'm30'); }
         else if (mt.ok && t < T.suelta){                                                     // machaca y se cuelga del aro
           dy = mt.alto + doblez/k; const th = t - T.slam;
-          fot = th < 90 ? TIPO.slam : th < 180 ? TIPO.agarra : TIPO.cuelga[Math.floor((th - 180)/160) % TIPO.cuelga.length];
+          fot = th < 90 ? TIPO.slam : th < 180 ? (mt.columpio ? 'r20' : TIPO.agarra) : CUELGA[Math.floor((th - 180)/(mt.columpio ? 200 : 160)) % CUELGA.length];
           if (fot === 'q03') offY -= Math.sin(th/120)*3; }
         else if (mt.ok){ const q = Math.min(1, (t - T.suelta)/300);                         // se suelta y cae
-          dy = mt.alto*(1 - q*q); fot = q < .25 ? 'p32' : q < 1 ? 'p32' : 'p33'; if (q >= 1 && prev !== 'p33') polvo(); }
+          const fin = mt.heroe ? 'r12' : 'p33';
+          dy = mt.alto*(1 - q*q); fot = q < 1 ? 'p32' : fin; if (q >= 1 && prev !== fin) polvo(); }
         else { const th = t - T.slam;                                                         // mate fallido
           if (th < 160){ dy = mt.alto; fot = 'm30'; }
           else { const q = Math.min(1, (th - 160)/380); dy = mt.alto*(1 - q*q); fot = q < 1 ? 'm31' : 'm32'; if (q >= 1 && prev !== 'm32') polvo(); } }
@@ -1693,7 +1723,8 @@
       tirar(){ flashesPublico(); accion = null; bolaDedo = null; modo = 'tiro'; t0 = performance.now(); destino = posX; conBalonEnDibujo(true); },
       soltar(){ conBalonEnDibujo(false); dy = -10; const [bx,by] = SPR.bola; return aCancha([bx, by]); },
       reaccion(ok){ $('#cancha').classList.remove('mate-delante'); const eraMate = modo === 'mate'; modo = 'reaccion'; t0 = performance.now(); if (!ok) vallaAviso(elige(['¡UYYY!','¡CASI!','¡OTRA VEZ!']), 1400);
-        sec = ok ? (eraMate ? CELEBRA_MATE : celebraEspecial ? CELEBRA_TRIPLE : CELEBRA) : LAMENTOS[Math.floor(Math.random()*LAMENTOS.length)];
+        sec = ok ? (eraMate ? (mt && mt.heroe ? CELEBRA_HEROE : CELEBRA_MATE) : celebraEspecial ? CELEBRA_TRIPLE : rachaActual === 2 ? SALTITO : CELEBRA)
+                 : (eraMate ? FALLO_MATE : LAMENTOS[Math.floor(Math.random()*LAMENTOS.length)]);
         tReac = ok ? 1800 : 1500; entrenador(ok ? 'bien' : 'mal'); },
       piensa(){ if (modo === 'botar') hacer([['a20',1000],['a21',800]]); },
       susto(){ hacer([['a22',450],['a23',1000]]); },
@@ -1711,13 +1742,28 @@
         alto = Math.max(alto, (8 - e.piso)/k + SPR.suelo - 40);                 // sin salirse por arriba
         const corre = Math.max(350, Math.min(900, Math.abs(x1 - posX)/0.33));
         const t = { corre }; t.coge = corre + 230; t.bate = t.coge + 130; t.slam = t.bate + 320; t.suelta = t.slam + 900;
-        const tipos = ['normal','dos','molino','giro'];
-        mt = { ok, x0: posX, x1, alto, t, fzT, tipo: ok ? ((location.search.match(/mate=(\w+)/)||[])[1] || tipos[Math.floor(Math.random()*tipos.length)]) : 'normal' };
+        const tipos = ['normal','dos','molino','giro','tablero'];
+        const qs = location.search;
+        mt = { ok, x0: posX, x1, alto, t, fzT, columpio: columpio || /columpio/.test(qs), heroe: ok && (/heroe/.test(qs) || (!/sinheroe/.test(qs) && Math.random() < .5)), tipo: ok ? ((location.search.match(/mate=(\w+)/)||[])[1] || tipos[Math.floor(Math.random()*tipos.length)]) : 'normal' };
+        if (mt.tipo === 'tablero'){ const L = 320; for (const kk of ['corre','coge','bate','slam','suelta']) t[kk] += L; t.lanza = L; }
         modo = 'mate'; t0 = performance.now(); destino = x1;
-        const tierra = ok ? t.suelta + 300 : t.slam + 540;
-        return { slam: t.slam, suelta: t.suelta, tierra, mano: [xMano, g.aroY - 3] };
+        const tierra2 = ok ? t.suelta + 300 : t.slam + 540;
+        const plan = { slam: t.slam, suelta: t.suelta, tierra: tierra2, mano: [xMano, g.aroY - 3], tipo: mt.tipo };
+        if (mt.tipo === 'tablero'){            // lanza el balón al tablero y lo caza en el aire
+          plan.lanza = t.lanza; plan.caza = t.bate + (t.slam - t.bate)*.45;
+          plan.desde = [e0.x + k0*(258 - SPR.ejeX + 130), e0.piso + k0*(-14 - SPR.suelo)];
+        }
+        return plan;
       },
       soltarMate(){ conBalonEnDibujo(false); },
+      conBalon(on){ conBalonEnDibujo(on); },
+      // entra corriendo desde la izquierda con el balón bajo el brazo y saluda al público
+      entrada(){ if (menosMov()) return; accion = null; modo = 'botar'; const x0 = posX;
+        posX = -150; destino = posX; conBalonEnDibujo(true);
+        const pasos = []; for (let i = 0; i < 8; i++) pasos.push([i % 2 ? 's01' : 's00', 140]);
+        pasos.push(['s02', 650], ['s03', 800]);
+        hacer(pasos, () => { posX = x0; destino = x0; t0 = performance.now(); });
+        entradaX = { desde: -150, hasta: x0, t: performance.now() }; },
       posBalon(){ return aCancha(SPR.bola); },
       cabeza(){ return aCancha(SPR.cabeza); },
       escala,
@@ -1951,12 +1997,24 @@
     const slam = plan.slam/1000, [hx, hy] = plan.mano;
     flashesPublico();
     let tramos, ev;
-    const espera = { dur: plan.slam, balon: () => null };
+    let espera = { dur: plan.slam, balon: () => null };
+    if (plan.tipo === 'tablero'){
+      const sc = (g.aroW + 6)/134, tab = [g.aroIzq + 64*sc, g.aroY - 62*sc], caza = [hx - 8, hy - 16];
+      const d1 = (plan.caza - plan.lanza)*.55, d2 = (plan.caza - plan.lanza)*.45;
+      espera = [{ dur: plan.lanza, balon: () => null },
+        { dur: d1, balon: t => { const [x,y] = vuelo(plan.desde, tab, 60)(t); return [x,y,1,1]; }, giro: .6,
+          al: t => { if (!balon.dataset.lanza){ balon.dataset.lanza = 1; jugador.conBalon(false); }
+                     if (t >= 1 && !balon.dataset.tab){ balon.dataset.tab = 1; sBote(.8); aroGolpe(); } } },
+        { dur: d2, balon: t => { const [x,y] = vuelo(tab, caza, 14)(t); return [x,y,1,1]; }, giro: -.5,
+          al: t => { if (t >= 1) jugador.conBalon(true); } },
+        { dur: plan.slam - plan.caza, balon: () => null }];
+    }
+    delete balon.dataset.lanza; delete balon.dataset.tab;
     if (ok){
       balon.style.zIndex = 4;
-      tramos = [espera,
+      tramos = [...[].concat(espera),
         { dur: 150, balon: t => { const [x,y] = caida([hx + 4, hy - R], [g.aroCx, g.aroY + 26])(t); return [x,y,1,1]; }, giro: -.4,
-          al: t => { if (!balon.dataset.mate){ balon.dataset.mate = 1; jugador.soltarMate(); redMueve(true); vallaAviso('¡¡MATE!!', 2400); } } },
+          al: t => { if (!balon.dataset.mate){ balon.dataset.mate = 1; jugador.soltarMate(); redMueve(true); vallaAviso('¡¡MATE!!', 2400); dispararCanones(); } } },
         { dur: 230, balon: t => { const [x,y] = caida([g.aroCx, g.aroY + 26], [g.aroCx - 2, g.suelo])(t); return [x,y,1,1]; }, giro: -.3 }];
       const x0 = g.aroCx - 2;
       tramos.push(
@@ -1969,7 +2027,7 @@
     } else {
       balon.style.zIndex = 7;
       const golpe = [g.aroIzq + 6, g.aroY - R];
-      tramos = [espera,
+      tramos = [...[].concat(espera),
         { dur: 700, balon: t => { const [x,y] = vuelo(golpe, [golpe[0] - 110, g.suelo], 70)(t); return [x,y,1,1]; }, giro: .7,
           al: t => { if (!balon.dataset.mate){ balon.dataset.mate = 1; jugador.soltarMate(); aroGolpe(); } } },
         { dur: 360, balon: t => { const [x,y] = vuelo([golpe[0]-110, g.suelo], [golpe[0]-140, g.suelo], 22)(t); return [x,y,1,1]; }, giro: .5 },
@@ -1991,6 +2049,7 @@
       const est = J.puntos>=18 ? 3 : J.puntos>=12 ? 2 : 1;
       const clave = J.clave; const prev = store.get(clave)||0;
       const record = J.puntos>prev; if (record) store.set(clave, J.puntos);
+      if (record) dispararCanones();
       h = `<img class="final-spr" src="sprites/${record ? 'a30' : est>=2 ? 'a31' : 'a32'}.webp" alt=""><h2>¡Fin del partido!</h2>
         <div class="estrellas">${'⭐'.repeat(est)}${'☆'.repeat(3-est)}</div>
         <div class="grande">${J.puntos}</div><p>puntos · ${J.aciertos} de 10 canastas</p>
@@ -2115,6 +2174,7 @@
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['3.22', ['⛹️ Gabi entra corriendo y saluda al público al empezar', '🎯 Nuevo mate: lanza el balón al tablero y lo machaca en el aire', '🎢 En las rachas se columpia en el aro', '🦸 A veces aterriza como un superhéroe', '🎉 Cañones de confeti en los mates', '👟 Mientras espera, a veces se ata la zapatilla']],
     ['3.21', ['💥 Mates mucho más fluidos: dos pasos, salto, machaque y balanceo en el aro', '🌪️ Cuatro mates al azar: normal, a dos manos, molino y 360°', '💪 Celebración especial después de cada mate']],
     ['3.20', ['🏀 Canasta nueva, más grande y sin poste', '💥 En el mate Gabi se cuelga del aro por delante y se le ve bien la cara']],
     ['3.19', ['💥 ¡Nuevo botón de MATE! Gabi corre, salta, machaca y se cuelga del aro', '🏀 El aro se dobla y el tablero tiembla con el mate']],
