@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="app-version" content="3.25">
+<meta name="app-version" content="3.26">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Canastas Gabi">
@@ -429,9 +429,13 @@
   .reloj-tab{position:absolute;z-index:6;background:#05070d;border:2px solid #39424f;border-radius:5px;padding:2px 5px;pointer-events:none;
     font-family:Orbitron,monospace;font-weight:900;color:#ff3b30;text-shadow:0 0 6px rgba(255,59,48,.8);line-height:1}
   /* Tirar o machacar: dos botones, uno al lado del otro */
-  #acciones{display:grid !important;grid-template-columns:1fr 1fr;gap:10px}
+  #acciones{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   #acciones .btn{margin:0;width:100%;padding-left:6px;padding-right:6px;white-space:nowrap}
   #btn-mate{background:#7c3aed !important;box-shadow:0 6px 0 #4c1d95 !important}
+  #acciones-sig .btn{margin:0;width:100%}
+  #acciones-sig{margin-top:12px}
+  #acciones-sig{animation:sigEntra .25s ease-out}
+  @keyframes sigEntra{from{transform:scale(.9);opacity:0}to{transform:none;opacity:1}}
   .resp.falta{animation:falta .45s ease-in-out 3;border-color:var(--naranja) !important}
   @keyframes falta{0%,100%{transform:scale(1);background:#fff}50%{transform:scale(1.12);background:#ffe1c4}}
   .resp.act{box-shadow:0 0 0 4px rgba(244,123,32,.35)}
@@ -552,7 +556,7 @@
         <button class="btn verde" id="btn-comprobar">🏀 ¡Tirar!</button>
         <button class="btn" id="btn-mate">💥 ¡Mate!</button>
       </div>
-      <div id="acciones-sig" style="display:none;margin-top:12px">
+      <div id="acciones-sig" style="display:none">
         <button class="btn" id="btn-siguiente">Siguiente ➜</button>
       </div>
     </div>
@@ -2209,6 +2213,7 @@
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['3.26', ['➜ El botón «Siguiente» sale en el sitio de Tirar y Mate']],
     ['3.25', ['🏀 Canasta más alta: en el mate Gabi se cuelga del aro con su tamaño de siempre']],
     ['3.24', ['🧹 Fuera los cañones de confeti']],
     ['3.23', ['⏱️ El reloj de posesión va en su propia barra, que se acorta y cambia de verde a rojo']],
