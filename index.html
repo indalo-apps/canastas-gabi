@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="app-version" content="3.24">
+<meta name="app-version" content="3.25">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Canastas Gabi">
@@ -1363,7 +1363,11 @@
     const piso = H - 14;                       // línea del suelo
     const suelo = piso - R;                    // centro del balón apoyado en el suelo
     // la canasta dibujada: el tablero (125 px de alto por cada 106 de aro) tiene que caber por arriba
-    const aroW = Math.round(Math.max(34, Math.min(50, H*0.29))), aroDcha = W - Math.round((aroW + 6)*125/134) + 3, aroY = Math.max(Math.round(H*0.36), Math.round((aroW + 6)*155/134) + 4);
+    const aroW = Math.round(Math.max(34, Math.min(50, H*0.29))), aroDcha = W - Math.round((aroW + 6)*125/134) + 3;
+    // el aro, lo bastante alto para que Gabi cuelgue de él con los pies en el aire (286 = del puño a los pies en el dibujo);
+    // si no cabe el tablero entero, su parte de arriba queda fuera del encuadre, como en la tele
+    const kJ = Math.min(.38, (H - 14)*0.62/298);
+    const aroY = Math.max(36, Math.min(Math.max(Math.round(H*0.36), Math.round((aroW + 6)*155/134) + 4), Math.round(piso - 286*kJ - 18)));
     return { W, H, piso, suelo, aroW, aroDcha, aroIzq: aroDcha-aroW, aroCx: aroDcha-aroW/2, aroY };
   }
   function colocarCanasta(){
@@ -1764,7 +1768,7 @@
         accion = null; bolaDedo = null; conBalonEnDibujo(true); $('#cancha').classList.add('mate-delante');
         fz = 1; const g = geo(), e0 = escala(), k0 = e0.k, [mx, my] = MATE.mano;
         // que colgado del aro no le lleguen los pies al suelo: 286 = del puño a los pies en el dibujo
-        const fzT = Math.max(.62, Math.min(1, ((e0.piso - g.aroY) - 16)/(286*k0)));
+        const fzT = 1;
         const e = { piso: e0.piso }, k = k0*fzT;
         casa = posX;
         const xMano = g.aroIzq + 2;                                   // agarra la parte delantera del aro
@@ -2205,6 +2209,7 @@
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['3.25', ['🏀 Canasta más alta: en el mate Gabi se cuelga del aro con su tamaño de siempre']],
     ['3.24', ['🧹 Fuera los cañones de confeti']],
     ['3.23', ['⏱️ El reloj de posesión va en su propia barra, que se acorta y cambia de verde a rojo']],
     ['3.22', ['⛹️ Gabi entra corriendo y saluda al público al empezar', '🎯 Nuevo mate: lanza el balón al tablero y lo machaca en el aire', '🎢 En las rachas se columpia en el aro', '🦸 A veces aterriza como un superhéroe', '🎉 Cañones de confeti en los mates', '👟 Mientras espera, a veces se ata la zapatilla']],
