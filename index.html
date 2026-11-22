@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="app-version" content="3.23">
+<meta name="app-version" content="3.24">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Canastas Gabi">
@@ -538,7 +538,7 @@
         <img src="sprites/bal0.webp" alt="" style="width:100%;height:100%;display:block">
       </div>
       <div class="red" id="red"></div>
-      <div class="aro-delante" id="aro-delante"></div><img class="aro-spr" id="aro-frente" src="sprites/red0.webp" alt=""><img id="fuego" alt="" style="display:none"><div class="reloj-tab" id="reloj-tab" hidden>24</div><img class="canon" id="canon-izq" src="sprites/s10.webp" alt=""><img class="canon der" id="canon-der" src="sprites/s10.webp" alt=""><img id="cometa" alt="" style="display:none"><img id="mareo" alt="" style="display:none">
+      <div class="aro-delante" id="aro-delante"></div><img class="aro-spr" id="aro-frente" src="sprites/red0.webp" alt=""><img id="fuego" alt="" style="display:none"><div class="reloj-tab" id="reloj-tab" hidden>24</div><img id="cometa" alt="" style="display:none"><img id="mareo" alt="" style="display:none">
       <svg class="frente" id="frente" aria-hidden="true"></svg>
     </div>
 
@@ -901,6 +901,7 @@
     $('#cancha').classList.toggle('vacia', !!(J && J.modo === 'entreno'));
   }
   function dispararCanones(){
+    return;                                   // cañones quitados
     colocarCanones();
     document.querySelectorAll('.canon').forEach((c, i) => {
       [['s11', 0], ['s12', 90], ['s13', 340], ['s10', 900]].forEach(([f, t]) => setTimeout(() => c.src = FOT(f), t + i*120));
@@ -2204,6 +2205,7 @@
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['3.24', ['🧹 Fuera los cañones de confeti']],
     ['3.23', ['⏱️ El reloj de posesión va en su propia barra, que se acorta y cambia de verde a rojo']],
     ['3.22', ['⛹️ Gabi entra corriendo y saluda al público al empezar', '🎯 Nuevo mate: lanza el balón al tablero y lo machaca en el aire', '🎢 En las rachas se columpia en el aro', '🦸 A veces aterriza como un superhéroe', '🎉 Cañones de confeti en los mates', '👟 Mientras espera, a veces se ata la zapatilla']],
     ['3.21', ['💥 Mates mucho más fluidos: dos pasos, salto, machaque y balanceo en el aro', '🌪️ Cuatro mates al azar: normal, a dos manos, molino y 360°', '💪 Celebración especial después de cada mate']],
