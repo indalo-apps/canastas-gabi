@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="app-version" content="3.31">
+<meta name="app-version" content="3.32">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Canastas Gabi">
@@ -1176,7 +1176,10 @@
   }
   // Tiro rápido: el balón sale de las manos de Gabi y entra sin parar el juego
   function tiroRapido(enLlamas){
-    const g = geo(), balon = $('#balon'), [x0, y0] = jugador.posBalon(), dest = [g.aroCx, g.aroY - R - 3];
+    const g = geo(), balon = $('#balon'), suelta = jugador.lanzaRapido(), dest = [g.aroCx, g.aroY - R - 3];
+    clearTimeout(tiroRapido.t);
+    tiroRapido.t = setTimeout(() => {
+    const [x0, y0] = jugador.puntoTiro();
     jugador.conBalon(false); balon.style.zIndex = 4; fuego = enLlamas;
     const alto = Math.max(14, (y0 + dest[1])/2 - (R + 5));
     animar([
@@ -1184,7 +1187,8 @@
       { dur: 240, balon: t => { const [x,y] = caida(dest, [g.aroCx - 2, g.suelo])(t); return [x,y,1,1]; }, giro: -.2,
         al: t => { if (!balon.dataset.rp){ balon.dataset.rp = 1; const fr = $('#aro-frente'); ['red1','red3','red4','red0'].forEach((f,i) => setTimeout(() => fr.src = FOT(f), i*70)); } } },
       { dur: 10, balon: () => null, al: () => { delete balon.dataset.rp; fuego = false; jugador.conBalon(true); } }]);
-    sSwish(.5); if (sonido){ tono(880, .1, .52, 'triangle', .08); }
+    }, suelta);
+    sSwish(.5 + suelta/1000); if (sonido){ tono(880, .1, .52, 'triangle', .08); }
     if (enLlamas && !menosMov()) reaccionPublico(true, .5);
   }
   function rapidoFin(){
@@ -1944,6 +1948,11 @@
         return plan;
       },
       soltarMate(){ conBalonEnDibujo(false); },
+      // tiro rápido (contrarreloj): sube el balón, lo suelta y deja la muñeca arriba; devuelve cuándo sale el balón
+      lanzaRapido(){ if (modo !== 'botar') { modo = 'botar'; t0 = performance.now(); }
+        bolaDedo = null; conBalonEnDibujo(true); destino = posX;
+        hacer([['b22',70],['b23',80],['b31',110],['b32',300],['b33',110]]); return 150; },
+      puntoTiro(){ return aCancha(SPR.bola); },
       conBalon(on){ conBalonEnDibujo(on); },
       // entra corriendo desde la izquierda con el balón bajo el brazo y saluda al público
       entrada(){ if (menosMov()) return; accion = null; modo = 'botar'; const x0 = posX;
@@ -2407,6 +2416,7 @@
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['3.32', ['🏀 En el Contrarreloj, Gabi tira de verdad cada canasta']],
     ['3.31', ['⚡ Nuevo modo Contrarreloj: ¿cuántas cuentas de cálculo mental aciertas en 1 minuto?']],
     ['3.30', ['🏀 Tiros más reales: arco más alto y distinto cada vez, con rotación hacia atrás', '💨 «¡Chof!» cuando entra limpio y la red se estira', '🤞 A veces el balón baila en el aro antes de entrar… o de salirse', '✋ Gabi deja la muñeca arriba mientras vuela el balón']],
     ['3.29', ['💥 Mate sin zoom ni cámara lenta']],
