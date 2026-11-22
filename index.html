@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="app-version" content="3.28">
+<meta name="app-version" content="3.29">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Canastas Gabi">
@@ -1737,7 +1737,7 @@
         else if (t < T.slam){ const q = (t - T.alto)/(T.slam - T.alto);                     // flota arriba, a cámara lenta
           dy = mt.alto*(.92 + .08*Math.sin(q*Math.PI/2));
           fot = mt.ok ? (q < .55 ? SUBE[3] : SUBE[4]) : (q < .5 ? SUBE[3] : 'm30');
-          $('#cancha').classList.toggle('lenta', q < .92 && !menosMov()); }
+          }
         else if (mt.ok && t < T.suelta){                                                     // machaca y se cuelga del aro
           if (mt.zoom && !mt.lentaFin){ mt.lentaFin = true; $('#cancha').classList.remove('lenta'); }
           dy = mt.alto + doblez/k; const th = t - T.slam;
@@ -1804,7 +1804,7 @@
         let alto = (g.aroY - 3 - e.piso)/k - (my - SPR.suelo);                 // desplazamiento vertical (negativo = arriba)
         alto = Math.max(alto, (8 - e.piso)/k + SPR.suelo - 40);                 // sin salirse por arriba
         const corre = Math.max(350, Math.min(900, Math.abs(x1 - posX)/0.33));
-        const t = { corre }; t.coge = corre + 230; t.bate = t.coge + 130; t.alto = t.bate + 330; t.slam = t.alto + (menosMov() ? 120 : 620); t.suelta = t.slam + 900;
+        const t = { corre }; t.coge = corre + 230; t.bate = t.coge + 130; t.alto = t.bate + 330; t.slam = t.alto + (menosMov() ? 120 : 280); t.suelta = t.slam + 900;
         const tipos = ['normal','dos','molino','giro','tablero'];
         const qs = location.search;
         mt = { ok, x0: posX, x1, alto, t, fzT, columpio: columpio || /columpio/.test(qs), heroe: ok && (/heroe/.test(qs) || (!/sinheroe/.test(qs) && Math.random() < .5)), tipo: ok ? ((location.search.match(/mate=(\w+)/)||[])[1] || tipos[Math.floor(Math.random()*tipos.length)]) : 'normal' };
@@ -2051,8 +2051,8 @@
     c.appendChild(cam); return cam;
   }
   function acercar(on){
+    on = false;                                        // zoom quitado
     const cam = camara(), g = geo();
-    if (menosMov()) on = false;
     cam.style.transformOrigin = `${g.aroCx}px ${g.aroY}px`;
     cam.style.transform = on ? 'scale(1.22)' : '';
   }
@@ -2258,6 +2258,7 @@
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['3.29', ['💥 Mate sin zoom ni cámara lenta']],
     ['3.28', ['🧍 Más cosas mientras espera: pasa el balón por la cintura, te anima, se limpia las zapatillas y, si tardas mucho, se sienta en el balón']],
     ['3.27', ['🎬 Mate de película: la cámara se acerca, cámara lenta arriba del todo y golpe metálico del aro', '🏃 Carrera que acelera antes de saltar', '🌑 La sombra se hace pequeña al saltar']],
     ['3.26', ['➜ El botón «Siguiente» sale en el sitio de Tirar y Mate']],
