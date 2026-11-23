@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<meta name="app-version" content="3.35">
+<meta name="app-version" content="3.35.1">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -618,6 +618,7 @@ const IK = (function(){
   function instalada(){ try { return matchMedia("(display-mode: standalone)").matches || navigator.standalone === true; } catch(e){ return false; } }
   const SHARE = '<svg class="ik-ic" viewBox="0 0 24 24"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M6 11H5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-1"/></svg>';
   const DOTS = '<svg class="ik-ic" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>';
+  const MENU3='<svg class="ik-ic" viewBox="0 0 24 24"><path d="M5 7h14M5 12h14M5 17h10"/></svg>';
   const HDOTS = '<svg class="ik-ic" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>';
   const PLUS = '<svg class="ik-ic" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M12 8v8M8 12h8"/></svg>';
 
@@ -643,7 +644,7 @@ const IK = (function(){
           <li>Elige <b>«Añadir a pantalla de inicio»</b> ${PLUS}. Si no está, toca <b>«Más»</b> o baja en la lista.</li>${fin}</ol>`;
       if (maj >= 26)
         return ver + `<ol class="ik-steps">
-          <li>Toca el botón <b>···</b> ${HDOTS} que está a la derecha de la barra de la dirección${IS_IPAD ? " (arriba)" : " (abajo)"}.</li>
+          <li>${maj>=27&&!IS_IPAD?`Toca el botón ${MENU3} de tres rayas que está a la izquierda, dentro de la barra de la dirección (abajo).`:`Toca el botón ${HDOTS} que está a la derecha de la barra de la dirección${IS_IPAD ? " (arriba)" : " (abajo)"}.`}</li>
           <li>Toca <b>«Compartir»</b> ${SHARE}.</li>
           <li>Toca <b>«Ver más»</b> si hace falta, baja en la lista y elige <b>«Añadir a pantalla de inicio»</b> ${PLUS}.</li>${fin}</ol>`;
       return ver + `<ol class="ik-steps">
@@ -2810,7 +2811,8 @@ const IK = (function(){
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
-    ['3.35', ['🔄 En Ajustes, botón «Buscar actualizaciones»', '📲 Ayuda para instalarlo con los pasos de tu iPad o móvil, y aviso amarillo en el menú', '🖼️ Iconos para todos los tamaños e imagen al compartir el enlace']],
+    ['3.35.1',['📲 Ayuda para instalar al día con iOS 27: el botón de tres rayas dentro de la barra de la dirección']],
+  ['3.35', ['🔄 En Ajustes, botón «Buscar actualizaciones»', '📲 Ayuda para instalarlo con los pasos de tu iPad o móvil, y aviso amarillo en el menú', '🖼️ Iconos para todos los tamaños e imagen al compartir el enlace']],
     ['3.34', ['🎯 Las cuentas que fallas salen más a menudo hasta que te las sabes', '📊 Nuevo «Mi progreso»: la tabla de multiplicar se va poniendo verde', '🃏 Nuevo juego de Tarjetas: ¿te la sabías o no?', '🧩 Nuevo juego «Completa la tabla», con pistas', '📲 En Ajustes: cómo instalarla en el iPad, copiar el enlace y «Acerca de»', '🏀 El botón «¡A jugar!» está siempre a mano, debajo de «¿Cómo jugamos?»', '👆 Tocar dos veces seguidas ya no acerca la pantalla']],
     ['3.33', ['🔇 El botón de sonido ya corta todos los sonidos al momento']],
     ['3.32', ['🏀 En el Contrarreloj, Gabi tira de verdad cada canasta']],
