@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="app-version" content="3.37">
+<meta name="app-version" content="3.38">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -558,6 +558,29 @@
   .modo-ico .signo{width:28px;height:28px;margin:0;filter:none}
   .modo-txt{display:flex;flex-direction:column;line-height:1.15}
   .modo-txt b{font-size:1.15rem}
+  /* 3.38: la pantalla de inicio cabe entera; «¡A jugar!» va al final de los pasos, sin flotar */
+  #inicio .led{padding:8px 10px;margin-bottom:8px}
+  #inicio .led .led-sub{margin-top:2px;font-size:.82rem;padding:0 42px}
+  #inicio .led-fila{margin-top:6px;gap:8px}
+  #inicio .led-caja{display:flex;align-items:center;justify-content:center;gap:8px;padding:2px 8px}
+  #inicio .led-etq{margin:0}
+  #inicio .led-num{font-size:1.25rem;margin:0}
+  #inicio .tarjeta{padding:10px 12px;margin-bottom:8px}
+  #inicio .tarjeta h2{margin:0 0 8px;font-size:1.1rem}
+  #niveles .opt{min-height:64px}
+  #inicio #eleccion-cifras,#inicio #eleccion-tablas{margin-top:6px;padding-top:6px}
+  #modos{grid-template-columns:1fr 1fr !important}
+  #modos .opt.modo{flex-direction:column;justify-content:center;text-align:center;gap:2px;padding:8px 6px;min-height:84px}
+  #modos .modo-ico{width:34px;height:34px}
+  #modos .modo-ico .signo{width:22px;height:22px}
+  #modos .modo-txt{align-items:center}
+  #modos .modo-txt small{font-size:.72rem;line-height:1.15}
+  #inicio .barra-jugar{position:static;margin:4px 0 4px}
+  #inicio #btn-jugar{padding-top:8px;padding-bottom:8px}
+  #inicio .mas-tarjeta{background:none;box-shadow:none;border:0;padding:0;margin:4px 0 6px}
+  .mas-tarjeta .mas{display:flex;align-items:center;justify-content:center;gap:6px;border-radius:22px;min-height:44px;padding:6px 8px;font-size:.88rem}
+  .mas-tarjeta .mas .signo{width:20px;height:20px;margin:0;flex-shrink:0}
+  .mas-tarjeta .mas small{display:none}
   .modo-txt small{margin-top:2px}
   /* 5: lo elegido, siempre con el aro amarillo */
   #inicio .chip.sel{background:#fff;color:var(--azul);border-color:#fff;box-shadow:0 3px 0 #c9cfdb,0 0 0 4px var(--amarillo);transform:translateY(-2px)}
@@ -829,12 +852,12 @@ const IK = (function(){
     <div class="barra-jugar"><button class="btn" id="btn-jugar"><span class="bj-txt">¡A jugar! 🏀</span><small id="bj-resumen"></small></button></div>
     <p class="centrado" id="record-txt" style="margin:8px 0 12px"></p>
 
-    <div class="tarjeta">
-      <h2>3. Más para practicar las tablas</h2>
+    <div class="tarjeta mas-tarjeta">
+      <h2 class="sr-only">Más para practicar las tablas</h2>
       <div class="mas-juegos">
         <button class="mas" id="btn-tarjetas" style="--c:#0d74aa;--o:#0a5983"><svg class="signo" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="11" height="15" rx="2" fill="none" stroke="#fff" stroke-width="2.1"/><path d="M8 3.5h9.5a2 2 0 0 1 2 2V18" fill="none" stroke="#fff" stroke-width="2.1" stroke-linecap="round"/><path d="M6.5 13.5h4M8.5 11.5v4" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg><b>Tarjetas</b><small>Repaso rápido</small></button>
-        <button class="mas" id="btn-completa" style="--c:#6b48f5;--o:#4a2bc4"><svg class="signo" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2.5"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></g><rect x="15" y="9" width="6" height="6" fill="#ffd23f"/></svg><b>Completa la tabla</b><small>Rellena lo que falta</small></button>
-        <button class="mas" id="btn-progreso" style="--c:#22814b;--o:#195f37"><svg class="signo" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><rect x="5" y="12" width="3.4" height="6" rx="1" fill="#fff"/><rect x="10.3" y="8" width="3.4" height="10" rx="1" fill="#fff"/><rect x="15.6" y="4" width="3.4" height="14" rx="1" fill="#ffd23f"/></svg><b>Mi progreso</b><small>Lo que ya sabes</small></button>
+        <button class="mas" id="btn-completa" style="--c:#6b48f5;--o:#4a2bc4"><svg class="signo" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2.5"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></g><rect x="15" y="9" width="6" height="6" fill="#ffd23f"/></svg><b>Completar</b><small>Rellena lo que falta</small></button>
+        <button class="mas" id="btn-progreso" style="--c:#22814b;--o:#195f37"><svg class="signo" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><rect x="5" y="12" width="3.4" height="6" rx="1" fill="#fff"/><rect x="10.3" y="8" width="3.4" height="10" rx="1" fill="#fff"/><rect x="15.6" y="4" width="3.4" height="14" rx="1" fill="#ffd23f"/></svg><b>Progreso</b><small>Lo que ya sabes</small></button>
       </div>
     </div>
 
@@ -2897,6 +2920,7 @@ const IK = (function(){
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['3.38',['📱 Pantalla de inicio en una sola vista: los modos en cuadrícula y «¡A jugar!» al final, sin tapar nada', '🃏 Tarjetas, Completar y Progreso en botones más pequeños']],
     ['3.37',['⛹️ ¡Ahora Gabi juega con sus compañeros! Les saluda, les anima por su nombre y les invita a su equipo', '🏆 Récord de Gabi: ¿quién lo supera?', '🏀 Vuelve el icono del balón con la G']],
     ['3.36',['✍️ Cada jugador escribe su nombre al empezar y el público lo grita en cada canasta', '⚙️ El nombre se puede cambiar en Ajustes', '🏀 Icono nuevo: un balón con +, − y ×', '👀 Colores de los botones más fuertes para que se lean mejor']],
     ['3.35.1',['📲 Ayuda para instalar al día con iOS 27: el botón de tres rayas dentro de la barra de la dirección']],
