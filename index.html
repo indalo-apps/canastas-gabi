@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="app-version" content="3.36">
+<meta name="app-version" content="3.37">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Canastas">
+<meta name="apple-mobile-web-app-title" content="Canastas Gabi">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -15,10 +15,10 @@
 <link rel="apple-touch-icon" sizes="152x152" href="icon-152.png">
 <link rel="apple-touch-icon" sizes="167x167" href="icon-167.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-<title>Canastas: sumas y restas con llevadas</title>
+<title>Canastas de Gabi: sumas y restas con llevadas</title>
 <meta name="description" content="Juego de baloncesto para practicar sumas y restas con llevadas y las tablas de multiplicar (2º de primaria).">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Canastas: sumas, restas y tablas jugando al baloncesto">
+<meta property="og:title" content="Canastas de Gabi">
 <meta property="og:description" content="Juego de baloncesto para practicar sumas y restas con llevadas y las tablas de multiplicar (2º de primaria).">
 <meta property="og:url" content="https://indalo-apps.github.io/canastas-gabi/">
 <meta property="og:image" content="https://indalo-apps.github.io/canastas-gabi/og.png">
@@ -29,7 +29,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
 <style>
   :root{
-    --naranja:#bd570a; --naranja-osc:#c95d0c; --azul:#1d3557; --azul2:#274b7a;
+    --naranja:#b5520a; --naranja-osc:#c95d0c; --azul:#1d3557; --azul2:#274b7a;
     --madera:#e9c48f; --madera2:#d9a865; --verde:#22814b; --rojo:#d63030;
     --crema:#fff8ee; --tinta:#1d2433; --amarillo:#ffd23f; --ik-accent:#e06a10;
   }
@@ -91,8 +91,8 @@
     box-shadow:0 8px 0 var(--o),0 0 0 4px var(--amarillo)}
   .opt[data-nivel]:not(.sel),.opt[data-modo]:not(.sel){filter:saturate(.75) brightness(.97)}
   .opt[data-nivel=suma]{--c:#22814b;--o:#195f37} .opt[data-nivel=resta]{--c:#2c6ccb;--o:#21549a}
-  .opt[data-nivel=tablas]{--c:#6b48f5;--o:#4a2bc4} .opt[data-nivel=mezcla]{--c:#bd570a;--o:#883f07}
-  .opt[data-modo=partido]{--c:#bd570a;--o:#883f07} .opt[data-modo=entreno]{--c:#107f7f;--o:#0c5d5d}
+  .opt[data-nivel=tablas]{--c:#6b48f5;--o:#4a2bc4} .opt[data-nivel=mezcla]{--c:#b5520a;--o:#883f07}
+  .opt[data-modo=partido]{--c:#b5520a;--o:#883f07} .opt[data-modo=entreno]{--c:#107f7f;--o:#0c5d5d}
   .opt[data-modo=reto]{--c:#d63030;--o:#a41c1c}
   .opt[data-modo=rapido]{--c:#7c3aed;--o:#4c1d95}
 
@@ -316,6 +316,12 @@
   .aj-nombre .campo-nombre{margin:0;font-size:1.1rem;min-height:44px;padding:8px 10px}
   .aj-nombre .chip{flex-shrink:0}
   #dlg-nombre .tarjeta{text-align:center}
+  .dice-gabi{position:relative;background:#fff;border:2px solid #1d3557;border-radius:16px;padding:10px 12px;margin:8px 0 4px!important;font-weight:600;color:#1d3557}
+  .dice-gabi::before{content:"";position:absolute;top:-10px;left:50%;margin-left:-9px;border:9px solid transparent;border-top:0;border-bottom:10px solid #1d3557}
+  /* En el partido, los mensajes los dice Gabi: bocadillo con su cara (solo para los compañeros de Gabi) */
+  .con-gabi .mensaje:not(:empty){display:flex;align-items:center;gap:8px;text-align:left;background:#fff;border:2px solid #1d3557;border-radius:14px;
+    padding:4px 10px 4px 4px;margin:4px auto 2px;max-width:100%;width:fit-content}
+  .con-gabi .mensaje:not(:empty)::before{content:"";flex:0 0 38px;height:38px;border-radius:50%;background:#ffd9a8 url(sprites/a32.webp) no-repeat 46% 4%/120px auto;border:2px solid #1d3557}
   #dlg-nombre img{width:90px;height:auto;margin:0 auto 4px;display:block}
   #dlg-nombre p{margin:4px 0;line-height:1.35}
   .nom-nota{display:block;color:#5b6475;margin-top:10px;font-size:.9rem}
@@ -775,7 +781,7 @@ const IK = (function(){
     <div class="led">
       <button class="btn-ajustes btn-esquina izq" id="btn-vitrina" aria-label="Mis trofeos" title="Mis trofeos"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0z M8 6H5a3 3 0 0 0 3 4 M16 6h3a3 3 0 0 1-3 4 M12 13v4 M8 20h8 M10 17h4" fill="none" stroke="#ffd23f" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="btn-ajustes" id="btn-ajustes" aria-label="Ajustes" title="Ajustes"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><g fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="6.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></g></svg></button>
       <div class="led-tit" id="led-hola">¡HOLA!</div>
-      <div class="led-sub">Cada cuenta bien hecha es una canasta 🏀</div>
+      <div class="led-sub" id="led-sub">Cada cuenta bien hecha es una canasta 🏀</div>
       <div class="led-fila">
         <div class="led-caja"><div class="led-etq">CANASTAS</div><div class="led-num" id="led-canastas">0</div></div>
         <div class="led-caja"><div class="led-etq">TROFEOS</div><div class="led-num verde" id="led-trofeos">0</div></div>
@@ -832,7 +838,7 @@ const IK = (function(){
       </div>
     </div>
 
-    <div class="version"><span class="nombre-juego">Canastas</span> · <button id="btn-version"></button></div>
+    <div class="version"><span class="nombre-juego">Canastas de Gabi</span> · <button id="btn-version"></button></div>
   </section>
 
   <!-- ============ JUEGO ============ -->
@@ -980,13 +986,13 @@ const IK = (function(){
 <div class="dlg" id="dlg-nombre" hidden role="dialog" aria-modal="true" aria-labelledby="nom-tit">
   <div class="tarjeta">
     <img src="sprites/a32.webp" alt="">
-    <h2 id="nom-tit">¡Hola! ¿Cómo te llamas?</h2>
-    <p>Escribe tu nombre y el público lo gritará en cada canasta 🏀</p>
+    <h2 id="nom-tit">¡Hola! Soy Gabi 👋</h2>
+    <p class="dice-gabi">Este es mi juego de canastas. Te invito a jugar en mi equipo. ¿Cómo te llamas?</p>
     <form id="nom-form" novalidate>
       <label for="nom-input" class="sr-only">Tu nombre</label>
       <input id="nom-input" class="campo-nombre" type="text" maxlength="12" autocomplete="off" autocapitalize="words" spellcheck="false" enterkeyhint="go" placeholder="Tu nombre">
       <p class="nom-error" id="nom-error" role="alert"></p>
-      <button class="btn" type="submit">¡A jugar! 🏀</button>
+      <button class="btn" type="submit">¡A jugar con Gabi! 🏀</button>
     </form>
     <small class="nom-nota">Se guarda solo en este dispositivo. Se puede cambiar en ⚙︎ Ajustes.</small>
   </div>
@@ -1016,7 +1022,7 @@ const IK = (function(){
       <div class="aj-botones"><button class="chip ancho" id="aj-instalar">📲 Cómo instalarla</button><button class="chip ancho" id="aj-enlace">🔗 Copiar enlace</button></div>
       <div class="aj-guia" id="aj-guia" hidden></div></div>
     <div class="ajuste"><b>Acerca de</b>
-      <p class="aj-acerca">🏀 <b class="nombre-juego">Canastas</b> · versión <span id="aj-version"></span><br>Hecho con cariño para que Gabi y sus compañeros practiquen sumas, restas y tablas jugando al baloncesto.</p>
+      <p class="aj-acerca">🏀 <b class="nombre-juego">Canastas de Gabi</b> · versión <span id="aj-version"></span><br>Este juego es de Gabi y lo comparte con su clase de 2º. Hecho con cariño para practicar sumas, restas y tablas jugando al baloncesto.</p>
       <p class="aj-aviso">Es un juego para practicar en casa y puede tener algún error. Si hay dudas, lo que vale es lo que enseñan en el cole.</p>
       <div class="aj-botones"><button class="chip ancho" id="aj-buscar">🔄 Buscar actualizaciones</button><button class="chip ancho" id="aj-novedades">✨ Ver novedades</button></div>
       <small id="aj-upd-msg" role="status" style="display:block;margin-top:6px;color:#5b6475">El juego se actualiza solo cuando hay una versión nueva.</small></div>
@@ -1055,6 +1061,9 @@ const IK = (function(){
   const PEDIR_NOMBRE = !NOMBRE && store.get('gabi-nombre') !== null;
   if (!NOMBRE) NOMBRE = 'crack';
   const MAY = NOMBRE.toLocaleUpperCase('es');
+  // En la tablet de Gabi todo sigue como siempre; para sus compañeros, Gabi les habla y les anima
+  const ES_GABI = NOMBRE.toLocaleLowerCase('es') === 'gabi';
+  if (!ES_GABI) document.documentElement.classList.add('con-gabi');
 
   // ---------- Sonido ----------
   let ctx = null, sonido = store.get('gabi-sonido'); if (sonido === null) sonido = true;
@@ -1290,6 +1299,12 @@ const IK = (function(){
     '¡Ha besado el aro y se ha escapado! 💋','¡Por un pelo de calvo! Prueba otra vez 👨‍🦲','¡Ese balón tenía prisa! Mira las casillas rojas',
     '¡Ay, el aro se ha puesto chulito! Otro intento','¡Hasta los mejores fallan! Revisa y vuelve a tirar','¡Uyyy! El público se ha tapado los ojos 🙈',
     '¡Se ha salido haciendo una pirueta! Otra vez','¡Casi entra! Mira despacio cada columna 🔍','¡Error de cálculo, capitán! Tienes otro tiro'];
+  if (!ES_GABI){
+    msgBien.push(`¡Toma ya, ${NOMBRE}! Así se juega en mi equipo 🏀`, '¡Eso lo hago yo con los ojos cerrados… bueno, casi! 😄',
+      `¡Choca esos cinco, ${NOMBRE}! ✋`, `¡Qué buen pase, ${NOMBRE}! La he metido gracias a ti`, `¡Me alegro de que juegues conmigo, ${NOMBRE}!`);
+    msgTriple.push(`¡Triple! ¡Tú y yo somos imparables, ${NOMBRE}! 🔥`, `¡Tres seguidas! Ni yo lo hago tan bien, ${NOMBRE} 😄`);
+    msgMal.push(`Tranqui, ${NOMBRE}, empieza por las unidades 😉`, `A mí también me pasa, ${NOMBRE}. ¡Otra vez!`, `No pasa nada, ${NOMBRE}. Lo repasamos juntos 🤝`);
+  }
   const msgRival = n => [`¡Canasta de ${n}!`,`${n} también sabe… ¡de momento!`,`¡Bien, ${n}! Pero ${NOMBRE} va a por ti`,
     `${n} ha acertado… ¡con las gafas puestas! 🤓`,`¡${n} no se ha oxidado nada! 🔧`,`¡Canasta! ${n} se viene arriba`,
     `${n} lo ha calculado con los dedos de los pies 🦶`,`Vaya, vaya… ${n} entrena a escondidas`];
@@ -1344,6 +1359,17 @@ const IK = (function(){
     return {suma:'Sumas', resta:'Restas', mezcla:'Mezcla'}[S.nivel] + (S.cifras==='3' ? ' de 3 cifras' : '');
   }
   const claveRecord = () => 'gabi-record-' + (S.modo==='rapido' ? 'rapido-' : '') + (S.nivel==='tablas' ? 'tabla-' + S.tabla : nivelReal());
+  // ---------- Récords de Gabi ----------
+  // Las mejores marcas de Gabi, para que sus compañeros intenten superarlas. Clave: la de claveRecord() sin «gabi-record-»
+  // (por ejemplo 'suma', 'resta3', 'tabla-7', 'rapido-suma'). Si una no está, no se muestra nada.
+  const RECORD_GABI = {};
+  const recordGabi = clave => ES_GABI ? 0 : (RECORD_GABI[String(clave).replace('gabi-record-','')] || 0);
+  const txtGabi = (puntos, clave) => {
+    const rg = recordGabi(clave); if (!rg) return '';
+    return puntos > rg ? `<p class="dice-gabi">🏆 ¡Has superado mi récord (${rg})! ¡Qué crack, ${NOMBRE}! — Gabi</p>`
+      : puntos === rg ? `<p class="dice-gabi">¡Empate con mi récord (${rg})! La próxima me ganas, ${NOMBRE} 😄 — Gabi</p>`
+      : `<p>⛹️ Récord de Gabi: ${rg} puntos. ¡A por él! 💪</p>`;
+  };
   // Selector de cifras
   function pintarCifras(){ document.querySelectorAll('#chips-cifras .chip').forEach(c=>c.classList.toggle('sel', c.dataset.cifras===S.cifras)); }
   $('#chips-cifras').addEventListener('click', e => {
@@ -1366,7 +1392,9 @@ const IK = (function(){
     const md = {partido:'Partido', entreno:'Entrenamiento', rapido:'Contrarreloj', reto:'Reto contra ' + (S.rival==='Mamá' ? 'mamá' : 'papá')}[S.modo] || '';
     const rs = document.getElementById('bj-resumen'); if (rs) rs.textContent = nombreNivel() + ' · ' + md;
     const r = store.get(claveRecord());
-    $('#record-txt').textContent = r ? `🏆 Tu récord en ${S.modo==='rapido' ? 'Contrarreloj de ' + nombreNivel().toLowerCase() : nombreNivel()}: ${r} puntos` : '';
+    const rg = recordGabi(claveRecord());
+    $('#record-txt').textContent = (r ? `🏆 Tu récord en ${S.modo==='rapido' ? 'Contrarreloj de ' + nombreNivel().toLowerCase() : nombreNivel()}: ${r} puntos` : '')
+      + (rg ? `${r ? ' · ' : ''}⛹️ Récord de Gabi: ${rg}` : '');
   }
   pintarRecord();
 
@@ -1486,7 +1514,7 @@ const IK = (function(){
     const luces = (n, max, color) => `<div class="luces">${Array.from({length:max},(_,i)=>`<i style="${i<n?`background:${color};box-shadow:0 0 6px ${color}`:''}"></i>`).join('')}</div>`;
     if (J.modo==='reto'){
       const [g,r] = J.jug;
-      m.innerHTML = `${salir}${equipo(`${MAY}`, g.puntos, '#ff3b30', J.turno===0?'turno':'')}
+      m.innerHTML = `${salir}${equipo(ES_GABI || MAY.length > 5 ? MAY : `${MAY} Y GABI`, g.puntos, '#ff3b30', J.turno===0?'turno':'')}
         <div class="centro"><div class="nom">RONDA</div><div class="panel peq">${seg7(Math.min(Math.floor(J.n/2)+1,5),'#ffb000',26,1)}</div>
           <div class="posesion"><span class="${J.turno===0?'on':''}">◀</span><small>TURNO</small><span class="${J.turno===1?'on':''}">▶</span></div></div>
         ${equipo(r.nombre.toUpperCase(), r.puntos, '#ff3b30', J.turno===1?'turno':'')}${snd}`;
@@ -2011,7 +2039,7 @@ const IK = (function(){
     let valla = `<rect x="0" y="${yValla}" width="${W}" height="${hValla}" fill="#0b1226"/><rect x="0" y="${yValla}" width="${W}" height="1.5" fill="#3b4a73"/>`;
     // valla LED: los anuncios se deslizan sin parar; parpadea a ratos y avisa de las canastas
     const textos = vacio ? ['ENTRENAMIENTO','SIN PRISA','PRÁCTICA LIBRE',(MAY.length <= 6 ? `¡TÚ PUEDES, ${MAY}!` : '¡TÚ PUEDES!')]
-      : [MAY.length <= 6 ? `CANASTAS DE ${MAY}` : 'CANASTAS','★ 2º DE PRIMARIA ★','¡A POR EL TRIPLE!','CALCULA · BOTA · ENCESTA',`${MAY} Nº 3`];
+      : ['CANASTAS DE GABI','★ 2º DE PRIMARIA ★','¡A POR EL TRIPLE!','CALCULA · BOTA · ENCESTA','GABI Nº 3'].concat(ES_GABI ? [] : [MAY.length <= 7 ? `¡VAMOS, ${MAY}!` : '¡VAMOS, EQUIPO!']);
     const pasoV = 190, PV = pasoV*textos.length, vueltas = Math.ceil(W/PV) + 1;
     let cinta = '';
     for (let v = 0; v < vueltas; v++) textos.forEach((t,i) => cinta += `<text x="${v*PV + i*pasoV + 8}" y="${yValla+12}" font-family="Orbitron, monospace" font-weight="900" font-size="11" fill="${['#38bdf8','#ffb000','#39d353','#ff5a8a','#ffffff'][i%5]}" letter-spacing="1">${t}</text>`);
@@ -2742,7 +2770,7 @@ const IK = (function(){
       : est===3 ? frase([`¡Partidazo, ${NOMBRE}! Eres el MVP 🏆`,'¡Qué exhibición! El público pide tu autógrafo ✍️','¡Partido de leyenda! Mañana sales en el periódico 📰'])
       : est===2 ? frase([`¡Muy buen partido, ${NOMBRE}! 💪`,'¡Gran partido! El entrenador está contentísimo 😄','¡Buenísimo! Un par de canastas más y es de récord'])
       : frase([`¡Bien jugado, ${NOMBRE}! Cada partido lo harás mejor 🏀`,'¡Los campeones también entrenan! A por el siguiente 💪','¡Buen esfuerzo! El próximo partido es tuyo 🔥'])}</b></p>
-        ${prev>0 && !record ? `<p>Tu récord: ${prev} puntos</p>`:''}`;
+        ${prev>0 && !record ? `<p>Tu récord: ${prev} puntos</p>`:''}${txtGabi(J.puntos, clave)}`;
       if (est===3 || record) confeti(80);
     } else if (J.modo==='rapido'){
       const clave = J.clave, prev = store.get(clave) || 0, record = J.puntos > prev; if (record) store.set(clave, J.puntos);
@@ -2752,7 +2780,7 @@ const IK = (function(){
         <div class="grande">${J.puntos}</div><p>puntos · ${J.aciertos} cuentas bien en 1 minuto${J.fallos ? ` · ${J.fallos} fallos` : ''}</p>
         <p style="font-size:1.2rem;margin-top:10px"><b>${record && prev>0 ? frase([`🏆 ¡NUEVO RÉCORD, ${NOMBRE}!`,'🏆 ¡Récord! ¡Más rápido que nunca! ⚡'])
           : est===3 ? frase(['¡Eres una calculadora humana! ⚡','¡Velocidad de campeón! 🏆']) : est===2 ? frase([`¡Muy rápido, ${NOMBRE}! 💪`,'¡Buen ritmo! A por el récord 🔥']) : frase(['¡Bien! Cuanto más juegues, más rápido irás 🏀','¡Buen esfuerzo! La próxima vez, más 💪'])}</b></p>
-        ${prev>0 && !record ? `<p>Tu récord: ${prev} puntos</p>` : ''}`;
+        ${prev>0 && !record ? `<p>Tu récord: ${prev} puntos</p>` : ''}${txtGabi(J.puntos, clave)}`;
       if (est===3 || record) confeti(80);
     } else if (J.modo==='reto'){
       const [g,r] = J.jug;
@@ -2869,6 +2897,7 @@ const IK = (function(){
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['3.37',['⛹️ ¡Ahora Gabi juega con sus compañeros! Les saluda, les anima por su nombre y les invita a su equipo', '🏆 Récord de Gabi: ¿quién lo supera?', '🏀 Vuelve el icono del balón con la G']],
     ['3.36',['✍️ Cada jugador escribe su nombre al empezar y el público lo grita en cada canasta', '⚙️ El nombre se puede cambiar en Ajustes', '🏀 Icono nuevo: un balón con +, − y ×', '👀 Colores de los botones más fuertes para que se lean mejor']],
     ['3.35.1',['📲 Ayuda para instalar al día con iOS 27: el botón de tres rayas dentro de la barra de la dirección']],
   ['3.35', ['🔄 En Ajustes, botón «Buscar actualizaciones»', '📲 Ayuda para instalarlo con los pasos de tu iPad o móvil, y aviso amarillo en el menú', '🖼️ Iconos para todos los tamaños e imagen al compartir el enlace']],
@@ -3197,9 +3226,8 @@ const IK = (function(){
   const CON_NOMBRE = NOMBRE !== 'crack';
   if (CON_NOMBRE){
     $('#led-hola').textContent = `¡HOLA, ${MAY}!`;
+    if (!ES_GABI) $('#led-sub').textContent = `Gabi: «¿Echamos unas canastas, ${NOMBRE}?» 🏀`;
     if (MAY.length > 6) $('#led-hola').style.fontSize = MAY.length > 9 ? '1rem' : '1.2rem';
-    document.querySelectorAll('.nombre-juego').forEach(el => el.textContent = `Canastas de ${NOMBRE}`);
-    document.title = `Canastas de ${NOMBRE}: sumas y restas con llevadas`;
   }
   // Guarda el nombre y recarga para que todos los mensajes del juego lo usen
   function guardarNombre(valor, error){
@@ -3265,7 +3293,7 @@ const IK = (function(){
   document.addEventListener('visibilitychange', ()=>{ if (document.visibilityState==='visible') buscarVersion(); });
   setInterval(buscarVersion, 5*60*1000);
   setTimeout(buscarVersion, 3000);
-  IK.init({nombre: 'Canastas', clave: 'gabi-sumas', version: VERSION, onNueva: () => actualizar(),
+  IK.init({nombre: 'Canastas Gabi', clave: 'gabi-sumas', version: VERSION, onNueva: () => actualizar(),
     esInicio: () => $('#inicio').classList.contains('activa') && $('#dlg-ajustes').hidden && $('#dlg-nombre').hidden && $('#dlg-novedades').hidden});
   $('#aj-buscar').onclick = () => { sClic(); IK.buscar($('#aj-buscar'), $('#aj-upd-msg')); };
   // Sin internet: el service worker guarda el juego para que funcione sin conexión

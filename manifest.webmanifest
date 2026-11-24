@@ -1,6 +1,6 @@
 {
-  "name": "Canastas: sumas y restas",
-  "short_name": "Canastas",
+  "name": "Canastas de Gabi: sumas y restas",
+  "short_name": "Canastas Gabi",
   "description": "Juego de baloncesto para practicar sumas y restas con llevadas y las tablas de multiplicar (2º de primaria).",
   "start_url": "./",
   "scope": "./",
