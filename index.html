@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<meta name="app-version" content="3.35.1">
+<meta name="app-version" content="3.36">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Canastas Gabi">
+<meta name="apple-mobile-web-app-title" content="Canastas">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -15,10 +15,10 @@
 <link rel="apple-touch-icon" sizes="152x152" href="icon-152.png">
 <link rel="apple-touch-icon" sizes="167x167" href="icon-167.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-<title>Canastas de Gabi: sumas y restas con llevadas</title>
+<title>Canastas: sumas y restas con llevadas</title>
 <meta name="description" content="Juego de baloncesto para practicar sumas y restas con llevadas y las tablas de multiplicar (2º de primaria).">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Canastas de Gabi">
+<meta property="og:title" content="Canastas: sumas, restas y tablas jugando al baloncesto">
 <meta property="og:description" content="Juego de baloncesto para practicar sumas y restas con llevadas y las tablas de multiplicar (2º de primaria).">
 <meta property="og:url" content="https://indalo-apps.github.io/canastas-gabi/">
 <meta property="og:image" content="https://indalo-apps.github.io/canastas-gabi/og.png">
@@ -304,6 +304,18 @@
   @media (max-width:380px){ .cp-fila{font-size:1.2rem} .cp-res{min-width:52px;height:40px;font-size:1.15rem} .mas small{display:none} }
   /* Ajustes */
   .aj-botones{display:flex;flex-wrap:wrap;gap:8px}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  .campo-nombre{display:block;width:100%;box-sizing:border-box;font:inherit;font-size:1.35rem;font-weight:800;text-align:center;
+    padding:12px 14px;min-height:52px;border:3px solid #1d3557;border-radius:16px;background:#fff;color:#1d3557;margin:10px 0 12px}
+  .campo-nombre:focus{outline:3px solid #f47b20;outline-offset:2px}
+  .aj-nombre{display:flex;gap:8px;align-items:center}
+  .aj-nombre .campo-nombre{margin:0;font-size:1.1rem;min-height:44px;padding:8px 10px}
+  .aj-nombre .chip{flex-shrink:0}
+  #dlg-nombre .tarjeta{text-align:center}
+  #dlg-nombre img{width:90px;height:auto;margin:0 auto 4px;display:block}
+  #dlg-nombre p{margin:4px 0;line-height:1.35}
+  .nom-nota{display:block;color:#5b6475;margin-top:10px;font-size:.9rem}
+  .nom-error{color:#b3261e;font-weight:700;min-height:1.3em;margin:0}
   .aj-guia{background:#fff;border-radius:14px;padding:10px 14px;margin-top:8px;font-size:1rem;line-height:1.35}
   .aj-guia ol{margin:4px 0 0;padding-left:22px}
   .aj-acerca{margin:0 0 6px;line-height:1.35} .aj-aviso{margin:0 0 8px;font-size:.88rem;color:#5b6475;line-height:1.3}
@@ -378,6 +390,7 @@
   .marcador .eq,.marcador .centro{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0}
   .marcador .eq{flex:1}
   .marcador .nom{font-family:'Baloo 2';font-weight:800;font-size:.72rem;letter-spacing:1.5px;color:#f2f2f2;line-height:1.1;text-transform:uppercase}
+  .marcador .eq .nom{max-width:92px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:.5px}
   .marcador .nom.mini{font-size:.55rem;margin-top:3px;color:#c9ccd1}
   .marcador .panel{background:#050505;border-radius:6px;padding:4px 6px;margin-top:2px;box-shadow:inset 0 2px 6px rgba(0,0,0,.9),0 0 0 1px #33373e}
   .marcador .panel.peq{padding:3px 5px}
@@ -757,7 +770,7 @@ const IK = (function(){
   <section id="inicio" class="pantalla activa">
     <div class="led">
       <button class="btn-ajustes btn-esquina izq" id="btn-vitrina" aria-label="Mis trofeos" title="Mis trofeos"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0z M8 6H5a3 3 0 0 0 3 4 M16 6h3a3 3 0 0 1-3 4 M12 13v4 M8 20h8 M10 17h4" fill="none" stroke="#ffd23f" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="btn-ajustes" id="btn-ajustes" aria-label="Ajustes" title="Ajustes"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><g fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="6.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></g></svg></button>
-      <div class="led-tit">¡HOLA, GABI!</div>
+      <div class="led-tit" id="led-hola">¡HOLA!</div>
       <div class="led-sub">Cada cuenta bien hecha es una canasta 🏀</div>
       <div class="led-fila">
         <div class="led-caja"><div class="led-etq">CANASTAS</div><div class="led-num" id="led-canastas">0</div></div>
@@ -815,7 +828,7 @@ const IK = (function(){
       </div>
     </div>
 
-    <div class="version">Canastas de Gabi · <button id="btn-version"></button></div>
+    <div class="version"><span class="nombre-juego">Canastas</span> · <button id="btn-version"></button></div>
   </section>
 
   <!-- ============ JUEGO ============ -->
@@ -960,9 +973,26 @@ const IK = (function(){
   </div>
 </div>
 <div class="toast" id="toast" role="status"></div>
+<div class="dlg" id="dlg-nombre" hidden role="dialog" aria-modal="true" aria-labelledby="nom-tit">
+  <div class="tarjeta">
+    <img src="sprites/a32.webp" alt="">
+    <h2 id="nom-tit">¡Hola! ¿Cómo te llamas?</h2>
+    <p>Escribe tu nombre y el público lo gritará en cada canasta 🏀</p>
+    <form id="nom-form" novalidate>
+      <label for="nom-input" class="sr-only">Tu nombre</label>
+      <input id="nom-input" class="campo-nombre" type="text" maxlength="12" autocomplete="off" autocapitalize="words" spellcheck="false" enterkeyhint="go" placeholder="Tu nombre">
+      <p class="nom-error" id="nom-error" role="alert"></p>
+      <button class="btn" type="submit">¡A jugar! 🏀</button>
+    </form>
+    <small class="nom-nota">Se guarda solo en este dispositivo. Se puede cambiar en ⚙︎ Ajustes.</small>
+  </div>
+</div>
 <div class="dlg" id="dlg-ajustes" hidden role="dialog" aria-labelledby="aj-tit">
   <div class="tarjeta">
     <h2 id="aj-tit">⚙︎ Ajustes</h2>
+    <div class="ajuste"><label for="aj-nombre-input"><b style="display:block;margin-bottom:6px;color:var(--azul)">Nombre del jugador</b></label>
+      <form class="aj-nombre" id="aj-nombre-form" novalidate><input id="aj-nombre-input" class="campo-nombre" type="text" maxlength="12" autocomplete="off" autocapitalize="words" spellcheck="false" enterkeyhint="done"><button class="chip ancho" type="submit">Cambiar</button></form>
+      <small id="aj-nombre-msg" role="status" style="display:block;margin-top:4px;color:#5b6475"></small></div>
     <div class="ajuste"><b>Tamaño de la letra</b>
       <div class="chips" data-aj="letra"><button class="chip ancho" data-v="normal">Normal</button><button class="chip ancho" data-v="grande">Grande</button><button class="chip ancho" data-v="muy-grande">Muy grande</button></div></div>
     <div class="ajuste"><b>Movimiento</b>
@@ -982,7 +1012,7 @@ const IK = (function(){
       <div class="aj-botones"><button class="chip ancho" id="aj-instalar">📲 Cómo instalarla</button><button class="chip ancho" id="aj-enlace">🔗 Copiar enlace</button></div>
       <div class="aj-guia" id="aj-guia" hidden></div></div>
     <div class="ajuste"><b>Acerca de</b>
-      <p class="aj-acerca">🏀 <b>Canastas de Gabi</b> · versión <span id="aj-version"></span><br>Hecho con cariño para que Gabi practique sumas, restas y tablas jugando al baloncesto.</p>
+      <p class="aj-acerca">🏀 <b class="nombre-juego">Canastas</b> · versión <span id="aj-version"></span><br>Hecho con cariño para que Gabi y sus compañeros practiquen sumas, restas y tablas jugando al baloncesto.</p>
       <p class="aj-aviso">Es un juego para practicar en casa y puede tener algún error. Si hay dudas, lo que vale es lo que enseñan en el cole.</p>
       <div class="aj-botones"><button class="chip ancho" id="aj-buscar">🔄 Buscar actualizaciones</button><button class="chip ancho" id="aj-novedades">✨ Ver novedades</button></div>
       <small id="aj-upd-msg" role="status" style="display:block;margin-top:6px;color:#5b6475">El juego se actualiza solo cuando hay una versión nueva.</small></div>
@@ -1004,6 +1034,23 @@ const IK = (function(){
     get(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } },
     set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
   };
+
+  // ---------- Nombre del jugador ----------
+  // Cada niño escribe su nombre la primera vez que abre el juego. En la tablet de Gabi, que ya tenía
+  // partidas guardadas de antes de la 3.36, no se pregunta nada: sigue siendo «Gabi».
+  const limpiaNombre = t => String(t || '').replace(/[<>&"'`\\${}]/g, '').replace(/\s+/g, ' ').slice(0, 12).trim();
+  let NOMBRE = store.get('gabi-nombre');
+  if (NOMBRE === null){
+    let antiguo = false;
+    try { antiguo = ['gabi-sumas-version','gabi-progreso','gabi-logros','gabi-nivel','gabi-ajustes'].some(k => localStorage.getItem(k) !== null); } catch(e){}
+    NOMBRE = antiguo ? 'Gabi' : '';
+    store.set('gabi-nombre', NOMBRE);
+  }
+  NOMBRE = limpiaNombre(NOMBRE);
+  // Si el móvil no deja guardar nada, no se pregunta (se volvería a preguntar cada vez)
+  const PEDIR_NOMBRE = !NOMBRE && store.get('gabi-nombre') !== null;
+  if (!NOMBRE) NOMBRE = 'crack';
+  const MAY = NOMBRE.toLocaleUpperCase('es');
 
   // ---------- Sonido ----------
   let ctx = null, sonido = store.get('gabi-sonido'); if (sonido === null) sonido = true;
@@ -1223,39 +1270,39 @@ const IK = (function(){
     usadas.push(f); if (usadas.length > 12) usadas.shift();
     return f;
   }
-  const msgBien = ['¡Canasta, Gabi! 🏀','¡Qué crack eres, Gabi!','¡Así se hace, Gabi! 💪','¡Limpia, sin tocar el aro!',
-    '¡Eres un máquina de las cuentas!','¡Toma ya! ¡Dos puntos!','¡Muy bien llevadas, Gabi!',
+  const msgBien = [`¡Canasta, ${NOMBRE}! 🏀`,`¡Qué crack eres, ${NOMBRE}!`,`¡Así se hace, ${NOMBRE}! 💪`,'¡Limpia, sin tocar el aro!',
+    '¡Eres una máquina de las cuentas!','¡Toma ya! ¡Dos puntos!',`¡Muy bien llevadas, ${NOMBRE}!`,
     '¡Chof! Ni ha tocado el aro 😎','¡Esa ha entrado hasta la cocina!','¡El público se vuelve loco! 📣',
-    '¡Gabi, eres un fenómeno!','¡Matemáticas y baloncesto: tu combo! 🔥','¡La red ha dicho «chof»!',
-    '¡Esa cuenta no te ha durado ni un bote!','¡Al entrenador se le ha caído la gorra! 🧢','¡Los números te tienen miedo, Gabi!',
-    '¡Tirazo! ¡Que alguien le haga una foto!','¡Más preciso que un reloj suizo! ⌚','¡Gabi lo ha vuelto a hacer!',
+    `¡${NOMBRE}, eres un fenómeno!`,'¡Matemáticas y baloncesto: tu combo! 🔥','¡La red ha dicho «chof»!',
+    '¡Esa cuenta no te ha durado ni un bote!','¡Al entrenador se le ha caído la gorra! 🧢',`¡Los números te tienen miedo, ${NOMBRE}!`,
+    '¡Tirazo! ¡Que alguien le haga una foto!','¡Más preciso que un reloj suizo! ⌚',`¡${NOMBRE} lo ha vuelto a hacer!`,
     '¡Pum! ¡Directo al fondo de la red!','¡Hasta el balón está contento! 🏀😄','¡Esa cuenta era pan comido! 🥖',
     '¡Has hecho que parezca fácil!','¡Lo están repitiendo a cámara lenta! 🎥','¡Fichaje para la NBA! ✍️',
     '¡Así se juega en el patio de los campeones!','¡El aro ni se ha enterado!','¡Calculadora humana activada! 🤖'];
-  const msgTriple = ['¡TRIPLE! 🔥 ¡Tres seguidas, Gabi!','¡Estás on fire, Gabi! ¡Triple!','¡Triple desde lejos! 🎯',
+  const msgTriple = [`¡TRIPLE! 🔥 ¡Tres seguidas, ${NOMBRE}!`,`¡Estás on fire, ${NOMBRE}! ¡Triple!`,'¡Triple desde lejos! 🎯',
     '¡TRIPLAZO! ¡Que se encienda el marcador! 🚨','¡Tres de tres! ¡Esto es un espectáculo!','¡Triple! ¡El Capitán Triple estaría orgulloso! ⭐',
     '¡Desde casa de tu abuela y ha entrado! 🏠','¡Triple! ¡Que alguien llame a los bomberos, que esto arde! 🚒'];
-  const msgMal = ['¡Uy, ha tocado el aro! Revisa las llevadas','¡Casi, Gabi! Mira bien las columnas en rojo','¡Rebote! Tienes otro tiro, tú puedes',
+  const msgMal = ['¡Uy, ha tocado el aro! Revisa las llevadas',`¡Casi, ${NOMBRE}! Mira bien las columnas en rojo`,'¡Rebote! Tienes otro tiro, tú puedes',
     '¡Ha besado el aro y se ha escapado! 💋','¡Por un pelo de calvo! Prueba otra vez 👨‍🦲','¡Ese balón tenía prisa! Mira las casillas rojas',
     '¡Ay, el aro se ha puesto chulito! Otro intento','¡Hasta los mejores fallan! Revisa y vuelve a tirar','¡Uyyy! El público se ha tapado los ojos 🙈',
     '¡Se ha salido haciendo una pirueta! Otra vez','¡Casi entra! Mira despacio cada columna 🔍','¡Error de cálculo, capitán! Tienes otro tiro'];
-  const msgRival = n => [`¡Canasta de ${n}!`,`${n} también sabe… ¡de momento!`,`¡Bien, ${n}! Pero Gabi va a por ti`,
-    `${n} ha acertado… ¡con las gafas puestas! 🤓`,`¡${n} no está tan oxidado! 🔧`,`¡Canasta! ${n} se viene arriba`,
+  const msgRival = n => [`¡Canasta de ${n}!`,`${n} también sabe… ¡de momento!`,`¡Bien, ${n}! Pero ${NOMBRE} va a por ti`,
+    `${n} ha acertado… ¡con las gafas puestas! 🤓`,`¡${n} no se ha oxidado nada! 🔧`,`¡Canasta! ${n} se viene arriba`,
     `${n} lo ha calculado con los dedos de los pies 🦶`,`Vaya, vaya… ${n} entrena a escondidas`];
   const msgRivalMal = n => [`¡Uy, ${n}! Otro intento…`,`¡${n} ha tirado con los ojos cerrados! 🙈`,`¡Ja! ${n} necesita gafas 👓`,
-    `¡Hasta ${n} falla! Gabi se frota las manos 😏`,`¡Air ball de ${n}! El público se ríe 😂`];
-  const msgRivalFallo = (n,r) => [`¡Fallo de ${n}! Era ${r}.`,`¡${n} ha fallado! Era ${r}. ¡Oportunidad para Gabi!`,
+    `¡Hasta ${n} falla! ${NOMBRE} se frota las manos 😏`,`¡Air ball de ${n}! El público se ríe 😂`];
+  const msgRivalFallo = (n,r) => [`¡Fallo de ${n}! Era ${r}.`,`¡${n} ha fallado! Era ${r}. ¡Oportunidad para ${NOMBRE}!`,
     `${n} dice que el balón estaba pinchado… Era ${r} 🙃`,`Era ${r}. ¡A ${n} le toca fregar los platos! 🍽️`];
   const msgRacha = n => n>=10 ? ['¡DIEZ SEGUIDAS! ¡Esto es historia del baloncesto! 🏆','¡10 seguidas! ¡Que paren el partido, esto es de récord!']
-    : ['¡CINCO SEGUIDAS! ¡Estás imparable, Gabi! 🔥','¡5 seguidas! ¡Los defensas no saben qué hacer!','¡5 de 5! ¡El balón solo quiere ir contigo!'];
+    : [`¡CINCO SEGUIDAS! ¡Estás imparable, ${NOMBRE}! 🔥`,'¡5 seguidas! ¡Los defensas no saben qué hacer!','¡5 de 5! ¡El balón solo quiere ir contigo!'];
   const msgRapido = ['¡Más rápido que un rayo! ⚡','¡Qué velocidad! ¡Ni te he visto pensar! 💨','¡En un abrir y cerrar de ojos! 👀',
     '¡Contraataque rapidísimo! 🏃'];
   const msgTiroLibre = ['¡Dentro a la segunda! Tiro libre 😉','¡Rectificar es de sabios! Tiro libre','¡A la segunda va la vencida!'];
   const msgConPista = ['¡Con ayuda también se encesta! 💡','¡La pista ha funcionado! Ahora sin ella 😉'];
-  const msgFallo2 = r => [`No pasa nada, Gabi. El resultado era <b>${r}</b>. ¡A por la siguiente!`,
+  const msgFallo2 = r => [`No pasa nada, ${NOMBRE}. El resultado era <b>${r}</b>. ¡A por la siguiente!`,
     `¡Esta se ha resistido! Era <b>${r}</b>. La próxima es tuya 💪`,`Hasta Michael Jordan fallaba. Era <b>${r}</b>. ¡Seguimos!`,
     `Era <b>${r}</b>. Mira cómo se hace y a por la siguiente 👇`];
-  const inicioCuenta = ['¡Tu turno, Gabi!','¡Balón para Gabi!','¡Bota, bota… y piensa!','¡El público espera! 📣','¡Vamos, crack!',
+  const inicioCuenta = [`¡Tu turno, ${NOMBRE}!`,`¡Balón para ${NOMBRE}!`,'¡Bota, bota… y piensa!','¡El público espera! 📣','¡Vamos, crack!',
     '¡Esta es fácil para ti!','¡Concentración de campeón! 🧠','¡Que no te tiemble el pulso!','¡Cuenta y a tirar!'];
 
   // ---------- Estado ----------
@@ -1329,7 +1376,7 @@ const IK = (function(){
     document.body.classList.toggle('modo-rapido', S.modo==='rapido');
     J = { modo:S.modo, nivel:S.modo==='rapido' ? 'rapido' : nivelReal(), etiqueta:nombreNivel(), clave:claveRecord(), n:0, total: S.modo==='partido'?10 : S.modo==='reto'?10 : Infinity,
           puntos:0, aciertos:0, fallos:0, racha:0, primeras:0, tabla:S.tabla,
-          jug:[{nombre:'Gabi',puntos:0,racha:0},{nombre:S.rival,puntos:0,racha:0}], turno:0 };
+          jug:[{nombre:`${NOMBRE}`,puntos:0,racha:0},{nombre:S.rival,puntos:0,racha:0}], turno:0 };
     nuevos = [];
     mostrar('juego');
     nuevaCuenta();
@@ -1435,7 +1482,7 @@ const IK = (function(){
     const luces = (n, max, color) => `<div class="luces">${Array.from({length:max},(_,i)=>`<i style="${i<n?`background:${color};box-shadow:0 0 6px ${color}`:''}"></i>`).join('')}</div>`;
     if (J.modo==='reto'){
       const [g,r] = J.jug;
-      m.innerHTML = `${salir}${equipo('GABI', g.puntos, '#ff3b30', J.turno===0?'turno':'')}
+      m.innerHTML = `${salir}${equipo(`${MAY}`, g.puntos, '#ff3b30', J.turno===0?'turno':'')}
         <div class="centro"><div class="nom">RONDA</div><div class="panel peq">${seg7(Math.min(Math.floor(J.n/2)+1,5),'#ffb000',26,1)}</div>
           <div class="posesion"><span class="${J.turno===0?'on':''}">◀</span><small>TURNO</small><span class="${J.turno===1?'on':''}">▶</span></div></div>
         ${equipo(r.nombre.toUpperCase(), r.puntos, '#ff3b30', J.turno===1?'turno':'')}${snd}`;
@@ -1468,7 +1515,7 @@ const IK = (function(){
       if (J.modo==='rapido') rapidoPausa();
       $('#salir-tit').textContent = J.modo==='reto' ? '¿Dejar el reto?' : J.modo==='rapido' ? '¿Dejar el contrarreloj?' : '¿Dejar el partido?';
       $('#salir-txt').innerHTML = J.modo==='reto'
-        ? `Vais <b>Gabi ${J.jug[0].puntos}</b> – <b>${J.jug[1].puntos} ${J.jug[1].nombre}</b>. Si sales, se pierde el reto.`
+        ? `Vais <b>${NOMBRE} ${J.jug[0].puntos}</b> – <b>${J.jug[1].puntos} ${J.jug[1].nombre}</b>. Si sales, se pierde el reto.`
         : J.modo==='rapido' ? `Llevas <b>${J.puntos} puntos</b>. Si sales, se pierde esta partida.`
         : `Llevas <b>${J.puntos} puntos</b> en ${J.n} ${J.n===1?'tiro':'tiros'}. Si sales, se pierde el partido.`;
       $('#dlg-salir').hidden = false;
@@ -1604,7 +1651,7 @@ const IK = (function(){
     ans = Array(op.W).fill(''); llevo = Array(op.W).fill(false);
     activo = op.horiz ? 0 : op.W-1; intentos = 0; usoPista = false; resuelta = false; enVuelo = false;
     const rivalN = J.modo==='reto' ? J.jug[1].nombre : '';
-    $('#mensaje').textContent = esRival ? frase([`Turno de ${rivalN}: ¡cuenta de mayores! 😎`,`${rivalN}, a ver si te acuerdas del cole… 🤓`,`¡${rivalN} al ataque! Gabi vigila 👀`])
+    $('#mensaje').textContent = esRival ? frase([`Turno de ${rivalN}: ¡cuenta de mayores! 😎`,`${rivalN}, a ver si te acuerdas del cole… 🤓`,`¡${rivalN} al ataque! ${NOMBRE} vigila 👀`])
       : op.horiz ? `${frase(inicioCuenta)} ¿Cuánto es? 🤔`
       : (J.n===0 || Math.random()<.35 ? 'Empieza por la derecha: las unidades 👉' : `${frase(inicioCuenta)} Empieza por las unidades 👉`);
     tInicio = performance.now();
@@ -1881,8 +1928,8 @@ const IK = (function(){
     if (J.modo==='reto'){
       J.turno = J.n%2;
       const quien = J.jug[J.turno].nombre;
-      $('#aviso-quien').textContent = quien==='Gabi' ? '¡GABI! 🏀' : quien.toUpperCase()+' 😎';
-      $('#aviso-sub').textContent = quien==='Gabi' ? 'Pásale la tablet a Gabi' : `Pásale la tablet a ${quien}. ¡Su cuenta es más difícil!`;
+      $('#aviso-quien').textContent = quien===`${NOMBRE}` ? `¡${MAY}! 🏀` : quien.toUpperCase()+' 😎';
+      $('#aviso-sub').textContent = quien===`${NOMBRE}` ? `Pásale la tablet a ${NOMBRE}` : `Pásale la tablet a ${quien}. ¡Su cuenta es más difícil!`;
       $('#aviso-turno').classList.add('vis');
     } else nuevaCuenta();
   };
@@ -1952,8 +1999,8 @@ const IK = (function(){
     // vallas luminosas
     let valla = `<rect x="0" y="${yValla}" width="${W}" height="${hValla}" fill="#0b1226"/><rect x="0" y="${yValla}" width="${W}" height="1.5" fill="#3b4a73"/>`;
     // valla LED: los anuncios se deslizan sin parar; parpadea a ratos y avisa de las canastas
-    const textos = vacio ? ['ENTRENAMIENTO','SIN PRISA','PRÁCTICA LIBRE','¡TÚ PUEDES, GABI!']
-      : ['CANASTAS DE GABI','★ 2º DE PRIMARIA ★','¡A POR EL TRIPLE!','CALCULA · BOTA · ENCESTA','GABI Nº 3'];
+    const textos = vacio ? ['ENTRENAMIENTO','SIN PRISA','PRÁCTICA LIBRE',(MAY.length <= 6 ? `¡TÚ PUEDES, ${MAY}!` : '¡TÚ PUEDES!')]
+      : [MAY.length <= 6 ? `CANASTAS DE ${MAY}` : 'CANASTAS','★ 2º DE PRIMARIA ★','¡A POR EL TRIPLE!','CALCULA · BOTA · ENCESTA',`${MAY} Nº 3`];
     const pasoV = 190, PV = pasoV*textos.length, vueltas = Math.ceil(W/PV) + 1;
     let cinta = '';
     for (let v = 0; v < vueltas; v++) textos.forEach((t,i) => cinta += `<text x="${v*PV + i*pasoV + 8}" y="${yValla+12}" font-family="Orbitron, monospace" font-weight="900" font-size="11" fill="${['#38bdf8','#ffb000','#39d353','#ff5a8a','#ffffff'][i%5]}" letter-spacing="1">${t}</text>`);
@@ -2376,7 +2423,7 @@ const IK = (function(){
   function redMueve(sinRed, poco){
     cometa = false; pintarEstela(...ultBalon);
     if (celebraEspecial){ const g = geo(); efecto('y0', g.aroCx, g.aroY + 4, Math.min(170, g.H*0.75), 420); }
-    vallaAviso(celebraEspecial ? '¡¡TRIPLE!!' : elige(['¡CANASTA!','¡CANASTA DE GABI!','¡DENTRO!','¡CHOF!']));
+    vallaAviso(celebraEspecial ? '¡¡TRIPLE!!' : elige(['¡CANASTA!',`¡CANASTA DE ${MAY}!`,'¡DENTRO!','¡CHOF!']));
     const fr = $('#aro-frente'), g = geo(); let i = 1;
     const pasos = poco ? ['red1','red4','red0'] : ['red1','red2','red3','red2','red4','red0'];
     const paso = () => { fr.src = FOT(pasos[i - 1]); if (i++ < pasos.length) setTimeout(paso, poco ? 90 : 80); };
@@ -2680,10 +2727,10 @@ const IK = (function(){
       h = `<img class="final-spr" src="sprites/${record ? 'a30' : est>=2 ? 'a31' : 'a32'}.webp" alt=""><h2>¡Fin del partido!</h2>
         <div class="estrellas">${'⭐'.repeat(est)}${'☆'.repeat(3-est)}</div>
         <div class="grande">${J.puntos}</div><p>puntos · ${J.aciertos} de 10 canastas</p>
-        <p style="font-size:1.2rem;margin-top:10px"><b>${record && prev>0 ? frase(['🏆 ¡NUEVO RÉCORD, Gabi!','🏆 ¡RÉCORD! ¡Hay que enmarcar este partido!','🏆 ¡Récord pulverizado! Avisad a la prensa 📰'])
-      : est===3 ? frase(['¡Partidazo, Gabi! Eres el MVP 🏆','¡Qué exhibición! El público pide tu autógrafo ✍️','¡Partido de leyenda! Mañana sales en el periódico 📰'])
-      : est===2 ? frase(['¡Muy buen partido, Gabi! 💪','¡Gran partido! El entrenador está contentísimo 😄','¡Buenísimo! Un par de canastas más y es de récord'])
-      : frase(['¡Bien jugado, Gabi! Cada partido lo harás mejor 🏀','¡Los campeones también entrenan! A por el siguiente 💪','¡Buen esfuerzo! El próximo partido es tuyo 🔥'])}</b></p>
+        <p style="font-size:1.2rem;margin-top:10px"><b>${record && prev>0 ? frase([`🏆 ¡NUEVO RÉCORD, ${NOMBRE}!`,'🏆 ¡RÉCORD! ¡Hay que enmarcar este partido!','🏆 ¡Récord pulverizado! Avisad a la prensa 📰'])
+      : est===3 ? frase([`¡Partidazo, ${NOMBRE}! Eres el MVP 🏆`,'¡Qué exhibición! El público pide tu autógrafo ✍️','¡Partido de leyenda! Mañana sales en el periódico 📰'])
+      : est===2 ? frase([`¡Muy buen partido, ${NOMBRE}! 💪`,'¡Gran partido! El entrenador está contentísimo 😄','¡Buenísimo! Un par de canastas más y es de récord'])
+      : frase([`¡Bien jugado, ${NOMBRE}! Cada partido lo harás mejor 🏀`,'¡Los campeones también entrenan! A por el siguiente 💪','¡Buen esfuerzo! El próximo partido es tuyo 🔥'])}</b></p>
         ${prev>0 && !record ? `<p>Tu récord: ${prev} puntos</p>`:''}`;
       if (est===3 || record) confeti(80);
     } else if (J.modo==='rapido'){
@@ -2692,24 +2739,24 @@ const IK = (function(){
       h = `<img class="final-spr" src="sprites/${record ? 'a30' : est>=2 ? 'a31' : 'a32'}.webp" alt=""><h2>¡Tiempo!</h2>
         <div class="estrellas">${'⭐'.repeat(est)}${'☆'.repeat(3-est)}</div>
         <div class="grande">${J.puntos}</div><p>puntos · ${J.aciertos} cuentas bien en 1 minuto${J.fallos ? ` · ${J.fallos} fallos` : ''}</p>
-        <p style="font-size:1.2rem;margin-top:10px"><b>${record && prev>0 ? frase(['🏆 ¡NUEVO RÉCORD, Gabi!','🏆 ¡Récord! ¡Más rápido que nunca! ⚡'])
-          : est===3 ? frase(['¡Eres una calculadora humana! ⚡','¡Velocidad de campeón! 🏆']) : est===2 ? frase(['¡Muy rápido, Gabi! 💪','¡Buen ritmo! A por el récord 🔥']) : frase(['¡Bien! Cuanto más juegues, más rápido irás 🏀','¡Buen esfuerzo! La próxima vez, más 💪'])}</b></p>
+        <p style="font-size:1.2rem;margin-top:10px"><b>${record && prev>0 ? frase([`🏆 ¡NUEVO RÉCORD, ${NOMBRE}!`,'🏆 ¡Récord! ¡Más rápido que nunca! ⚡'])
+          : est===3 ? frase(['¡Eres una calculadora humana! ⚡','¡Velocidad de campeón! 🏆']) : est===2 ? frase([`¡Muy rápido, ${NOMBRE}! 💪`,'¡Buen ritmo! A por el récord 🔥']) : frase(['¡Bien! Cuanto más juegues, más rápido irás 🏀','¡Buen esfuerzo! La próxima vez, más 💪'])}</b></p>
         ${prev>0 && !record ? `<p>Tu récord: ${prev} puntos</p>` : ''}`;
       if (est===3 || record) confeti(80);
     } else if (J.modo==='reto'){
       const [g,r] = J.jug;
-      const res = g.puntos>r.puntos ? frase([`🏆 ¡GANA GABI! ¡Le has ganado a ${r.nombre}!`,`🏆 ¡Paliza a ${r.nombre}! Que vaya preparando la revancha 😎`,`🏆 ¡GABI CAMPEÓN! ${r.nombre} pide la hoja de reclamaciones 📝`])
-        : g.puntos<r.puntos ? frase([`Esta vez gana ${r.nombre}… ¡la revancha está al caer, Gabi! 💪`,`${r.nombre} gana por los pelos… ¡seguro que ha hecho trampa! 😜`,`Gana ${r.nombre}, pero solo porque tiene más años practicando 👴`])
+      const res = g.puntos>r.puntos ? frase([`🏆 ¡GANA ${MAY}! ¡Le has ganado a ${r.nombre}!`,`🏆 ¡Paliza a ${r.nombre}! Que vaya preparando la revancha 😎`,`🏆 ¡NÚMERO 1: ${MAY}! ${r.nombre} pide la hoja de reclamaciones 📝`])
+        : g.puntos<r.puntos ? frase([`Esta vez gana ${r.nombre}… ¡la revancha está al caer, ${NOMBRE}! 💪`,`${r.nombre} gana por los pelos… ¡seguro que ha hecho trampa! 😜`,`Gana ${r.nombre}, pero solo porque tiene más años practicando 👴`])
         : frase(['¡EMPATE! 🤝 ¿Desempate?','¡Empate! Esto se decide en la prórroga ⏱️']);
       h = `<img class="final-spr" src="sprites/${g.puntos>r.puntos ? 'a30' : 'a32'}.webp" alt=""><h2>¡Fin del reto!</h2>
         <div class="fila" style="margin:10px 0">
-          <div><div style="font-weight:700">GABI</div><div class="grande">${g.puntos}</div></div>
+          <div><div style="font-weight:700">${MAY}</div><div class="grande">${g.puntos}</div></div>
           <div style="flex:.3;font-size:2rem">–</div>
           <div><div style="font-weight:700">${r.nombre.toUpperCase()}</div><div class="grande">${r.puntos}</div></div>
         </div><p style="font-size:1.25rem"><b>${res}</b></p>`;
       if (g.puntos>=r.puntos) confeti(90);
     } else {
-      h = `<h2>¡Buen entrenamiento, Gabi!</h2><div class="grande">${J.aciertos}/${J.n}</div><p>cuentas bien hechas</p>
+      h = `<h2>¡Buen entrenamiento, ${NOMBRE}!</h2><div class="grande">${J.aciertos}/${J.n}</div><p>cuentas bien hechas</p>
         <p style="font-size:1.2rem"><b>${J.aciertos===J.n ? frase(['¡Todas bien! ¡Eres un crack! 🏆','¡Pleno! El entrenador no tiene nada que corregirte 😎']) : frase(['¡Cada día te salen mejor! 💪','¡Buen entreno! Así se hacen los campeones 🏋️','¡Los músculos del cerebro, a tope! 🧠'])}</b></p>`;
       if (J.aciertos===J.n && J.n>=5) confeti(60);
     }
@@ -2811,6 +2858,7 @@ const IK = (function(){
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['3.36',['✍️ Cada jugador escribe su nombre al empezar y el público lo grita en cada canasta', '⚙️ El nombre se puede cambiar en Ajustes']],
     ['3.35.1',['📲 Ayuda para instalar al día con iOS 27: el botón de tres rayas dentro de la barra de la dirección']],
   ['3.35', ['🔄 En Ajustes, botón «Buscar actualizaciones»', '📲 Ayuda para instalarlo con los pasos de tu iPad o móvil, y aviso amarillo en el menú', '🖼️ Iconos para todos los tamaños e imagen al compartir el enlace']],
     ['3.34', ['🎯 Las cuentas que fallas salen más a menudo hasta que te las sabes', '📊 Nuevo «Mi progreso»: la tabla de multiplicar se va poniendo verde', '🃏 Nuevo juego de Tarjetas: ¿te la sabías o no?', '🧩 Nuevo juego «Completa la tabla», con pistas', '📲 En Ajustes: cómo instalarla en el iPad, copiar el enlace y «Acerca de»', '🏀 El botón «¡A jugar!» está siempre a mano, debajo de «¿Cómo jugamos?»', '👆 Tocar dos veces seguidas ya no acerca la pantalla']],
@@ -2868,7 +2916,7 @@ const IK = (function(){
     if (!todas.length) return;
     const lista = todas.slice(0, 4);               // solo las 4 últimas versiones, para que quepa
     const mas = todas.length - lista.length;
-    $('#nov-titulo').textContent = desde ? '¡Novedades en el juego, Gabi!' : 'Lo último del juego';
+    $('#nov-titulo').textContent = desde ? `¡Novedades en el juego, ${NOMBRE}!` : 'Lo último del juego';
     $('#nov-lista').innerHTML = lista.map(([v,items]) => `<h4>Versión ${v}</h4><ul>${items.map(t=>`<li>${t}</li>`).join('')}</ul>`).join('')
       + (mas > 0 ? `<p style="margin:10px 0 0;color:#5b6475">…y ${mas} ${mas===1 ? 'versión' : 'versiones'} más con otras mejoras 🏀</p>` : '');
     $('#dlg-novedades').hidden = false;
@@ -2984,7 +3032,7 @@ const IK = (function(){
     $('#tj-sub').textContent = '¡Ronda terminada!';
     $('#tj-juego').hidden = true; $('#tj-fin').hidden = false;
     $('#tj-fin').innerHTML = `<div class="estrellas">${est}</div>
-      <p style="font-size:1.3rem;margin:4px 0"><b>Te sabías ${n} de ${total}</b> ${n===total ? '¡Todas! 🏆' : n >= total*.7 ? '¡Muy bien! 💪' : '¡Sigue practicando, Gabi! 🏀'}</p>
+      <p style="font-size:1.3rem;margin:4px 0"><b>Te sabías ${n} de ${total}</b> ${n===total ? '¡Todas! 🏆' : n >= total*.7 ? '¡Muy bien! 💪' : `¡Sigue practicando, ${NOMBRE}! 🏀`}</p>
       ${TJ.falladas.length ? `<p style="margin:8px 0 0">Para repasar:</p><div class="tj-repaso">${TJ.falladas.map(f => `<span>${f}</span>`).join('')}</div>` : ''}
       <button class="btn" id="tj-otra">Otra ronda 🔁</button>`;
     $('#tj-otra').onclick = () => { sClic(); empezarTarjetas(TJ.modo); };
@@ -3134,6 +3182,44 @@ const IK = (function(){
   };
   $('#aj-novedades').onclick = () => { sClic(); $('#dlg-ajustes').hidden = true; verNovedades(null); };
   $('#aj-version').textContent = VERSION;
+  // ---------- Nombre en pantalla y ventana de «¿Cómo te llamas?» ----------
+  const CON_NOMBRE = NOMBRE !== 'crack';
+  if (CON_NOMBRE){
+    $('#led-hola').textContent = `¡HOLA, ${MAY}!`;
+    if (MAY.length > 6) $('#led-hola').style.fontSize = MAY.length > 9 ? '1rem' : '1.2rem';
+    document.querySelectorAll('.nombre-juego').forEach(el => el.textContent = `Canastas de ${NOMBRE}`);
+    document.title = `Canastas de ${NOMBRE}: sumas y restas con llevadas`;
+  }
+  // Guarda el nombre y recarga para que todos los mensajes del juego lo usen
+  function guardarNombre(valor, error){
+    const n = limpiaNombre(valor);
+    if (!n){ error('Escribe tu nombre (solo letras, sin símbolos raros).'); return false; }
+    store.set('gabi-nombre', n);
+    if (store.get('gabi-nombre') !== n){ error('Este dispositivo no deja guardar el nombre.'); return false; }
+    location.reload();
+    return true;
+  }
+  if (PEDIR_NOMBRE){
+    const d = $('#dlg-nombre'), inp = $('#nom-input'), err = $('#nom-error');
+    d.hidden = false;
+    setTimeout(() => { try { inp.focus(); } catch(e){} }, 150);
+    // El foco no sale de la ventana con el tabulador
+    d.addEventListener('keydown', e => {
+      if (e.key !== 'Tab') return;
+      const f = [...d.querySelectorAll('input,button')], a = f[0], z = f[f.length-1];
+      if (e.shiftKey && document.activeElement === a){ e.preventDefault(); z.focus(); }
+      else if (!e.shiftKey && document.activeElement === z){ e.preventDefault(); a.focus(); }
+    });
+    inp.addEventListener('input', () => err.textContent = '');
+    $('#nom-form').addEventListener('submit', e => { e.preventDefault(); sClic(); guardarNombre(inp.value, t => { err.textContent = t; inp.focus(); }); });
+  }
+  $('#aj-nombre-input').value = CON_NOMBRE ? NOMBRE : '';
+  $('#aj-nombre-form').addEventListener('submit', e => {
+    e.preventDefault(); sClic();
+    const v = $('#aj-nombre-input').value;
+    if (limpiaNombre(v) === NOMBRE){ $('#aj-nombre-msg').textContent = `✓ Ya te llamas ${NOMBRE}`; return; }
+    guardarNombre(v, t => $('#aj-nombre-msg').textContent = t);
+  });
   $('#btn-version').onclick = () => { sClic(); verNovedades(null); };
   $('#nov-cerrar').onclick = () => { sClic(); $('#dlg-novedades').hidden = true; };
   // Al abrir una versión nueva por primera vez, se enseñan sus novedades (una sola vez)
@@ -3147,7 +3233,7 @@ const IK = (function(){
   const EN_WEB = /\.github\.io$/.test(location.hostname) || location.hostname==='localhost';
   let actPendiente = false;
   // Nunca se recarga en mitad de una cuenta: solo en el menú o en la pantalla final
-  const seguroRecargar = () => $('#dlg-ajustes').hidden && !$('#juego').classList.contains('activa') && !$('#aviso-turno').classList.contains('vis')
+  const seguroRecargar = () => $('#dlg-ajustes').hidden && $('#dlg-nombre').hidden && !$('#juego').classList.contains('activa') && !$('#aviso-turno').classList.contains('vis')
     && !(TJ && !TJ.fin && TJ.i>0 && $('#tarjetas').classList.contains('activa')) && !(CP && !CP.fin && CP.hechas>0 && $('#completa').classList.contains('activa'));
   function actualizar(){
     if (!seguroRecargar()){ actPendiente = true; return; }
@@ -3168,8 +3254,8 @@ const IK = (function(){
   document.addEventListener('visibilitychange', ()=>{ if (document.visibilityState==='visible') buscarVersion(); });
   setInterval(buscarVersion, 5*60*1000);
   setTimeout(buscarVersion, 3000);
-  IK.init({nombre: 'Canastas Gabi', clave: 'gabi-sumas', version: VERSION, onNueva: () => actualizar(),
-    esInicio: () => $('#inicio').classList.contains('activa') && $('#dlg-ajustes').hidden && $('#dlg-novedades').hidden});
+  IK.init({nombre: 'Canastas', clave: 'gabi-sumas', version: VERSION, onNueva: () => actualizar(),
+    esInicio: () => $('#inicio').classList.contains('activa') && $('#dlg-ajustes').hidden && $('#dlg-nombre').hidden && $('#dlg-novedades').hidden});
   $('#aj-buscar').onclick = () => { sClic(); IK.buscar($('#aj-buscar'), $('#aj-upd-msg')); };
   // Sin internet: el service worker guarda el juego para que funcione sin conexión
   if (EN_WEB && 'serviceWorker' in navigator){
