@@ -1,6 +1,6 @@
 # Canastas de Gabi
 
-Juego de baloncesto para practicar sumas y restas con llevadas y las tablas (2º de primaria). Se hizo para Gabi y desde la 3.36 lo usan también sus compañeros de clase: cada niño escribe su nombre al abrirlo (se guarda solo en su dispositivo, en `gabi-nombre`). Los dispositivos que ya tenían partidas de antes de la 3.36 se quedan con «Gabi». Desde la 3.37, a los compañeros les habla Gabi (bienvenida, mensajes en su bocadillo) y pueden intentar superar sus récords (`RECORD_GABI` en `index.html`).
+Juego de baloncesto para practicar sumas y restas con llevadas y las tablas (2º de primaria). Se hizo para Gabi y desde la 3.36 lo usan también sus compañeros de clase: cada niño escribe su nombre al abrirlo (se guarda solo en su dispositivo, en `gabi-nombre`). Los dispositivos que ya tenían partidas de antes de la 3.36 se quedan con «Gabi». Desde la 3.37, a los compañeros les habla Gabi (bienvenida, mensajes en su bocadillo).
 
 Se publica con GitHub Pages: https://indalo-apps.github.io/canastas-gabi/
 

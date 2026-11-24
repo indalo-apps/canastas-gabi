@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="app-version" content="3.38">
+<meta name="app-version" content="3.38.1">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1382,17 +1382,6 @@ const IK = (function(){
     return {suma:'Sumas', resta:'Restas', mezcla:'Mezcla'}[S.nivel] + (S.cifras==='3' ? ' de 3 cifras' : '');
   }
   const claveRecord = () => 'gabi-record-' + (S.modo==='rapido' ? 'rapido-' : '') + (S.nivel==='tablas' ? 'tabla-' + S.tabla : nivelReal());
-  // ---------- Récords de Gabi ----------
-  // Las mejores marcas de Gabi, para que sus compañeros intenten superarlas. Clave: la de claveRecord() sin «gabi-record-»
-  // (por ejemplo 'suma', 'resta3', 'tabla-7', 'rapido-suma'). Si una no está, no se muestra nada.
-  const RECORD_GABI = {};
-  const recordGabi = clave => ES_GABI ? 0 : (RECORD_GABI[String(clave).replace('gabi-record-','')] || 0);
-  const txtGabi = (puntos, clave) => {
-    const rg = recordGabi(clave); if (!rg) return '';
-    return puntos > rg ? `<p class="dice-gabi">🏆 ¡Has superado mi récord (${rg})! ¡Qué crack, ${NOMBRE}! — Gabi</p>`
-      : puntos === rg ? `<p class="dice-gabi">¡Empate con mi récord (${rg})! La próxima me ganas, ${NOMBRE} 😄 — Gabi</p>`
-      : `<p>⛹️ Récord de Gabi: ${rg} puntos. ¡A por él! 💪</p>`;
-  };
   // Selector de cifras
   function pintarCifras(){ document.querySelectorAll('#chips-cifras .chip').forEach(c=>c.classList.toggle('sel', c.dataset.cifras===S.cifras)); }
   $('#chips-cifras').addEventListener('click', e => {
@@ -1415,9 +1404,7 @@ const IK = (function(){
     const md = {partido:'Partido', entreno:'Entrenamiento', rapido:'Contrarreloj', reto:'Reto contra ' + (S.rival==='Mamá' ? 'mamá' : 'papá')}[S.modo] || '';
     const rs = document.getElementById('bj-resumen'); if (rs) rs.textContent = nombreNivel() + ' · ' + md;
     const r = store.get(claveRecord());
-    const rg = recordGabi(claveRecord());
-    $('#record-txt').textContent = (r ? `🏆 Tu récord en ${S.modo==='rapido' ? 'Contrarreloj de ' + nombreNivel().toLowerCase() : nombreNivel()}: ${r} puntos` : '')
-      + (rg ? `${r ? ' · ' : ''}⛹️ Récord de Gabi: ${rg}` : '');
+    $('#record-txt').textContent = r ? `🏆 Tu récord en ${S.modo==='rapido' ? 'Contrarreloj de ' + nombreNivel().toLowerCase() : nombreNivel()}: ${r} puntos` : '';
   }
   pintarRecord();
 
@@ -2793,7 +2780,7 @@ const IK = (function(){
       : est===3 ? frase([`¡Partidazo, ${NOMBRE}! Eres el MVP 🏆`,'¡Qué exhibición! El público pide tu autógrafo ✍️','¡Partido de leyenda! Mañana sales en el periódico 📰'])
       : est===2 ? frase([`¡Muy buen partido, ${NOMBRE}! 💪`,'¡Gran partido! El entrenador está contentísimo 😄','¡Buenísimo! Un par de canastas más y es de récord'])
       : frase([`¡Bien jugado, ${NOMBRE}! Cada partido lo harás mejor 🏀`,'¡Los campeones también entrenan! A por el siguiente 💪','¡Buen esfuerzo! El próximo partido es tuyo 🔥'])}</b></p>
-        ${prev>0 && !record ? `<p>Tu récord: ${prev} puntos</p>`:''}${txtGabi(J.puntos, clave)}`;
+        ${prev>0 && !record ? `<p>Tu récord: ${prev} puntos</p>`:''}`;
       if (est===3 || record) confeti(80);
     } else if (J.modo==='rapido'){
       const clave = J.clave, prev = store.get(clave) || 0, record = J.puntos > prev; if (record) store.set(clave, J.puntos);
@@ -2803,7 +2790,7 @@ const IK = (function(){
         <div class="grande">${J.puntos}</div><p>puntos · ${J.aciertos} cuentas bien en 1 minuto${J.fallos ? ` · ${J.fallos} fallos` : ''}</p>
         <p style="font-size:1.2rem;margin-top:10px"><b>${record && prev>0 ? frase([`🏆 ¡NUEVO RÉCORD, ${NOMBRE}!`,'🏆 ¡Récord! ¡Más rápido que nunca! ⚡'])
           : est===3 ? frase(['¡Eres una calculadora humana! ⚡','¡Velocidad de campeón! 🏆']) : est===2 ? frase([`¡Muy rápido, ${NOMBRE}! 💪`,'¡Buen ritmo! A por el récord 🔥']) : frase(['¡Bien! Cuanto más juegues, más rápido irás 🏀','¡Buen esfuerzo! La próxima vez, más 💪'])}</b></p>
-        ${prev>0 && !record ? `<p>Tu récord: ${prev} puntos</p>` : ''}${txtGabi(J.puntos, clave)}`;
+        ${prev>0 && !record ? `<p>Tu récord: ${prev} puntos</p>` : ''}`;
       if (est===3 || record) confeti(80);
     } else if (J.modo==='reto'){
       const [g,r] = J.jug;
@@ -2920,8 +2907,9 @@ const IK = (function(){
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
+    ['3.38.1',['🧹 Pequeños arreglos']],
     ['3.38',['📱 Pantalla de inicio en una sola vista: los modos en cuadrícula y «¡A jugar!» al final, sin tapar nada', '🃏 Tarjetas, Completar y Progreso en botones más pequeños']],
-    ['3.37',['⛹️ ¡Ahora Gabi juega con sus compañeros! Les saluda, les anima por su nombre y les invita a su equipo', '🏆 Récord de Gabi: ¿quién lo supera?', '🏀 Vuelve el icono del balón con la G']],
+    ['3.37',['⛹️ ¡Ahora Gabi juega con sus compañeros! Les saluda, les anima por su nombre y les invita a su equipo', '🏀 Vuelve el icono del balón con la G']],
     ['3.36',['✍️ Cada jugador escribe su nombre al empezar y el público lo grita en cada canasta', '⚙️ El nombre se puede cambiar en Ajustes', '🏀 Icono nuevo: un balón con +, − y ×', '👀 Colores de los botones más fuertes para que se lean mejor']],
     ['3.35.1',['📲 Ayuda para instalar al día con iOS 27: el botón de tres rayas dentro de la barra de la dirección']],
   ['3.35', ['🔄 En Ajustes, botón «Buscar actualizaciones»', '📲 Ayuda para instalarlo con los pasos de tu iPad o móvil, y aviso amarillo en el menú', '🖼️ Iconos para todos los tamaños e imagen al compartir el enlace']],
