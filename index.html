@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="app-version" content="3.36">
 <meta name="theme-color" content="#1d3557">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -29,11 +29,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
 <style>
   :root{
-    --naranja:#f47b20; --naranja-osc:#c95d0c; --azul:#1d3557; --azul2:#274b7a;
-    --madera:#e9c48f; --madera2:#d9a865; --verde:#2a9d5c; --rojo:#e04848;
+    --naranja:#bd570a; --naranja-osc:#c95d0c; --azul:#1d3557; --azul2:#274b7a;
+    --madera:#e9c48f; --madera2:#d9a865; --verde:#22814b; --rojo:#d63030;
     --crema:#fff8ee; --tinta:#1d2433; --amarillo:#ffd23f; --ik-accent:#e06a10;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+  /* Sin zoom sin querer mientras se juega (el zoom del sistema sigue disponible en los menús) */
+  #juego,#tarjetas,#completa{touch-action:pan-y}
+  /* Con el teclado, lo que recibe el foco no se queda escondido detrás del botón «¡A jugar!» (pegado abajo) */
+  html{scroll-padding-bottom:110px}
   html,body{-webkit-text-size-adjust:100%}
   html,body{margin:0;height:100%}
   body{
@@ -57,7 +61,7 @@
   h1{margin:0;font-size:2rem;line-height:1.05;color:var(--azul)}
   h2{margin:0 0 8px;font-size:1.3rem;color:var(--azul)}
   p{margin:.3em 0}
-  .version{font-size:.8rem;opacity:.55;text-align:center;margin-top:6px}
+  .version{font-size:.8rem;color:#5b6475;text-align:center;margin-top:6px}
 
   .cabecera{display:flex;align-items:center;gap:12px}
   .balon-logo{width:64px;height:64px;flex:none}
@@ -82,14 +86,14 @@
   .jugador-in[data-pose=tira]{animation:none}
   .opt[data-nivel],.opt[data-modo]{background:var(--c);color:#fff;border:3px solid transparent;
     box-shadow:0 5px 0 var(--o);transition:transform .12s, box-shadow .12s;text-shadow:0 1px 0 rgba(0,0,0,.2)}
-  .opt[data-nivel] small,.opt[data-modo] small{color:rgba(255,255,255,.92)}
+  .opt[data-nivel] small,.opt[data-modo] small{color:#fff}
   .opt[data-nivel].sel,.opt[data-modo].sel{background:var(--c);border-color:#fff;transform:translateY(-3px);
     box-shadow:0 8px 0 var(--o),0 0 0 4px var(--amarillo)}
   .opt[data-nivel]:not(.sel),.opt[data-modo]:not(.sel){filter:saturate(.75) brightness(.97)}
-  .opt[data-nivel=suma]{--c:#2a9d5c;--o:#1b6e40} .opt[data-nivel=resta]{--c:#3478d4;--o:#235597}
-  .opt[data-nivel=tablas]{--c:#7b5cff;--o:#5539c9} .opt[data-nivel=mezcla]{--c:#f47b20;--o:#b9560e}
-  .opt[data-modo=partido]{--c:#f47b20;--o:#b9560e} .opt[data-modo=entreno]{--c:#14a3a3;--o:#0c7373}
-  .opt[data-modo=reto]{--c:#e04848;--o:#a32f2f}
+  .opt[data-nivel=suma]{--c:#22814b;--o:#195f37} .opt[data-nivel=resta]{--c:#2c6ccb;--o:#21549a}
+  .opt[data-nivel=tablas]{--c:#6b48f5;--o:#4a2bc4} .opt[data-nivel=mezcla]{--c:#bd570a;--o:#883f07}
+  .opt[data-modo=partido]{--c:#bd570a;--o:#883f07} .opt[data-modo=entreno]{--c:#107f7f;--o:#0c5d5d}
+  .opt[data-modo=reto]{--c:#d63030;--o:#a41c1c}
   .opt[data-modo=rapido]{--c:#7c3aed;--o:#4c1d95}
 
   .btn{display:block;width:100%;border:0;border-radius:18px;padding:14px;font:inherit;
@@ -252,7 +256,7 @@
     background:var(--c);box-shadow:0 4px 0 var(--o);line-height:1.1}
   .mas:active{transform:translateY(3px);box-shadow:0 1px 0 var(--o)}
   .mas .signo{width:32px;height:32px;display:block;margin:0 auto 4px;filter:drop-shadow(0 2px 0 rgba(0,0,0,.25))}
-  .mas b{display:block} .mas small{display:block;font-weight:500;font-size:.78rem;opacity:.92;margin-top:2px}
+  .mas b{display:block} .mas small{display:block;font-weight:500;font-size:.78rem;margin-top:2px}
   .tablas-mini{margin:0 0 10px;justify-content:center;gap:6px}
   .tablas-mini .chip{min-width:40px;font-size:1.05rem;padding:4px 6px}
   /* Mi progreso */
@@ -335,7 +339,7 @@
   .led::before,.led::after{content:"";position:absolute;top:-14px;width:10px;height:14px;background:#2c2c2c}
   .led::before{left:30%} .led::after{right:30%}
   .barra-jugar{margin:4px 0 0;position:sticky;bottom:max(10px, env(safe-area-inset-bottom));z-index:6}
-  #btn-jugar .bj-txt{display:block;line-height:1.1} #btn-jugar small{display:block;font-size:.95rem;font-weight:700;opacity:.95;margin-top:2px}
+  #btn-jugar .bj-txt{display:block;line-height:1.1} #btn-jugar small{display:block;font-size:.95rem;font-weight:700;margin-top:2px}
   #btn-jugar{font-size:1.7rem;padding:16px;border:4px solid #fff;
     box-shadow:0 6px 0 var(--naranja-osc),0 10px 26px rgba(0,0,0,.35);animation:llama 1.8s ease-in-out infinite}
   #btn-jugar:active{animation:none}
@@ -413,7 +417,7 @@
     background:#050505;border-radius:6px;padding:4px 6px;box-shadow:inset 0 2px 6px rgba(0,0,0,.9)}
   .icono-btn{background:#f2f2f2;color:#1b2440;align-self:center;width:38px;height:38px;border-radius:50%;padding:0;
     display:flex;align-items:center;justify-content:center;font-size:1.15rem;border:2px solid #fff;box-shadow:0 3px 0 rgba(0,0,0,.45)}
-  .icono-btn.salir{background:#e04848;border-color:#fff}
+  .icono-btn.salir{background:#d63030;border-color:#fff}
   .icono-btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.45)}
   /* inicio: marcador del pabellón */
   .led{background:linear-gradient(#2a2d33,#15171b);border:3px solid #0a0b0d;box-shadow:0 0 0 2px #4a4f58 inset,0 6px 0 rgba(0,0,0,.3)}
@@ -822,9 +826,9 @@ const IK = (function(){
     <div class="tarjeta">
       <h2>3. Más para practicar las tablas</h2>
       <div class="mas-juegos">
-        <button class="mas" id="btn-tarjetas" style="--c:#0f8fd1;--o:#0a6696"><svg class="signo" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="11" height="15" rx="2" fill="none" stroke="#fff" stroke-width="2.1"/><path d="M8 3.5h9.5a2 2 0 0 1 2 2V18" fill="none" stroke="#fff" stroke-width="2.1" stroke-linecap="round"/><path d="M6.5 13.5h4M8.5 11.5v4" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg><b>Tarjetas</b><small>Repaso rápido</small></button>
-        <button class="mas" id="btn-completa" style="--c:#7b5cff;--o:#5539c9"><svg class="signo" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2.5"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></g><rect x="15" y="9" width="6" height="6" fill="#ffd23f"/></svg><b>Completa la tabla</b><small>Rellena lo que falta</small></button>
-        <button class="mas" id="btn-progreso" style="--c:#2a9d5c;--o:#1b6e40"><svg class="signo" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><rect x="5" y="12" width="3.4" height="6" rx="1" fill="#fff"/><rect x="10.3" y="8" width="3.4" height="10" rx="1" fill="#fff"/><rect x="15.6" y="4" width="3.4" height="14" rx="1" fill="#ffd23f"/></svg><b>Mi progreso</b><small>Lo que ya sabes</small></button>
+        <button class="mas" id="btn-tarjetas" style="--c:#0d74aa;--o:#0a5983"><svg class="signo" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="11" height="15" rx="2" fill="none" stroke="#fff" stroke-width="2.1"/><path d="M8 3.5h9.5a2 2 0 0 1 2 2V18" fill="none" stroke="#fff" stroke-width="2.1" stroke-linecap="round"/><path d="M6.5 13.5h4M8.5 11.5v4" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg><b>Tarjetas</b><small>Repaso rápido</small></button>
+        <button class="mas" id="btn-completa" style="--c:#6b48f5;--o:#4a2bc4"><svg class="signo" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2.5"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></g><rect x="15" y="9" width="6" height="6" fill="#ffd23f"/></svg><b>Completa la tabla</b><small>Rellena lo que falta</small></button>
+        <button class="mas" id="btn-progreso" style="--c:#22814b;--o:#195f37"><svg class="signo" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><rect x="5" y="12" width="3.4" height="6" rx="1" fill="#fff"/><rect x="10.3" y="8" width="3.4" height="10" rx="1" fill="#fff"/><rect x="15.6" y="4" width="3.4" height="14" rx="1" fill="#ffd23f"/></svg><b>Mi progreso</b><small>Lo que ya sabes</small></button>
       </div>
     </div>
 
@@ -1664,6 +1668,13 @@ const IK = (function(){
     if (J.modo==='rapido' && J.n===0) rapidoEmpieza();
   }
 
+  // Nombre de cada casilla del resultado para el lector de pantalla («Resultado, decenas: 7, bien»)
+  const LUGARES = ['unidades','decenas','centenas','unidades de millar','decenas de millar'];
+  const etqResp = (i, W, marcas) => {
+    const v = ans[i], m = marcas && marcas[i] ? String(marcas[i]) : '';
+    const est = /\bok\b|bien/.test(m) ? ', bien' : /mal/.test(m) ? ', revisar' : '';
+    return `Resultado, ${LUGARES[W-1-i] || 'cifra'}${v !== '' && v != null ? ': ' + v : ', vacía'}${est}`;
+  };
   function pintarRejilla(marcas, colPista){
     const W = op.W, g = $('#rejilla');
     g.classList.toggle('horiz', !!op.horiz);
@@ -1672,7 +1683,7 @@ const IK = (function(){
       let h = `<div class="celda ancha">${op.a}</div><div class="celda signo">${op.t==='+' ? '+' : op.t==='-' ? '−' : '×'}</div><div class="celda ancha">${op.b}</div><div class="celda">=</div>`;
       for (let i=0;i<W;i++){
         let c='resp'; if (i===activo && !resuelta) c+=' act'; if (marcas && marcas[i]) c+=' '+marcas[i];
-        h += `<button class="${c}" data-r="${i}">${ans[i]}</button>`;
+        h += `<button class="${c}" data-r="${i}" aria-label="${etqResp(i, W, marcas)}">${ans[i]}</button>`;
       }
       g.innerHTML = h; return;
     }
@@ -1696,7 +1707,7 @@ const IK = (function(){
       let c = 'resp';
       if (i===activo && !resuelta) c+=' act';
       if (marcas && marcas[i]) c+=' '+marcas[i];
-      h += `<button class="${c}" data-r="${i}">${ans[i]}</button>`;
+      h += `<button class="${c}" data-r="${i}" aria-label="${etqResp(i, W, marcas)}">${ans[i]}</button>`;
     }
     g.innerHTML = h;
   }
@@ -2858,7 +2869,7 @@ const IK = (function(){
   const VERSION = (document.querySelector('meta[name="app-version"]')||{}).content || 'dev';
   // Lo que trae cada versión, contado para Gabi (lo más nuevo, arriba)
   const NOVEDADES = [
-    ['3.36',['✍️ Cada jugador escribe su nombre al empezar y el público lo grita en cada canasta', '⚙️ El nombre se puede cambiar en Ajustes']],
+    ['3.36',['✍️ Cada jugador escribe su nombre al empezar y el público lo grita en cada canasta', '⚙️ El nombre se puede cambiar en Ajustes', '🏀 Icono nuevo: un balón con + y −', '👀 Colores de los botones más fuertes para que se lean mejor']],
     ['3.35.1',['📲 Ayuda para instalar al día con iOS 27: el botón de tres rayas dentro de la barra de la dirección']],
   ['3.35', ['🔄 En Ajustes, botón «Buscar actualizaciones»', '📲 Ayuda para instalarlo con los pasos de tu iPad o móvil, y aviso amarillo en el menú', '🖼️ Iconos para todos los tamaños e imagen al compartir el enlace']],
     ['3.34', ['🎯 Las cuentas que fallas salen más a menudo hasta que te las sabes', '📊 Nuevo «Mi progreso»: la tabla de multiplicar se va poniendo verde', '🃏 Nuevo juego de Tarjetas: ¿te la sabías o no?', '🧩 Nuevo juego «Completa la tabla», con pistas', '📲 En Ajustes: cómo instalarla en el iPad, copiar el enlace y «Acerca de»', '🏀 El botón «¡A jugar!» está siempre a mano, debajo de «¿Cómo jugamos?»', '👆 Tocar dos veces seguidas ya no acerca la pantalla']],
